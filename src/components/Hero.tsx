@@ -1,6 +1,47 @@
 import { ArrowRight, Play } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+
+interface UploadedFile {
+  id: string;
+  file_name: string;
+  file_path: string;
+  bucket_id: string;
+  public_url: string;
+}
 
 export default function Hero() {
+  const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const fetchMainVideo = async () => {
+      const { data, error } = await supabase
+        .from('uploaded_files')
+        .select('*')
+        .eq('bucket_id', 'main-videos')
+        .maybeSingle();
+
+      if (data && !error) {
+        setMainVideo(data);
+      }
+    };
+
+    fetchMainVideo();
+  }, []);
+
+  const handlePlayClick = () => {
+    const videoElement = document.querySelector('#main-video') as HTMLVideoElement;
+    if (videoElement) {
+      if (isPlaying) {
+        videoElement.pause();
+      } else {
+        videoElement.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
     <section className="relative bg-gradient-to-b from-white via-gray-50 to-white pb-12">
       {/* Header Section */}
@@ -24,25 +65,47 @@ export default function Hero() {
           <div className="grid md:grid-cols-[1.3fr_1fr] gap-0">
             {/* Video Section */}
             <div className="relative p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white">
-              <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
-                <img
-                  src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                  alt="Coach"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+              <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer" onClick={handlePlayClick}>
+                {mainVideo ? (
+                  <>
+                    <video
+                      id="main-video"
+                      src={mainVideo.public_url}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onEnded={() => setIsPlaying(false)}
+                    />
+                    {!isPlaying && (
+                      <>
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
 
-                {/* Play Button */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:scale-110">
-                    <Play className="w-8 h-8 text-blue-600 fill-blue-600 ml-1" />
-                  </div>
-                </div>
+                        {/* Play Button */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                            <Play className="w-8 h-8 text-blue-600 fill-blue-600 ml-1" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                      alt="Coach"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
 
-                {/* Duration Badge */}
-                <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm text-white text-sm font-semibold px-3 py-1.5 rounded-lg shadow-lg">
-                  1:00
-                </div>
+                    {/* Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                        <Play className="w-8 h-8 text-blue-600 fill-blue-600 ml-1" />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

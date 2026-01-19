@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Hero from './components/Hero';
 import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
+import ImageTestimonials from './components/ImageTestimonials';
 import Admin from './pages/Admin';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <Hero />
       <VideoTestimonials />
       <MessagesCollage />
+      <ImageTestimonials />
     </div>
   );
 }
