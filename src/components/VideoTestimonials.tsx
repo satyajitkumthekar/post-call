@@ -1,37 +1,38 @@
-import { PlayCircle, Star } from 'lucide-react';
-
-const videoTestimonials = [
-  {
-    id: 1,
-    name: 'Michael Chen',
-    role: 'CEO & Entrepreneur',
-    thumbnail: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Lost 35 lbs in 12 weeks',
-  },
-  {
-    id: 2,
-    name: 'Sarah Anderson',
-    role: 'Marketing Director',
-    thumbnail: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Gained 15 lbs of muscle',
-  },
-  {
-    id: 3,
-    name: 'David Martinez',
-    role: 'Software Engineer',
-    thumbnail: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Transformed in 90 days',
-  },
-  {
-    id: 4,
-    name: 'Emily Thompson',
-    role: 'Financial Advisor',
-    thumbnail: 'https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Best shape of my life',
-  },
-];
+import { PlayCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import type { VideoTestimonial } from '../lib/supabase';
 
 export default function VideoTestimonials() {
+  const [videoTestimonials, setVideoTestimonials] = useState<VideoTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const loadTestimonials = async () => {
+    const { data } = await supabase
+      .from('video_testimonials')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order');
+
+    if (data) {
+      setVideoTestimonials(data);
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
       <div className="max-w-7xl mx-auto">
@@ -48,7 +49,7 @@ export default function VideoTestimonials() {
               <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
                 <div className="aspect-video relative overflow-hidden bg-gray-950">
                   <img
-                    src={testimonial.thumbnail}
+                    src={testimonial.thumbnail_url}
                     alt={testimonial.name}
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-all group-hover:scale-105 duration-500"
                   />
@@ -61,7 +62,8 @@ export default function VideoTestimonials() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
-                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                  <p className="text-gray-400 text-sm mb-2">{testimonial.role}</p>
+                  <p className="text-blue-400 font-semibold">{testimonial.result}</p>
                 </div>
               </div>
             </div>

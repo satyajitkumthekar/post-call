@@ -1,28 +1,39 @@
-const messages = [
-  { text: "That last workout was INSANE", name: "Alex" },
-  { text: "I've never felt better", name: "Jordan" },
-  { text: "Down 20lbs in 6 weeks!", name: "Sam" },
-  { text: "This program changed everything", name: "Casey" },
-  { text: "My confidence is through the roof", name: "Morgan" },
-  { text: "Finally seeing real results", name: "Taylor" },
-  { text: "You're the best coach ever 🙌", name: "Riley" },
-  { text: "Can't believe the transformation", name: "Jamie" },
-  { text: "This is next level", name: "Blake" },
-  { text: "Best investment I've made", name: "Drew" },
-  { text: "The structure is perfect", name: "Cameron" },
-  { text: "Already feeling stronger", name: "Quinn" },
-  { text: "This actually works", name: "Avery" },
-  { text: "I'm addicted to this program", name: "Skylar" },
-  { text: "Life changing experience", name: "River" },
-  { text: "Never stopping this", name: "Phoenix" },
-  { text: "Best purchase ever", name: "Sage" },
-  { text: "How are you so good at this?", name: "Justice" },
-  { text: "Complete game changer", name: "Emerson" },
-  { text: "I recommend you to everyone", name: "Parker" },
-];
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import type { MessageTestimonial } from '../lib/supabase';
 
 export default function MessagesCollage() {
+  const [messages, setMessages] = useState<MessageTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const loadMessages = async () => {
+    const { data } = await supabase
+      .from('message_testimonials')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      setMessages(data);
+    }
+    setLoading(false);
+  };
+
   const shuffledMessages = [...messages].sort(() => Math.random() - 0.5);
+
+  if (loading) {
+    return (
+      <section className="relative py-24 px-6 bg-black overflow-hidden">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative py-24 px-6 bg-black overflow-hidden">
