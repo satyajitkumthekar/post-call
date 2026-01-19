@@ -1,38 +1,51 @@
 import { MessageSquare, Star } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import type { TextTestimonial } from '../lib/supabase';
+
+const textTestimonials = [
+  {
+    id: 1,
+    text: "Superhuman Lab completely transformed my life. In just 3 months, I've gained more muscle and confidence than I thought possible. The personalized approach is incredible!",
+    author: "James Wilson",
+    title: "Tech Executive",
+    rating: 5,
+  },
+  {
+    id: 2,
+    text: "Best investment I've ever made in myself. The protocol is intense but the results speak for themselves. Down 40 lbs and feeling unstoppable!",
+    author: "Rachel Kim",
+    title: "Startup Founder",
+    rating: 5,
+  },
+  {
+    id: 3,
+    text: "I've tried every program out there. Nothing comes close to Superhuman Lab. The attention to detail and support is unmatched. Truly life-changing.",
+    author: "Marcus Johnson",
+    title: "Investment Banker",
+    rating: 5,
+  },
+  {
+    id: 4,
+    text: "Finally found a fitness protocol that fits my busy schedule. The results are phenomenal and the community is incredibly supportive.",
+    author: "Lisa Chang",
+    title: "Doctor",
+    rating: 5,
+  },
+  {
+    id: 5,
+    text: "I was skeptical at first, but the transformation has been incredible. Not just physically, but mentally too. My energy levels are through the roof!",
+    author: "Tom Henderson",
+    title: "Lawyer",
+    rating: 5,
+  },
+  {
+    id: 6,
+    text: "This program gave me the structure I needed. The coaching is world-class and the results are permanent. Couldn't recommend it more highly!",
+    author: "Nina Patel",
+    title: "Consultant",
+    rating: 5,
+  },
+];
 
 export default function TextTestimonials() {
-  const [textTestimonials, setTextTestimonials] = useState<TextTestimonial[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadTestimonials();
-  }, []);
-
-  const loadTestimonials = async () => {
-    const { data } = await supabase
-      .from('text_testimonials')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order');
-
-    if (data) {
-      setTextTestimonials(data);
-    }
-    setLoading(false);
-  };
-
-  if (loading) {
-    return (
-      <section className="relative py-24 px-6 bg-gradient-to-b from-gray-950 to-black">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      </section>
-    );
-  }
   return (
     <section className="relative py-24 px-6 bg-gradient-to-b from-gray-950 to-black">
       <div className="max-w-7xl mx-auto">
