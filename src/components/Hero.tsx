@@ -3,8 +3,9 @@ import { ArrowRight } from 'lucide-react';
 export default function Hero() {
   return (
     <section className="relative bg-white">
-      <div className="bg-blue-600 text-white text-center py-3 px-6">
-        <p className="text-sm font-medium">Call Confirmed - Check your inbox for your Zoom link</p>
+      <div className="bg-blue-600 text-white text-center py-12 px-6">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3">Thank you for booking your call</h1>
+        <p className="text-blue-100 text-lg">Check your inbox for your Zoom link</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
