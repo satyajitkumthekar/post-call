@@ -60,16 +60,8 @@ export default function VideoTestimonials() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-blue-400 fill-blue-400" />
-                    ))}
-                  </div>
                   <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
-                  <p className="text-gray-400 text-sm mb-3">{testimonial.role}</p>
-                  <div className="inline-block bg-blue-500/10 border border-blue-500/30 px-3 py-1 rounded-full">
-                    <span className="text-blue-300 text-sm font-medium">{testimonial.result}</span>
-                  </div>
+                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
                 </div>
               </div>
             </div>

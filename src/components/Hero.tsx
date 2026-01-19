@@ -3,13 +3,13 @@ import { ArrowRight } from 'lucide-react';
 export default function Hero() {
   return (
     <section className="relative bg-white">
-      <div className="bg-blue-600 text-white text-center py-12 px-6">
-        <h1 className="text-4xl md:text-5xl font-bold mb-3">Thank you for booking your call</h1>
-        <p className="text-blue-100 text-lg">Check your inbox for your Zoom link</p>
-      </div>
+      <div className="max-w-6xl mx-auto px-6 pt-16 pb-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">Thank you for booking your call</h1>
+          <p className="text-gray-600 text-lg">Check your inbox for your Zoom link</p>
+        </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
           <div className="relative">
             <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden shadow-xl">
               <img
@@ -23,24 +23,24 @@ export default function Hero() {
             </div>
           </div>
 
-          <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">What to expect on the call</h2>
-            <ul className="space-y-5">
+          <div className="flex flex-col justify-center h-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-5">What to expect on the call</h2>
+            <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-800">We'll discuss your fitness levels and overall body confidence</span>
+                <span className="text-gray-700 text-base">We'll discuss your fitness levels and overall body confidence</span>
               </li>
               <li className="flex items-start gap-3">
                 <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-800">Assess your goals</span>
+                <span className="text-gray-700 text-base">Assess your goals</span>
               </li>
               <li className="flex items-start gap-3">
                 <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-800">Clarity over what's holding you back</span>
+                <span className="text-gray-700 text-base">Clarity over what's holding you back</span>
               </li>
               <li className="flex items-start gap-3">
                 <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-800">Action plan to work on moving forward</span>
+                <span className="text-gray-700 text-base">Action plan to work on moving forward</span>
               </li>
             </ul>
           </div>
