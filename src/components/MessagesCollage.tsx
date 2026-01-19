@@ -1,10 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface UploadedFile {
   id: string;
   url: string;
   file_name: string;
+}
+
+interface ImagePosition {
+  x: number;
+  y: number;
+  delay: number;
+  rotation: number;
 }
 
 export default function MessagesCollage() {
@@ -25,6 +32,37 @@ export default function MessagesCollage() {
     fetchTestimonialImages();
   }, []);
 
+  // Generate stable, evenly distributed positions
+  const imagePositions = useMemo(() => {
+    if (testimonialImages.length === 0) return [];
+
+    const positions: ImagePosition[] = [];
+    const cols = Math.ceil(Math.sqrt(testimonialImages.length));
+    const rows = Math.ceil(testimonialImages.length / cols);
+
+    testimonialImages.forEach((_, index) => {
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+
+      // Base grid position with spacing
+      const baseX = (col / (cols - 1 || 1)) * 80 + 10;
+      const baseY = (row / (rows - 1 || 1)) * 70 + 15;
+
+      // Add small random offset for natural feel
+      const offsetX = (Math.random() - 0.5) * 15;
+      const offsetY = (Math.random() - 0.5) * 15;
+
+      positions.push({
+        x: Math.max(5, Math.min(85, baseX + offsetX)),
+        y: Math.max(10, Math.min(80, baseY + offsetY)),
+        delay: index * 2,
+        rotation: Math.random() * 15 - 7.5,
+      });
+    });
+
+    return positions;
+  }, [testimonialImages]);
+
   if (testimonialImages.length === 0) {
     return null;
   }
@@ -33,26 +71,23 @@ export default function MessagesCollage() {
     <section className="relative py-24 bg-black overflow-hidden min-h-[600px]">
       {/* Animated testimonial images collage */}
       {testimonialImages.map((image, index) => {
-        const randomX = 10 + Math.random() * 80;
-        const randomY = 10 + Math.random() * 80;
-        const randomDelay = index * 2;
+        const position = imagePositions[index];
         const cycleDuration = 12;
-        const randomRotation = Math.random() * 15 - 7.5;
 
         return (
           <div
             key={image.id}
             className="absolute pointer-events-none"
             style={{
-              left: `${randomX}%`,
-              top: `${randomY}%`,
-              animation: `testimonialCycle ${cycleDuration}s ease-in-out ${randomDelay}s infinite`,
+              left: `${position.x}%`,
+              top: `${position.y}%`,
+              animation: `testimonialCycle ${cycleDuration}s ease-in-out ${position.delay}s infinite`,
               transformOrigin: 'center',
             }}
           >
             <div className="relative rounded-2xl shadow-2xl"
               style={{
-                transform: `rotate(${randomRotation}deg)`,
+                transform: `rotate(${position.rotation}deg)`,
               }}
             >
               <img
