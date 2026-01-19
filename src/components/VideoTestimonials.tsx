@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlayCircle, PauseCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -14,10 +14,35 @@ export default function VideoTestimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [loadedVideos, setLoadedVideos] = useState<Set<string>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     fetchTestimonials();
   }, []);
+
+  useEffect(() => {
+    // Set up intersection observer for lazy loading videos
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const videoId = entry.target.getAttribute('data-video-id');
+            if (videoId && !loadedVideos.has(videoId)) {
+              setLoadedVideos((prev) => new Set(prev).add(videoId));
+            }
+          }
+        });
+      },
+      { rootMargin: '100px' } // Start loading 100px before video enters viewport
+    );
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [loadedVideos]);
 
   const fetchTestimonials = async () => {
     try {
@@ -78,28 +103,50 @@ export default function VideoTestimonials() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {testimonials.map((testimonial) => {
+          {testimonials.map((testimonial, index) => {
             const isPlaying = playingVideo === testimonial.id;
+            const shouldLoad = loadedVideos.has(testimonial.id) || index < 2; // Load first 2 immediately
             return (
-              <div key={testimonial.id} className="group relative">
+              <div
+                key={testimonial.id}
+                className="group relative"
+                ref={(el) => {
+                  if (el && observerRef.current && !shouldLoad) {
+                    el.setAttribute('data-video-id', testimonial.id);
+                    observerRef.current.observe(el);
+                  }
+                }}
+              >
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-500"></div>
                 <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
                   <div
                     className="aspect-video relative overflow-hidden bg-gray-950 cursor-pointer"
                     onClick={() => handleVideoClick(testimonial.id)}
                   >
-                    <video
-                      id={`video-${testimonial.id}`}
-                      src={testimonial.url}
-                      className="w-full h-full object-cover"
-                      preload="metadata"
-                      onEnded={() => setPlayingVideo(null)}
-                      onPause={() => {
-                        if (playingVideo === testimonial.id) {
-                          setPlayingVideo(null);
-                        }
-                      }}
-                    />
+                    {shouldLoad ? (
+                      <video
+                        id={`video-${testimonial.id}`}
+                        src={testimonial.url}
+                        className="w-full h-full object-cover"
+                        preload="metadata"
+                        playsInline
+                        onEnded={() => setPlayingVideo(null)}
+                        onPause={() => {
+                          if (playingVideo === testimonial.id) {
+                            setPlayingVideo(null);
+                          }
+                        }}
+                        onLoadedMetadata={(e) => {
+                          // Generate thumbnail from first frame
+                          const video = e.target as HTMLVideoElement;
+                          video.currentTime = 0.1;
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                        <div className="animate-pulse text-gray-600">Loading...</div>
+                      </div>
+                    )}
                     {!isPlaying && (
                       <>
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
