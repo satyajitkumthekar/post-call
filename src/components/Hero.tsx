@@ -2,12 +2,12 @@ import { ArrowRight, Play } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50 to-white">
+    <section className="relative bg-gradient-to-b from-white via-gray-50 to-white pb-16">
       {/* Header Section */}
-      <div className="relative bg-white border-b border-gray-200/60">
-        <div className="max-w-6xl mx-auto px-6 py-10 md:py-12">
+      <div className="relative bg-white shadow-sm">
+        <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
               Thank you for booking your call
             </h1>
             <p className="text-gray-600 text-lg leading-relaxed">
@@ -15,10 +15,11 @@ export default function Hero() {
             </p>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       </div>
 
       {/* Content Section */}
-      <div className="max-w-6xl mx-auto px-6 py-10 md:py-12">
+      <div className="max-w-6xl mx-auto px-6 pt-8 md:pt-10">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden">
           <div className="grid md:grid-cols-2 gap-0">
             {/* Video Section */}
