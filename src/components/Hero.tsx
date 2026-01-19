@@ -2,10 +2,10 @@ import { ArrowRight, Play } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-b from-white via-gray-50 to-white pb-16">
+    <section className="relative bg-gradient-to-b from-white via-gray-50 to-white pb-12">
       {/* Header Section */}
       <div className="relative bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-8 md:py-10">
+        <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
               Thank you for booking your call
@@ -19,12 +19,12 @@ export default function Hero() {
       </div>
 
       {/* Content Section */}
-      <div className="max-w-6xl mx-auto px-6 pt-8 md:pt-10">
+      <div className="max-w-6xl mx-auto px-6 pt-8">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden">
           <div className="grid md:grid-cols-2 gap-0">
             {/* Video Section */}
-            <div className="relative p-10 md:p-14 bg-gradient-to-br from-gray-50 to-white">
-              <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
+            <div className="relative p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white">
+              <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
                 <img
                   src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
                   alt="Coach"
@@ -47,7 +47,7 @@ export default function Hero() {
             </div>
 
             {/* What to Expect Section */}
-            <div className="relative flex flex-col justify-center p-10 md:p-14 bg-white">
+            <div className="relative flex flex-col justify-center p-8 md:p-12 bg-white">
               <h2 className="text-2xl font-bold text-gray-900 mb-8">What to expect on the call</h2>
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
