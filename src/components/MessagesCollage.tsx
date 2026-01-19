@@ -45,7 +45,7 @@ export default function MessagesCollage() {
               return (
                 <div
                   key={image.id}
-                  className="absolute"
+                  className="absolute pointer-events-none"
                   style={{
                     left: `${randomX}%`,
                     top: `${randomY}%`,
@@ -53,7 +53,7 @@ export default function MessagesCollage() {
                     transformOrigin: 'center',
                   }}
                 >
-                  <div className="relative rounded-2xl shadow-2xl transition-all duration-500"
+                  <div className="relative rounded-2xl shadow-2xl"
                     style={{
                       transform: `rotate(${randomRotation}deg)`,
                     }}
@@ -61,7 +61,7 @@ export default function MessagesCollage() {
                     <img
                       src={image.url}
                       alt="Testimonial"
-                      className="w-72 h-auto rounded-2xl border-2 border-gray-700/50 shadow-2xl"
+                      className="w-72 h-auto rounded-2xl border-2 border-gray-700/50 shadow-2xl pointer-events-none select-none"
                     />
                   </div>
                 </div>
