@@ -1,72 +1,51 @@
-import { PlayCircle, CheckCircle2 } from 'lucide-react';
+import { PlayCircle, ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative px-6 pt-16 pb-24 bg-gradient-to-b from-white via-gray-50 to-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 px-4 py-2 rounded-full mb-6">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            <span className="text-green-700 font-semibold text-sm">Call Confirmed</span>
-          </div>
+    <section className="relative bg-white">
+      <div className="bg-blue-600 text-white text-center py-3 px-6">
+        <p className="text-sm font-medium">Call Confirmed - Check your inbox for your Zoom link</p>
+      </div>
 
-          <h1 className="text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
-            Thanks for booking your call
-          </h1>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 max-w-2xl mx-auto mb-12">
-            <p className="text-blue-900 font-semibold text-sm mb-2">Check your inbox</p>
-            <p className="text-gray-700 text-sm leading-relaxed">
-              Look for a confirmation email with your Zoom link. If you don't see it, check your spam folder and promotions tab.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
-            <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden border border-gray-300 shadow-xl">
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative">
+            <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden shadow-xl">
               <img
                 src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Coach"
-                className="absolute inset-0 w-full h-full object-cover opacity-40"
+                className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+              <div className="absolute inset-0 bg-black/30"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <PlayCircle className="w-16 h-16 text-blue-500 mx-auto mb-3 opacity-90 hover:opacity-100 transition cursor-pointer drop-shadow-lg" />
-                  <p className="text-white text-sm font-medium drop-shadow-lg">What to Expect on Your Call</p>
+                  <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center mx-auto mb-2 cursor-pointer hover:bg-white transition">
+                    <PlayCircle className="w-10 h-10 text-blue-600" fill="currentColor" />
+                  </div>
+                  <p className="text-white text-xs font-medium">1:00</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
-            <h3 className="text-2xl font-bold text-black mb-6">What to Expect</h3>
+          <div>
+            <h2 className="text-3xl lg:text-4xl font-bold text-black mb-8">What to expect on the call</h2>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                </div>
-                <span className="text-gray-700 leading-relaxed">We'll discuss your fitness levels and overall body confidence</span>
+                <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-800">We'll discuss your fitness levels and overall body confidence</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                </div>
-                <span className="text-gray-700 leading-relaxed">Assess your goals and what you want to achieve</span>
+                <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-800">Assess your goals</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                </div>
-                <span className="text-gray-700 leading-relaxed">Get clarity on what's holding you back</span>
+                <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-800">Clarity over what's holding you back</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                </div>
-                <span className="text-gray-700 leading-relaxed">Create an action plan to move forward</span>
+                <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-800">Action plan to work on moving forward</span>
               </li>
             </ul>
           </div>
