@@ -7,7 +7,7 @@ interface UploadedFile {
   file_name: string;
   file_path: string;
   bucket_id: string;
-  public_url: string;
+  url: string;
   testimonial_name?: string;
   testimonial_designation?: string;
 }
@@ -61,7 +61,7 @@ export default function ImageTestimonials() {
               <div className="relative">
                 <div className="aspect-[3/4] overflow-hidden bg-gray-950">
                   <img
-                    src={image.public_url}
+                    src={image.url}
                     alt={image.testimonial_name || 'Testimonial'}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />

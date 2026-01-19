@@ -7,7 +7,7 @@ interface UploadedFile {
   file_name: string;
   file_path: string;
   bucket_id: string;
-  public_url: string;
+  url: string;
 }
 
 export default function Hero() {
@@ -70,7 +70,7 @@ export default function Hero() {
                   <>
                     <video
                       id="main-video"
-                      src={mainVideo.public_url}
+                      src={mainVideo.url}
                       className="absolute inset-0 w-full h-full object-cover"
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
