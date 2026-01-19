@@ -18,11 +18,15 @@ interface UploadStatus {
 export default function FileUploader({ bucketId, onUploadComplete }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState<UploadStatus[]>([]);
+  const [testimonialName, setTestimonialName] = useState('');
+  const [testimonialDesignation, setTestimonialDesignation] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const acceptedTypes = bucketId === 'text-testimonial-images'
     ? 'image/jpeg,image/png,image/webp,image/gif'
     : 'video/mp4,video/webm,video/ogg';
+
+  const isVideoTestimonial = bucketId === 'video-testimonials';
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -48,6 +52,11 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
   };
 
   const handleFiles = async (files: File[]) => {
+    if (isVideoTestimonial && !testimonialName.trim()) {
+      alert('Please enter the testimonial name before uploading');
+      return;
+    }
+
     const newUploads: UploadStatus[] = files.map(file => ({
       file,
       status: 'uploading' as const,
@@ -84,17 +93,24 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
           .from(bucketId)
           .getPublicUrl(filePath);
 
+        const insertData: any = {
+          bucket_id: bucketId,
+          file_path: filePath,
+          file_name: file.name,
+          file_type: file.type,
+          file_size: file.size,
+          url: publicUrl,
+          uploaded_by: user.id
+        };
+
+        if (isVideoTestimonial && testimonialName) {
+          insertData.testimonial_name = testimonialName;
+          insertData.testimonial_designation = testimonialDesignation;
+        }
+
         const { error: dbError } = await supabase
           .from('uploaded_files')
-          .insert({
-            bucket_id: bucketId,
-            file_path: filePath,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            url: publicUrl,
-            uploaded_by: user.id
-          });
+          .insert(insertData);
 
         if (dbError) throw dbError;
 
@@ -111,6 +127,11 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
 
         if (onUploadComplete) {
           onUploadComplete();
+        }
+
+        if (isVideoTestimonial) {
+          setTestimonialName('');
+          setTestimonialDesignation('');
         }
 
       } catch (error) {
@@ -140,6 +161,35 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
 
   return (
     <div className="space-y-4">
+      {isVideoTestimonial && (
+        <div className="grid md:grid-cols-2 gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={testimonialName}
+              onChange={(e) => setTestimonialName(e.target.value)}
+              placeholder="Enter person's name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Designation
+            </label>
+            <input
+              type="text"
+              value={testimonialDesignation}
+              onChange={(e) => setTestimonialDesignation(e.target.value)}
+              placeholder="Enter designation/role"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+      )}
+
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

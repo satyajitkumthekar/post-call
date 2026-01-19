@@ -20,6 +20,15 @@ export default function Admin({ onBackToHome }: AdminProps) {
 
   useEffect(() => {
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const checkAuth = async () => {
@@ -40,17 +49,14 @@ export default function Admin({ onBackToHome }: AdminProps) {
       });
 
       if (error) throw error;
-      setIsAuthenticated(true);
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : 'Failed to sign in');
-    } finally {
       setIsSigningIn(false);
     }
   };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setIsAuthenticated(false);
   };
 
   const handleUploadComplete = () => {

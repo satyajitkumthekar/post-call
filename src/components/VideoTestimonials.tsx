@@ -1,37 +1,53 @@
-import { PlayCircle, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { PlayCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
-const videoTestimonials = [
-  {
-    id: 1,
-    name: 'Michael Chen',
-    role: 'CEO & Entrepreneur',
-    thumbnail: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Lost 35 lbs in 12 weeks',
-  },
-  {
-    id: 2,
-    name: 'Sarah Anderson',
-    role: 'Marketing Director',
-    thumbnail: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Gained 15 lbs of muscle',
-  },
-  {
-    id: 3,
-    name: 'David Martinez',
-    role: 'Software Engineer',
-    thumbnail: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Transformed in 90 days',
-  },
-  {
-    id: 4,
-    name: 'Emily Thompson',
-    role: 'Financial Advisor',
-    thumbnail: 'https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=800',
-    result: 'Best shape of my life',
-  },
-];
+interface Testimonial {
+  id: string;
+  testimonial_name: string | null;
+  testimonial_designation: string | null;
+  url: string;
+  file_name: string;
+}
 
 export default function VideoTestimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('uploaded_files')
+        .select('id, testimonial_name, testimonial_designation, url, file_name')
+        .eq('bucket_id', 'video-testimonials')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTestimonials(data || []);
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null;
+  }
   return (
     <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
       <div className="max-w-7xl mx-auto">
@@ -42,15 +58,15 @@ export default function VideoTestimonials() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {videoTestimonials.map((testimonial) => (
+          {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="group relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-500"></div>
               <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
                 <div className="aspect-video relative overflow-hidden bg-gray-950">
-                  <img
-                    src={testimonial.thumbnail}
-                    alt={testimonial.name}
-                    className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-all group-hover:scale-105 duration-500"
+                  <video
+                    src={testimonial.url}
+                    className="w-full h-full object-cover opacity-70"
+                    preload="metadata"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -60,8 +76,12 @@ export default function VideoTestimonials() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-1">{testimonial.name}</h3>
-                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {testimonial.testimonial_name || 'Anonymous'}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    {testimonial.testimonial_designation || 'Client'}
+                  </p>
                 </div>
               </div>
             </div>
