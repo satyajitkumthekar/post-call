@@ -4,16 +4,16 @@ export default function Hero() {
   return (
     <section className="relative bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-6xl mx-auto px-6 pt-16 pb-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">Thank you for booking your call</h1>
-          <p className="text-gray-600 text-lg">Check your inbox for your Zoom link</p>
+        <div className="text-center mb-16 pb-8 border-b border-gray-200/60">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Thank you for booking your call</h1>
+          <p className="text-gray-600 text-xl">Check your inbox for your meeting link</p>
         </div>
 
-        <div className="relative bg-white rounded-3xl shadow-xl border border-gray-200/50 p-8 md:p-12">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent rounded-3xl pointer-events-none"></div>
+        <div className="relative bg-white rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent pointer-events-none"></div>
 
-          <div className="relative grid md:grid-cols-2 gap-12 items-start">
-            <div className="relative">
+          <div className="relative grid md:grid-cols-2 gap-0">
+            <div className="relative p-8 md:p-10">
               <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/10">
                 <img
                   src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=800"
@@ -26,7 +26,7 @@ export default function Hero() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center h-full">
+            <div className="relative flex flex-col justify-center p-8 md:p-10 bg-gray-50/30 border-l border-gray-200/60">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">What to expect on the call</h2>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
