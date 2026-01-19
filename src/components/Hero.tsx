@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Play } from 'lucide-react';
 
 export default function Hero() {
   return (
@@ -18,17 +18,27 @@ export default function Hero() {
       </div>
 
       {/* Content Section */}
-      <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-20">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden">
-          <div className="grid md:grid-cols-2 gap-0">
+          <div className="grid lg:grid-cols-5 gap-0">
             {/* Video Section */}
-            <div className="relative p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white">
-              <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5">
+            <div className="relative lg:col-span-3 p-10 md:p-16 bg-gradient-to-br from-gray-50 to-white">
+              <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
                 <img
-                  src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
                   alt="Coach"
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+
+                {/* Play Button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                    <Play className="w-8 h-8 text-blue-600 fill-blue-600 ml-1" />
+                  </div>
+                </div>
+
+                {/* Duration Badge */}
                 <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm text-white text-sm font-semibold px-3 py-1.5 rounded-lg shadow-lg">
                   1:00
                 </div>
@@ -36,10 +46,9 @@ export default function Hero() {
             </div>
 
             {/* What to Expect Section */}
-            <div className="relative flex flex-col justify-center p-8 md:p-12 bg-white border-l border-gray-200/60">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-600 to-blue-400"></div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-8 pl-2">What to expect on the call</h2>
-              <ul className="space-y-5 pl-2">
+            <div className="relative lg:col-span-2 flex flex-col justify-center p-10 md:p-12 bg-white border-l border-gray-200/60">
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">What to expect on the call</h2>
+              <ul className="space-y-6">
                 <li className="flex items-start gap-4">
                   <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
                   <span className="text-gray-700 text-base leading-relaxed">We'll discuss your fitness levels and overall body confidence</span>
