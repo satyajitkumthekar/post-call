@@ -27,6 +27,15 @@ export default function MessagesCollage() {
   return (
     <section className="relative py-24 px-6 bg-black overflow-hidden">
       <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+            Join Our <span className="bg-gradient-to-r from-blue-500 to-blue-300 bg-clip-text text-transparent">Community</span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            See what our clients are saying in real-time
+          </p>
+        </div>
+
         <div className="relative h-[600px] rounded-3xl overflow-hidden bg-gradient-to-b from-gray-900 to-black border border-gray-800 backdrop-blur">
           {/* Animated messages collage */}
           <div className="absolute inset-0 overflow-hidden">
