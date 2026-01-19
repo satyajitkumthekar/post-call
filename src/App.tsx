@@ -1,27 +1,32 @@
-import { useState } from 'react';
-import { Settings } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Hero from './components/Hero';
 import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
 import Admin from './pages/Admin';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
-  if (currentPage === 'admin') {
-    return <Admin onBackToHome={() => setCurrentPage('home')} />;
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const navigateHome = () => {
+    window.history.pushState({}, '', '/');
+    setCurrentPath('/');
+  };
+
+  if (currentPath === '/admin') {
+    return <Admin onBackToHome={navigateHome} />;
   }
 
   return (
     <div className="min-h-screen">
-      <button
-        onClick={() => setCurrentPage('admin')}
-        className="fixed bottom-6 right-6 bg-gray-900 hover:bg-gray-800 text-white p-4 rounded-full shadow-lg transition-colors z-50"
-        title="Admin Panel"
-      >
-        <Settings className="h-6 w-6" />
-      </button>
-
       <Hero />
       <VideoTestimonials />
       <MessagesCollage />
