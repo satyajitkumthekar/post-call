@@ -36,23 +36,24 @@ export default function MessagesCollage() {
           {/* Animated testimonial images collage */}
           <div className="absolute inset-0 overflow-hidden">
             {testimonialImages.map((image, index) => {
-              const randomX = Math.random() * 70;
-              const randomY = Math.random() * 70;
-              const randomDelay = index * 0.3;
-              const randomDuration = 20 + Math.random() * 10;
-              const randomRotation = Math.random() * 20 - 10;
+              const randomX = 10 + Math.random() * 70;
+              const randomY = 10 + Math.random() * 70;
+              const randomDelay = index * 2;
+              const cycleDuration = 12;
+              const randomRotation = Math.random() * 15 - 7.5;
 
               return (
                 <div
                   key={image.id}
-                  className="absolute animate-float"
+                  className="absolute"
                   style={{
                     left: `${randomX}%`,
                     top: `${randomY}%`,
-                    animation: `float ${randomDuration}s ease-in-out ${randomDelay}s infinite`,
+                    animation: `testimonialCycle ${cycleDuration}s ease-in-out ${randomDelay}s infinite`,
+                    transformOrigin: 'center',
                   }}
                 >
-                  <div className="relative rounded-2xl shadow-2xl hover:shadow-blue-500/20 transition-all hover:scale-105 duration-300"
+                  <div className="relative rounded-2xl shadow-2xl transition-all duration-500"
                     style={{
                       transform: `rotate(${randomRotation}deg)`,
                     }}
@@ -60,7 +61,7 @@ export default function MessagesCollage() {
                     <img
                       src={image.url}
                       alt="Testimonial"
-                      className="w-64 h-auto rounded-2xl border-2 border-gray-700"
+                      className="w-72 h-auto rounded-2xl border-2 border-gray-700/50 shadow-2xl"
                     />
                   </div>
                 </div>
@@ -74,14 +75,42 @@ export default function MessagesCollage() {
         </div>
 
         <style>{`
-          @keyframes float {
-            0%, 100% {
-              transform: translateY(0px) rotate(0deg);
-              opacity: 0.3;
+          @keyframes testimonialCycle {
+            0% {
+              opacity: 0;
+              transform: scale(0.8) translateY(20px);
+              z-index: 1;
+            }
+            15% {
+              opacity: 0.95;
+              transform: scale(0.95) translateY(0px);
+              z-index: 5;
+            }
+            35% {
+              opacity: 1;
+              transform: scale(1.05) translateY(-10px);
+              z-index: 10;
+              filter: brightness(1.1);
             }
             50% {
-              transform: translateY(-20px) rotate(1deg);
-              opacity: 0.8;
+              opacity: 1;
+              transform: scale(1) translateY(-5px);
+              z-index: 10;
+            }
+            65% {
+              opacity: 0.95;
+              transform: scale(0.95) translateY(0px);
+              z-index: 5;
+            }
+            85% {
+              opacity: 0.4;
+              transform: scale(0.85) translateY(15px);
+              z-index: 1;
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0.8) translateY(20px);
+              z-index: 1;
             }
           }
         `}</style>
