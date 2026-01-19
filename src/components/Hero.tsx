@@ -21,7 +21,7 @@ export default function Hero() {
       {/* Content Section */}
       <div className="max-w-6xl mx-auto px-6 pt-8">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden">
-          <div className="grid md:grid-cols-2 gap-0">
+          <div className="grid md:grid-cols-[1.3fr_1fr] gap-0">
             {/* Video Section */}
             <div className="relative p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white">
               <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
@@ -49,7 +49,7 @@ export default function Hero() {
             {/* What to Expect Section */}
             <div className="relative flex flex-col justify-center p-8 md:p-12 bg-white">
               <h2 className="text-2xl font-bold text-gray-900 mb-8">What to expect on the call</h2>
-              <ul className="space-y-6">
+              <ul className="space-y-4">
                 <li className="flex items-start gap-4">
                   <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
                   <span className="text-gray-700 text-base leading-relaxed">We'll discuss your fitness levels and overall body confidence</span>
