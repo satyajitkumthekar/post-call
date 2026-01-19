@@ -1,7 +1,6 @@
 import Hero from './components/Hero';
 import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
-import TextTestimonials from './components/TextTestimonials';
 
 function App() {
   return (
@@ -9,7 +8,6 @@ function App() {
       <Hero />
       <VideoTestimonials />
       <MessagesCollage />
-      <TextTestimonials />
     </div>
   );
 }
