@@ -1,6 +1,16 @@
 import { ArrowRight, Play } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { loadMainVideo } from '../utils/mediaLoader';
+import VideoModal from './VideoModal';
 
 export default function Hero() {
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadMainVideo().then(setVideoUrl);
+  }, []);
+
   return (
     <section className="relative bg-gradient-to-b from-white via-gray-50 to-white pb-12">
       {/* Header Section */}
@@ -24,12 +34,23 @@ export default function Hero() {
           <div className="grid md:grid-cols-[1.3fr_1fr] gap-0">
             {/* Video Section */}
             <div className="relative p-8 md:p-12 bg-gradient-to-br from-gray-50 to-white">
-              <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer">
-                <img
-                  src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                  alt="Coach"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+              <div
+                className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer"
+                onClick={() => videoUrl && setIsVideoModalOpen(true)}
+              >
+                {videoUrl ? (
+                  <video
+                    className="absolute inset-0 w-full h-full object-cover"
+                    src={videoUrl}
+                    preload="metadata"
+                  />
+                ) : (
+                  <img
+                    src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                    alt="Coach"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                )}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
 
                 {/* Play Button */}
@@ -37,11 +58,6 @@ export default function Hero() {
                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:scale-110">
                     <Play className="w-8 h-8 text-blue-600 fill-blue-600 ml-1" />
                   </div>
-                </div>
-
-                {/* Duration Badge */}
-                <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm text-white text-sm font-semibold px-3 py-1.5 rounded-lg shadow-lg">
-                  1:00
                 </div>
               </div>
             </div>
@@ -71,6 +87,12 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        videoUrl={videoUrl || ''}
+      />
     </section>
   );
 }
