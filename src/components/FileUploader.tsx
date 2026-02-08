@@ -108,27 +108,18 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
+      // Upload file with progress tracking
       const { error: uploadError } = await supabase.storage
         .from(bucketId)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
-          onUploadProgress: (progress) => {
-            const percentCompleted = (progress.loaded / progress.total) * 100;
-            setUploads(prev => {
-              const newUploads = [...prev];
-              if (newUploads[uploadIndex]) {
-                newUploads[uploadIndex] = {
-                  ...newUploads[uploadIndex],
-                  progress: Math.round(percentCompleted)
-                };
-              }
-              return newUploads;
-            });
-          }
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message || JSON.stringify(uploadError)}`);
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from(bucketId)
