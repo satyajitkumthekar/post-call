@@ -112,7 +112,20 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
         .from(bucketId)
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          onUploadProgress: (progress) => {
+            const percentCompleted = (progress.loaded / progress.total) * 100;
+            setUploads(prev => {
+              const newUploads = [...prev];
+              if (newUploads[uploadIndex]) {
+                newUploads[uploadIndex] = {
+                  ...newUploads[uploadIndex],
+                  progress: Math.round(percentCompleted)
+                };
+              }
+              return newUploads;
+            });
+          }
         });
 
       if (uploadError) throw uploadError;
@@ -336,6 +349,24 @@ export default function FileUploader({ bucketId, onUploadComplete }: FileUploade
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {upload.file.name}
                 </p>
+                {upload.status === 'uploading' && (
+                  <div className="mt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-blue-500 h-full transition-all duration-300 rounded-full"
+                          style={{ width: `${upload.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-600 font-medium w-12 text-right">
+                        {upload.progress}%
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {(upload.file.size / (1024 * 1024)).toFixed(2)} MB
+                    </p>
+                  </div>
+                )}
                 {upload.status === 'error' && upload.error && (
                   <p className="text-xs text-red-500">{upload.error}</p>
                 )}
