@@ -120,14 +120,14 @@ export default function VideoTestimonials() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-500"></div>
                 <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
                   <div
-                    className="aspect-video relative overflow-hidden bg-gray-950 cursor-pointer"
+                    className="aspect-[9/16] relative overflow-hidden bg-gray-950 cursor-pointer"
                     onClick={() => handleVideoClick(testimonial.id)}
                   >
                     {shouldLoad ? (
                       <video
                         id={`video-${testimonial.id}`}
                         src={testimonial.url}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         preload="metadata"
                         playsInline
                         onEnded={() => setPlayingVideo(null)}
@@ -137,7 +137,6 @@ export default function VideoTestimonials() {
                           }
                         }}
                         onLoadedMetadata={(e) => {
-                          // Generate thumbnail from first frame
                           const video = e.target as HTMLVideoElement;
                           video.currentTime = 0.1;
                         }}
@@ -149,7 +148,7 @@ export default function VideoTestimonials() {
                     )}
                     {!isPlaying && (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-16 h-16 rounded-full bg-blue-500/90 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
                             <PlayCircle className="w-8 h-8 text-white" />
@@ -165,7 +164,7 @@ export default function VideoTestimonials() {
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 bg-gray-900">
                     <h3 className="text-xl font-bold text-white mb-1">
                       {testimonial.testimonial_name || 'Anonymous'}
                     </h3>

@@ -13,6 +13,7 @@ interface UploadedFile {
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
 
   useEffect(() => {
     const fetchMainVideo = async () => {
@@ -24,19 +25,44 @@ export default function Hero() {
 
       if (data && !error) {
         setMainVideo(data);
+        // Generate thumbnail from video
+        generateThumbnail(data.url);
       }
     };
 
     fetchMainVideo();
   }, []);
 
-  const handlePlayClick = () => {
+  const generateThumbnail = (videoUrl: string) => {
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.preload = 'metadata';
+    video.src = videoUrl;
+
+    video.onloadeddata = () => {
+      video.currentTime = 0.5; // Seek to 0.5 seconds
+    };
+
+    video.onseeked = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        setThumbnailUrl(canvas.toDataURL('image/jpeg', 0.8));
+      }
+    };
+  };
+
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     const videoElement = document.querySelector('#main-video') as HTMLVideoElement;
     if (videoElement) {
       if (isPlaying) {
         videoElement.pause();
       } else {
-        videoElement.play();
+        videoElement.play().catch(err => console.error('Play failed:', err));
       }
       setIsPlaying(!isPlaying);
     }
@@ -68,14 +94,36 @@ export default function Hero() {
               <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer" onClick={handlePlayClick}>
                 {mainVideo ? (
                   <>
+                    {/* Thumbnail overlay - shown when not playing */}
+                    {!isPlaying && thumbnailUrl && (
+                      <img
+                        src={thumbnailUrl}
+                        alt="Video thumbnail"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    {!isPlaying && !thumbnailUrl && (
+                      <img
+                        src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                        alt="Loading thumbnail"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+
                     <video
                       id="main-video"
                       src={mainVideo.url}
                       className="absolute inset-0 w-full h-full object-cover"
+                      playsInline
+                      preload="metadata"
+                      controlsList="nodownload nofullscreen noremoteplayback"
+                      disablePictureInPicture
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
                       onEnded={() => setIsPlaying(false)}
+                      style={{ display: isPlaying ? 'block' : 'none' }}
                     />
+
                     {!isPlaying && (
                       <>
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
