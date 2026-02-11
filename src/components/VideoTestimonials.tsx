@@ -83,7 +83,7 @@ export default function VideoTestimonials() {
   if (isLoading) {
     return (
       <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
         </div>
       </section>
@@ -95,21 +95,21 @@ export default function VideoTestimonials() {
   }
   return (
     <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
             Here is what some of our incredible clients have to say
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {testimonials.map((testimonial, index) => {
             const isPlaying = playingVideo === testimonial.id;
             const shouldLoad = loadedVideos.has(testimonial.id) || index < 2; // Load first 2 immediately
             return (
               <div
                 key={testimonial.id}
-                className="group relative w-full max-w-xs"
+                className="group relative w-full max-w-sm"
                 ref={(el) => {
                   if (el && observerRef.current && !shouldLoad) {
                     el.setAttribute('data-video-id', testimonial.id);
