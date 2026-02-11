@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { PlayCircle, PauseCircle } from 'lucide-react';
+import { Play, PauseCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Testimonial {
@@ -150,8 +150,8 @@ export default function VideoTestimonials() {
                       <>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-16 h-16 rounded-full bg-blue-500/90 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                            <PlayCircle className="w-8 h-8 text-white" />
+                          <div className="w-20 h-20 bg-white/10 backdrop-blur-sm border-2 border-white/40 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110 group-hover:border-white/60">
+                            <Play className="w-8 h-8 text-white fill-white ml-0.5" />
                           </div>
                         </div>
                       </>

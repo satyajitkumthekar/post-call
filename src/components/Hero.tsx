@@ -101,7 +101,7 @@ export default function Hero() {
 
                         {/* Play Button */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-24 h-24 bg-white/20 backdrop-blur-sm border-2 border-white/60 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/30 group-hover:scale-110 group-hover:border-white/80">
+                          <div className="w-24 h-24 bg-white/10 backdrop-blur-sm border-2 border-white/40 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110 group-hover:border-white/60">
                             <Play className="w-10 h-10 text-white fill-white ml-1" />
                           </div>
                         </div>
@@ -119,7 +119,7 @@ export default function Hero() {
 
                     {/* Play Button */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24 h-24 bg-white/20 backdrop-blur-sm border-2 border-white/60 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/30 group-hover:scale-110 group-hover:border-white/80">
+                      <div className="w-24 h-24 bg-white/10 backdrop-blur-sm border-2 border-white/40 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110 group-hover:border-white/60">
                         <Play className="w-10 h-10 text-white fill-white ml-1" />
                       </div>
                     </div>
