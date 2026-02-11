@@ -70,13 +70,6 @@ export default function Hero() {
               <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5 group cursor-pointer" onClick={handlePlayClick}>
                 {mainVideo ? (
                   <>
-                    {/* Placeholder while video loads */}
-                    {!videoLoaded && (
-                      <div className="absolute inset-0 w-full h-full bg-gray-800 flex items-center justify-center">
-                        <div className="animate-pulse text-gray-400">Loading...</div>
-                      </div>
-                    )}
-
                     <video
                       id="main-video"
                       src={mainVideo.url}

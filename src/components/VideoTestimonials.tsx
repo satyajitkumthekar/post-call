@@ -123,7 +123,7 @@ export default function VideoTestimonials() {
                     className="aspect-[9/16] relative overflow-hidden bg-gray-950 cursor-pointer"
                     onClick={() => handleVideoClick(testimonial.id)}
                   >
-                    {shouldLoad ? (
+                    {shouldLoad && (
                       <video
                         id={`video-${testimonial.id}`}
                         src={testimonial.url}
@@ -141,10 +141,6 @@ export default function VideoTestimonials() {
                           video.currentTime = 0.1;
                         }}
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-900">
-                        <div className="animate-pulse text-gray-600">Loading...</div>
-                      </div>
                     )}
                     {!isPlaying && (
                       <>
