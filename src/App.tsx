@@ -55,7 +55,7 @@ function App() {
 
       {/* Before the Call section */}
       <section
-        className="relative py-24 md:py-32 px-6"
+        className="relative py-16 md:py-20 px-6"
         style={{ backgroundColor: '#111114' }}
       >
         <div className="max-w-4xl mx-auto text-center">
@@ -79,7 +79,7 @@ function App() {
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
-              fontSize: 'clamp(2rem, 4.5vw, 3.2rem)',
+              fontSize: 'clamp(1.7rem, 4vw, 2.25rem)',
               color: '#F0EDE8',
               lineHeight: 1.1,
             }}
@@ -113,7 +113,7 @@ function App() {
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 300,
-                    fontSize: '0.85rem',
+                    fontSize: '0.9375rem',
                     color: '#8A8680',
                     lineHeight: '1.7',
                   }}
@@ -131,7 +131,7 @@ function App() {
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
               fontStyle: 'italic',
-              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              fontSize: 'clamp(1.5rem, 3vw, 2.25rem)',
               color: '#F0EDE8',
               lineHeight: 1.2,
             }}

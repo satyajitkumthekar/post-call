@@ -1,4 +1,4 @@
-import { Play } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -31,9 +31,10 @@ const expectItems = [
 
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const fetchMainVideo = async () => {
@@ -68,16 +69,10 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const videoElement = document.querySelector('#main-video') as HTMLVideoElement;
-    if (videoElement) {
-      if (isPlaying) {
-        videoElement.pause();
-      } else {
-        videoElement.play().catch(err => console.error('Play failed:', err));
-      }
-      setIsPlaying(!isPlaying);
+  const handleToggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
     }
   };
 
@@ -108,7 +103,7 @@ export default function Hero() {
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
-            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+            fontSize: 'clamp(1.8rem, 4vw, 2.25rem)',
             color: '#F0EDE8',
             lineHeight: 1.1,
           }}
@@ -123,7 +118,7 @@ export default function Hero() {
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontWeight: 300,
-            fontSize: '0.95rem',
+            fontSize: '0.9375rem',
             color: '#8A8680',
             lineHeight: '1.75',
           }}
@@ -155,129 +150,141 @@ export default function Hero() {
         <div className="h-px" style={{ backgroundColor: 'rgba(201,168,76,0.07)' }} />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8 md:py-12">
-        <div className="grid md:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-start">
-          <div className="reveal">
-            <div
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer group"
-              style={{
-                backgroundColor: '#0D0D0F',
-                border: '1px solid rgba(255,255,255,0.06)',
-                boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
-              }}
-              onClick={handlePlayClick}
-            >
-              {!mainVideo || !videoLoaded ? (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <p style={{ color: '#5A5855', fontSize: '0.85rem', fontFamily: "'DM Sans', sans-serif" }}>
-                    Loading video...
-                  </p>
-                </div>
-              ) : null}
+      {/* Video — full width, first */}
+      <div className="max-w-4xl mx-auto px-6 pt-8 pb-4">
+        <div className="reveal">
+          <div
+            className="relative w-full rounded-2xl overflow-hidden"
+            style={{
+              backgroundColor: '#0D0D0F',
+              border: '1px solid rgba(255,255,255,0.06)',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
+              aspectRatio: '16/9',
+            }}
+          >
+            {!mainVideo || !videoLoaded ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p style={{ color: '#5A5855', fontSize: '0.9375rem', fontFamily: "'DM Sans', sans-serif" }}>
+                  Loading video...
+                </p>
+              </div>
+            ) : null}
 
-              {mainVideo && (
-                <>
-                  <video
-                    id="main-video"
-                    src={mainVideo.url}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    playsInline
-                    preload="metadata"
-                    controlsList="nodownload nofullscreen noremoteplayback"
-                    disablePictureInPicture
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => setIsPlaying(false)}
-                    onLoadedMetadata={(e) => {
-                      setVideoLoaded(true);
-                      const video = e.target as HTMLVideoElement;
-                      video.currentTime = 0.1;
+            {mainVideo && (
+              <>
+                <video
+                  ref={videoRef}
+                  id="main-video"
+                  src={mainVideo.url}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  playsInline
+                  autoPlay
+                  muted
+                  loop
+                  preload="auto"
+                  controlsList="nodownload nofullscreen noremoteplayback"
+                  disablePictureInPicture
+                  onLoadedMetadata={() => setVideoLoaded(true)}
+                />
+
+                {videoLoaded && (
+                  <button
+                    onClick={handleToggleMute}
+                    className="absolute bottom-3 right-3 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.55)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      backdropFilter: 'blur(6px)',
                     }}
-                  />
-
-                  {!isPlaying && videoLoaded && (
-                    <>
-                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div
-                          className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                          style={{
-                            border: '1.5px solid rgba(201,168,76,0.6)',
-                            backgroundColor: 'rgba(201,168,76,0.08)',
-                            backdropFilter: 'blur(8px)',
-                          }}
-                        >
-                          <Play className="w-8 h-8 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  >
+                    {isMuted
+                      ? <VolumeX className="w-4 h-4" style={{ color: '#C9A84C' }} />
+                      : <Volume2 className="w-4 h-4" style={{ color: '#C9A84C' }} />
+                    }
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
-          <div className="reveal" style={{ transitionDelay: '0.15s' }}>
-            <h2
-              className="mb-8"
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                color: '#F0EDE8',
-              }}
-            >
-              What to expect on the call
-            </h2>
+          <p
+            className="text-center mt-2"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.72rem',
+              color: '#5A5855',
+              letterSpacing: '0.04em',
+            }}
+          >
+            tap for sound
+          </p>
+        </div>
+      </div>
 
-            <div className="space-y-4">
-              {expectItems.map((item, i) => (
+      {/* Expect items — below video */}
+      <div className="max-w-4xl mx-auto px-6 pb-10 pt-4">
+        <div className="reveal" style={{ transitionDelay: '0.1s' }}>
+          <h2
+            className="mb-6 text-center"
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontSize: 'clamp(1.4rem, 3vw, 2.25rem)',
+              color: '#F0EDE8',
+            }}
+          >
+            What to expect on the call
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {expectItems.map((item, i) => (
+              <div
+                key={i}
+                className="flex gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: '#131316',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
                 <div
-                  key={i}
-                  className="flex gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5"
                   style={{
-                    backgroundColor: '#131316',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(201,168,76,0.35)',
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: '0.85rem',
+                    color: '#C9A84C',
                   }}
                 >
+                  {i + 1}
+                </div>
+                <div>
                   <div
-                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5"
+                    className="mb-1"
                     style={{
-                      border: '1px solid rgba(201,168,76,0.35)',
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: '0.85rem',
-                      color: '#C9A84C',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 400,
+                      fontSize: '0.9375rem',
+                      color: '#F0EDE8',
                     }}
                   >
-                    {i + 1}
+                    {item.title}
                   </div>
-                  <div>
-                    <div
-                      className="mb-1"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontWeight: 400,
-                        fontSize: '0.9rem',
-                        color: '#F0EDE8',
-                      }}
-                    >
-                      {item.title}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontWeight: 300,
-                        fontSize: '0.84rem',
-                        color: '#8A8680',
-                        lineHeight: '1.65',
-                      }}
-                    >
-                      {item.description}
-                    </div>
+                  <div
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 300,
+                      fontSize: '0.9375rem',
+                      color: '#8A8680',
+                      lineHeight: '1.65',
+                    }}
+                  >
+                    {item.description}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

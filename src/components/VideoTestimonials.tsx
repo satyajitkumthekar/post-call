@@ -101,7 +101,7 @@ export default function VideoTestimonials() {
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontSize: 'clamp(1.5rem, 3vw, 2.25rem)',
               color: '#F0EDE8',
               lineHeight: 1.15,
             }}
