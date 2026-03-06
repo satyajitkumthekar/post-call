@@ -188,6 +188,21 @@ export default function Admin({ onBackToHome }: AdminProps) {
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Files</h2>
+          {(selectedBucket === 'main-videos' || selectedBucket === 'video-testimonials') && (
+            <div className="mb-5 flex gap-3 p-4 rounded-lg border border-amber-200 bg-amber-50">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-amber-800 mb-1">Compress videos before uploading for faster load times</p>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Use <strong>HandBrake</strong> (free, desktop) or <strong>Clideo</strong> (free, browser-based) to compress to H.264 MP4 at 720p, quality ~28, 30fps. This typically reduces file size by 60–80% with no visible quality loss on small screens.
+                </p>
+              </div>
+            </div>
+          )}
           <FileUploader bucketId={selectedBucket} onUploadComplete={handleUploadComplete} />
         </div>
 

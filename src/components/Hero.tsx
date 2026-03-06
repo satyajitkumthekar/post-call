@@ -201,13 +201,17 @@ export default function Hero() {
               aspectRatio: '16/9',
             }}
           >
-            {!mainVideo || !videoLoaded ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p style={{ color: '#5A5855', fontSize: '0.9375rem', fontFamily: "'DM Sans', sans-serif" }}>
-                  Loading video...
-                </p>
+            {(!mainVideo || !videoLoaded) && (
+              <div className="absolute inset-0 animate-pulse" style={{ backgroundColor: '#131316' }}>
+                <div className="absolute bottom-4 left-4 right-4 space-y-2">
+                  <div className="h-1 rounded-full" style={{ backgroundColor: '#1e1e24', width: '100%' }} />
+                  <div className="flex justify-between">
+                    <div className="h-3 rounded" style={{ backgroundColor: '#1e1e24', width: '32px' }} />
+                    <div className="h-3 rounded" style={{ backgroundColor: '#1e1e24', width: '32px' }} />
+                  </div>
+                </div>
               </div>
-            ) : null}
+            )}
 
             {mainVideo && (
               <>
