@@ -29,12 +29,23 @@ const expectItems = [
   },
 ];
 
+function formatTime(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isScrubbing, setIsScrubbing] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchMainVideo = async () => {
@@ -74,6 +85,34 @@ export default function Hero() {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
     }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current && !isScrubbing) {
+      const vid = videoRef.current;
+      setCurrentTime(vid.currentTime);
+      if (vid.duration) {
+        setProgress((vid.currentTime / vid.duration) * 100);
+      }
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    setVideoLoaded(true);
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const seekTo = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!progressBarRef.current || !videoRef.current) return;
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const newTime = ratio * videoRef.current.duration;
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+    setProgress(ratio * 100);
   };
 
   return (
@@ -150,7 +189,7 @@ export default function Hero() {
         <div className="h-px" style={{ backgroundColor: 'rgba(201,168,76,0.07)' }} />
       </div>
 
-      {/* Video — full width, first */}
+      {/* Video */}
       <div className="max-w-4xl mx-auto px-6 pt-8 pb-4">
         <div className="reveal">
           <div
@@ -180,17 +219,17 @@ export default function Hero() {
                   playsInline
                   autoPlay
                   muted
-                  loop
                   preload="auto"
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
-                  onLoadedMetadata={() => setVideoLoaded(true)}
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onTimeUpdate={handleTimeUpdate}
                 />
 
                 {videoLoaded && (
                   <button
                     onClick={handleToggleMute}
-                    className="absolute bottom-3 right-3 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
+                    className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
                     style={{
                       backgroundColor: 'rgba(0,0,0,0.55)',
                       border: '1px solid rgba(255,255,255,0.12)',
@@ -208,22 +247,72 @@ export default function Hero() {
             )}
           </div>
 
-          <p
-            className="text-center mt-2"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.72rem',
-              color: '#5A5855',
-              letterSpacing: '0.04em',
-            }}
-          >
-            tap for sound
-          </p>
+          {/* Progress bar + controls */}
+          {videoLoaded && (
+            <div className="mt-2.5 px-1">
+              <div
+                ref={progressBarRef}
+                className="relative h-1 rounded-full cursor-pointer group"
+                style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+                onClick={seekTo}
+                onMouseDown={() => setIsScrubbing(true)}
+                onMouseMove={(e) => { if (isScrubbing) seekTo(e); }}
+                onMouseUp={() => setIsScrubbing(false)}
+                onMouseLeave={() => setIsScrubbing(false)}
+              >
+                <div
+                  className="h-full rounded-full transition-all duration-100"
+                  style={{
+                    width: `${progress}%`,
+                    backgroundColor: '#C9A84C',
+                  }}
+                />
+                {/* Scrub handle */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{
+                    left: `${progress}%`,
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: '#C9A84C',
+                    boxShadow: '0 0 0 2px rgba(201,168,76,0.3)',
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-1.5">
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.68rem',
+                  color: '#5A5855',
+                  letterSpacing: '0.03em',
+                }}>
+                  {formatTime(currentTime)}
+                </span>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.68rem',
+                  color: '#5A5855',
+                  letterSpacing: '0.03em',
+                }}>
+                  tap for sound
+                </span>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.68rem',
+                  color: '#5A5855',
+                  letterSpacing: '0.03em',
+                }}>
+                  {formatTime(duration)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Expect items — below video */}
+      {/* Expect items */}
       <div className="max-w-4xl mx-auto px-6 pb-10 pt-4">
         <div className="reveal" style={{ transitionDelay: '0.1s' }}>
           <h2

@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import ProgramSection from './components/ProgramSection';
 import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
+import ChatTestimonials from './components/ChatTestimonials';
 import Admin from './pages/Admin';
 
 const beforeCallItems = [
@@ -52,6 +53,7 @@ function App() {
       <ProgramSection />
       <VideoTestimonials />
       <MessagesCollage />
+      <ChatTestimonials />
 
       {/* Before the Call section */}
       <section
