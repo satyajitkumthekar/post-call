@@ -18,35 +18,34 @@ export default function Header() {
               boxShadow: '0 0 8px rgba(201,168,76,0.2)',
             }}
           />
-          <span
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontWeight: 300,
-              fontSize: '1.15rem',
-              letterSpacing: '0.18em',
-            }}
-          >
-            <span style={{ color: '#F0EDE8' }}>SUPERHUMAN</span>
-            <span style={{ color: '#C9A84C' }}> LAB</span>
-          </span>
-        </div>
-
-        <div
-          className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs tracking-widest uppercase"
-          style={{
-            border: '1px solid rgba(201,168,76,0.3)',
-            color: '#C9A84C',
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 400,
-            fontSize: '0.6rem',
-            letterSpacing: '0.15em',
-          }}
-        >
-          <span
-            className="w-1.5 h-1.5 rounded-full pulse-dot"
-            style={{ backgroundColor: '#4ade80' }}
-          />
-          Your Call is Confirmed
+          <div className="flex flex-col leading-tight">
+            <span
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontWeight: 300,
+                fontSize: '1.15rem',
+                letterSpacing: '0.18em',
+                lineHeight: 1.1,
+              }}
+            >
+              <span style={{ color: '#F0EDE8' }}>SUPERHUMAN</span>
+              <span style={{ color: '#C9A84C' }}> LAB</span>
+            </span>
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.6rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.18)',
+                lineHeight: 1,
+                marginTop: '2px',
+              }}
+            >
+              Call Confirmed
+            </span>
+          </div>
         </div>
       </div>
     </header>
