@@ -68,8 +68,24 @@ export default function MessagesCollage() {
   }
 
   return (
-    <section className="relative py-24 bg-black overflow-hidden min-h-[600px]">
-      {/* Animated testimonial images collage */}
+    <section
+      className="relative overflow-hidden min-h-[700px]"
+      style={{ backgroundColor: '#000000' }}
+    >
+      <div className="relative z-10 pt-20 pb-8 text-center pointer-events-none">
+        <h2
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontWeight: 300,
+            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+            color: '#F0EDE8',
+            lineHeight: 1.2,
+          }}
+        >
+          Inside the program — real messages, real clients
+        </h2>
+      </div>
+
       {testimonialImages.map((image, index) => {
         const position = imagePositions[index];
         const cycleDuration = 12;
@@ -85,24 +101,26 @@ export default function MessagesCollage() {
               transformOrigin: 'center',
             }}
           >
-            <div className="relative rounded-2xl shadow-2xl"
-              style={{
-                transform: `rotate(${position.rotation}deg)`,
-              }}
+            <div
+              className="relative rounded-2xl shadow-2xl"
+              style={{ transform: `rotate(${position.rotation}deg)` }}
             >
               <img
                 src={image.url}
                 alt="Testimonial"
-                className="w-72 h-auto rounded-2xl border-2 border-gray-700/50 shadow-2xl pointer-events-none select-none"
+                className="w-72 h-auto rounded-2xl pointer-events-none select-none"
+                style={{
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.7)',
+                }}
               />
             </div>
           </div>
         );
       })}
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black pointer-events-none"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none" />
 
       <style>{`
         @keyframes testimonialCycle {

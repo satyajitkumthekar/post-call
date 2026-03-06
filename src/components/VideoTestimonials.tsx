@@ -82,9 +82,9 @@ export default function VideoTestimonials() {
 
   if (isLoading) {
     return (
-      <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
+      <section className="relative py-24 px-6" style={{ backgroundColor: '#0A0A0B' }}>
         <div className="max-w-6xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p style={{ color: '#5A5855', fontFamily: "'DM Sans', sans-serif", fontSize: '0.85rem' }}>Loading...</p>
         </div>
       </section>
     );
@@ -94,18 +94,26 @@ export default function VideoTestimonials() {
     return null;
   }
   return (
-    <section className="relative py-16 px-6 bg-gradient-to-b from-black to-gray-950">
+    <section className="relative py-24 md:py-32 px-6" style={{ backgroundColor: '#0A0A0B' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Here is what some of our incredible clients have to say
+        <div className="text-center mb-16">
+          <h2
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              color: '#F0EDE8',
+              lineHeight: 1.15,
+            }}
+          >
+            Here's what some of our clients have to say
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {testimonials.map((testimonial, index) => {
             const isPlaying = playingVideo === testimonial.id;
-            const shouldLoad = loadedVideos.has(testimonial.id) || index < 2; // Load first 2 immediately
+            const shouldLoad = loadedVideos.has(testimonial.id) || index < 2;
             return (
               <div
                 key={testimonial.id}
@@ -117,10 +125,25 @@ export default function VideoTestimonials() {
                   }
                 }}
               >
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-500"></div>
-                <div className="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
+                <div
+                  className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    backgroundColor: '#131316',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(201,168,76,0.3)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                  }}
+                >
                   <div
-                    className="aspect-[9/16] relative overflow-hidden bg-gray-950 cursor-pointer"
+                    className="aspect-[9/16] relative overflow-hidden cursor-pointer"
+                    style={{ backgroundColor: '#0A0A0B' }}
                     onClick={() => handleVideoClick(testimonial.id)}
                   >
                     {shouldLoad && (
@@ -144,27 +167,49 @@ export default function VideoTestimonials() {
                     )}
                     {!isPlaying && (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-20 h-20 bg-white/10 backdrop-blur-sm border-2 border-white/40 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110 group-hover:border-white/60">
-                            <Play className="w-8 h-8 text-white fill-white ml-0.5" />
+                          <div
+                            className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                            style={{
+                              border: '1.5px solid rgba(201,168,76,0.5)',
+                              backgroundColor: 'rgba(201,168,76,0.07)',
+                              backdropFilter: 'blur(6px)',
+                            }}
+                          >
+                            <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
                           </div>
                         </div>
                       </>
                     )}
                     {isPlaying && (
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
-                          <PauseCircle className="w-6 h-6 text-white" />
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
+                          <PauseCircle className="w-5 h-5" style={{ color: '#C9A84C' }} />
                         </div>
                       </div>
                     )}
                   </div>
-                  <div className="p-6 bg-gray-900">
-                    <h3 className="text-xl font-bold text-white mb-1">
+                  <div className="px-5 py-4">
+                    <h3
+                      style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontWeight: 400,
+                        fontSize: '1.1rem',
+                        color: '#F0EDE8',
+                        marginBottom: '2px',
+                      }}
+                    >
                       {testimonial.testimonial_name || 'Anonymous'}
                     </h3>
-                    <p className="text-gray-400 text-sm">
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 300,
+                        fontSize: '0.78rem',
+                        color: '#8A8680',
+                      }}
+                    >
                       {testimonial.testimonial_designation || 'Client'}
                     </p>
                   </div>
