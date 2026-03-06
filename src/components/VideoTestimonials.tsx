@@ -94,7 +94,7 @@ export default function VideoTestimonials() {
     return null;
   }
   return (
-    <section className="relative py-24 md:py-32 px-6" style={{ backgroundColor: '#0A0A0B' }}>
+    <section className="relative py-16 md:py-20 px-6" style={{ backgroundColor: '#0A0A0B' }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2

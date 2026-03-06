@@ -5,28 +5,28 @@ const problemItems = [
   "You started, it was going well, then one bad week happened and you just... stopped. And couldn't really explain why.",
   "You've had the same conversation with yourself every Sunday night about how this week will be different.",
   "You had a rough day, you ate badly, you felt guilty about it, and somehow that made the next day worse too.",
-  "The moment your schedule got disrupted — a work trip, a late night, a stressful month — the whole thing fell apart.",
+  "The moment your schedule got disrupted, a work trip, a late night, a stressful month, the whole thing fell apart.",
   "You've been consistent before. You know you can do it. That's what makes it so frustrating that you're here again.",
   "It's not that you don't care. You care a lot. That's almost the problem.",
 ];
 
 const solutionItems = [
-  "We don't build your plan around an ideal week. We build it around your actual week — 12-hour days, back-to-back meetings, travel, bad days included.",
-  "When a hard day happens and you want to fall apart — I'm on WhatsApp. That moment is where the program does its real work.",
-  "Missing one day is accounted for. Missing one day doesn't mean the week is gone. We change that loop permanently.",
-  "Your nutrition doesn't require willpower. It's built for the life you actually live — Indian food, client dinners, the meal you didn't plan.",
-  "The accountability isn't a weekly check-in. It's daily. It's me personally. It's the external structure your environment was never going to give you on its own.",
-  "You stop having this be a problem in your head. It becomes background — solved — so you can focus on everything else you're building.",
+  "We handle the thinking so you don't have to. The plan, the adjustments, the decisions are on us. You just show up.",
+  "Someone else is carrying the weight of keeping this going. Your only job is to not disappear.",
+  "No meal plans. We build how you eat around your actual day, your actual food, until good choices stop feeling like choices.",
+  "When a bad week happens we don't start over. We pick up exactly where you left off. The momentum never fully dies.",
+  "We look at everything quietly working against you. Sleep, stress, the daily patterns that have nothing to do with the gym but explain everything.",
+  "Over time the rules disappear. The tracking stops. The Sunday night conversation stops. You just live like this, because it's become who you are.",
 ];
 
 const pillars = [
   {
     title: 'Training That Survives Your Life',
-    body: "Most programs assume you'll have five free evenings a week. Yours is built for the opposite. Adjusted every week based on what's actually happening — travel, work sprints, everything.",
+    body: "Most programs assume you'll have five free evenings a week. Yours is built for the opposite. Adjusted every week based on what's actually happening, travel, work sprints, everything.",
   },
   {
     title: 'Nutrition Without the Crash Cycle',
-    body: 'The eat-clean-for-two-weeks-then-fall-apart pattern ends here. We build around your real eating — Indian food, social dinners, bad days — so that slipping once is just slipping once.',
+    body: 'The eat-clean-for-two-weeks-then-fall-apart pattern ends here. We build around your real eating, Indian food, social dinners, bad days, so that slipping once is just slipping once.',
   },
   {
     title: 'The Accountability Layer',
@@ -60,7 +60,7 @@ export default function ProgramSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-24 md:py-32"
+      className="relative py-16 md:py-20"
       style={{ backgroundColor: '#111114' }}
     >
       <div className="max-w-[1100px] mx-auto px-6">
@@ -165,7 +165,7 @@ export default function ProgramSection() {
                   color: '#C9A84C',
                 }}
               >
-                What this program does instead
+                What changes
               </div>
               <div className="space-y-5">
                 {solutionItems.map((item, i) => (
@@ -182,9 +182,9 @@ export default function ProgramSection() {
                   >
                     <span
                       className="flex-shrink-0 mt-0.5"
-                      style={{ color: '#C9A84C', fontWeight: 400 }}
+                      style={{ color: '#8A8680' }}
                     >
-                      →
+                      —
                     </span>
                     <span>{item}</span>
                   </div>

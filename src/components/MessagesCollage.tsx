@@ -82,7 +82,7 @@ export default function MessagesCollage() {
             lineHeight: 1.2,
           }}
         >
-          Inside the program — real messages, real clients
+          Inside the program. Real messages, real clients.
         </h2>
       </div>
 

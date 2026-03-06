@@ -16,16 +16,16 @@ const expectItems = [
     description: "We'll discuss your fitness levels, energy, confidence, and what your days actually look like.",
   },
   {
-    title: 'Your goals — honestly',
+    title: 'Your goals, honestly',
     description: 'Not what you think you should want. What actually matters to you right now.',
   },
   {
     title: "What's been in the way",
-    description: 'Clarity on the real patterns — not motivation, not discipline — the actual structural blockers.',
+    description: 'Clarity on the real patterns. Not motivation, not discipline. The actual structural blockers.',
   },
   {
     title: 'A direction forward',
-    description: "A clear picture of how a program built for your life would actually work — and what that looks like.",
+    description: "A clear picture of how a program built for your life would actually work and what that looks like.",
   },
 ];
 
@@ -84,11 +84,11 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen pt-[72px]"
+      className="relative pt-[72px]"
       style={{ backgroundColor: '#0A0A0B' }}
     >
-      <div className="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
-        <div className="fade-up fade-up-1 flex items-center justify-center gap-4 mb-8">
+      <div className="max-w-3xl mx-auto px-6 pt-10 pb-8 text-center">
+        <div className="fade-up fade-up-1 flex items-center justify-center gap-4 mb-5">
           <div className="h-px w-12 flex-shrink-0" style={{ backgroundColor: 'rgba(201,168,76,0.4)' }} />
           <span style={{
             fontFamily: "'DM Sans', sans-serif",
@@ -104,11 +104,11 @@ export default function Hero() {
         </div>
 
         <h1
-          className="fade-up fade-up-2 mb-6"
+          className="fade-up fade-up-2 mb-4"
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
-            fontSize: 'clamp(2.6rem, 6vw, 4.25rem)',
+            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
             color: '#F0EDE8',
             lineHeight: 1.1,
           }}
@@ -123,16 +123,16 @@ export default function Hero() {
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontWeight: 300,
-            fontSize: '1.05rem',
+            fontSize: '0.95rem',
             color: '#8A8680',
             lineHeight: '1.75',
           }}
         >
-          A confirmation email is on its way. Before we speak — spend 10 minutes with this page. It'll make our conversation significantly more valuable.
+          A confirmation email is on its way. Before we speak, spend 10 minutes with this page. It'll make our conversation significantly more valuable.
         </p>
 
         <div
-          className="fade-up fade-up-4 inline-flex items-center gap-2.5 mt-8 px-5 py-2.5 rounded-full"
+          className="fade-up fade-up-4 inline-flex items-center gap-2.5 mt-5 px-5 py-2.5 rounded-full"
           style={{
             border: '1px solid rgba(74, 222, 128, 0.25)',
             backgroundColor: 'rgba(74, 222, 128, 0.05)',
@@ -155,8 +155,8 @@ export default function Hero() {
         <div className="h-px" style={{ backgroundColor: 'rgba(201,168,76,0.07)' }} />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
-        <div className="grid md:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-start">
+      <div className="max-w-6xl mx-auto px-6 py-8 md:py-12">
+        <div className="grid md:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-start">
           <div className="reveal">
             <div
               className="relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer group"
