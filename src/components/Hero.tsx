@@ -45,6 +45,7 @@ export default function Hero() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isScrubbing, setIsScrubbing] = useState(false);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -116,8 +117,27 @@ export default function Hero() {
   };
 
   const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
+    const video = videoRef.current;
+    if (!video) return;
+    setDuration(video.duration);
+    if (!thumbnail) {
+      video.currentTime = 0.1;
+    }
+  };
+
+  const handleSeeked = () => {
+    const video = videoRef.current;
+    if (!video || thumbnail || hasStarted) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      if (dataUrl && dataUrl !== 'data:,') setThumbnail(dataUrl);
+    } catch {
     }
   };
 
@@ -264,9 +284,11 @@ export default function Hero() {
                   className="absolute inset-0 w-full h-full object-cover"
                   playsInline
                   preload="metadata"
+                  poster={thumbnail ?? undefined}
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
+                  onSeeked={handleSeeked}
                   onCanPlay={handleCanPlay}
                   onTimeUpdate={handleTimeUpdate}
                   onWaiting={() => setVideoBuffering(true)}
