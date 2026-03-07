@@ -38,9 +38,9 @@ function formatTime(seconds: number) {
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const [videoBuffering, setVideoBuffering] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -82,11 +82,16 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
-  const handlePlay = () => {
+  const handlePlay = async () => {
     if (!videoRef.current) return;
     setHasStarted(true);
     videoRef.current.muted = false;
-    videoRef.current.play().catch(() => {});
+    try {
+      await videoRef.current.play();
+    } catch {
+      setVideoError(true);
+      setHasStarted(false);
+    }
   };
 
   const handleReplay = () => {
@@ -112,7 +117,6 @@ export default function Hero() {
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
-      setVideoReady(true);
     }
   };
 
@@ -120,7 +124,6 @@ export default function Hero() {
     setVideoBuffering(false);
     if (videoRef.current) {
       if (videoRef.current.duration) setDuration(videoRef.current.duration);
-      setVideoReady(true);
     }
   };
 
@@ -259,8 +262,7 @@ export default function Hero() {
                   src={mainVideo.url}
                   className="absolute inset-0 w-full h-full object-cover"
                   playsInline
-                  muted
-                  preload="metadata"
+                  preload="none"
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
@@ -269,10 +271,28 @@ export default function Hero() {
                   onWaiting={() => setVideoBuffering(true)}
                   onPlaying={() => setVideoBuffering(false)}
                   onEnded={() => setVideoEnded(true)}
+                  onError={() => setVideoError(true)}
                 />
 
+                {/* Error state */}
+                {videoError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ backgroundColor: 'rgba(10,10,11,0.85)' }}>
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 300,
+                      fontSize: '0.8rem',
+                      letterSpacing: '0.08em',
+                      color: 'rgba(201,168,76,0.6)',
+                      textAlign: 'center',
+                      padding: '0 1.5rem',
+                    }}>
+                      Video unavailable. Please try again later.
+                    </span>
+                  </div>
+                )}
+
                 {/* Play button overlay - shown until user taps play */}
-                {!hasStarted && (
+                {!hasStarted && !videoError && (
                   <button
                     onClick={handlePlay}
                     className="absolute inset-0 flex flex-col items-center justify-center w-full h-full group"
@@ -304,7 +324,7 @@ export default function Hero() {
                         color: 'rgba(201,168,76,0.7)',
                       }}
                     >
-                      {videoReady ? 'Tap to watch' : 'Loading...'}
+                      Tap to watch
                     </span>
                   </button>
                 )}
