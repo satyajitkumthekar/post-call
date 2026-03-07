@@ -38,6 +38,7 @@ function formatTime(seconds: number) {
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoBuffering, setVideoBuffering] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -202,14 +203,31 @@ export default function Hero() {
             }}
           >
             {(!mainVideo || !videoLoaded) && (
-              <div className="absolute inset-0 animate-pulse" style={{ backgroundColor: '#131316' }}>
-                <div className="absolute bottom-4 left-4 right-4 space-y-2">
-                  <div className="h-1 rounded-full" style={{ backgroundColor: '#1e1e24', width: '100%' }} />
-                  <div className="flex justify-between">
-                    <div className="h-3 rounded" style={{ backgroundColor: '#1e1e24', width: '32px' }} />
-                    <div className="h-3 rounded" style={{ backgroundColor: '#1e1e24', width: '32px' }} />
-                  </div>
+              <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: '#131316' }}>
+                <div className="flex flex-col items-center gap-3">
+                  <svg className="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,0.2)" strokeWidth="2" />
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <span style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.15em',
+                    color: 'rgba(201,168,76,0.5)',
+                  }}>
+                    Loading video...
+                  </span>
                 </div>
+              </div>
+            )}
+
+            {mainVideo && videoLoaded && videoBuffering && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+                <svg className="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,0.2)" strokeWidth="2" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" />
+                </svg>
               </div>
             )}
 
@@ -223,11 +241,17 @@ export default function Hero() {
                   playsInline
                   autoPlay
                   muted
-                  preload="auto"
+                  preload="metadata"
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
                   onTimeUpdate={handleTimeUpdate}
+                  onCanPlay={() => {
+                    setVideoBuffering(false);
+                    videoRef.current?.play().catch(() => {});
+                  }}
+                  onWaiting={() => setVideoBuffering(true)}
+                  onPlaying={() => setVideoBuffering(false)}
                 />
 
                 {videoLoaded && (
