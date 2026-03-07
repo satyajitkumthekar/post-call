@@ -80,10 +80,10 @@ function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnde
         detail = 'Playback was interrupted. Please try again.';
       } else if (mediaErr) {
         const mediaMessages: Record<number, string> = {
-          1: 'MEDIA_ERR_ABORTED — playback was aborted.',
-          2: 'MEDIA_ERR_NETWORK — network error while loading video.',
-          3: 'MEDIA_ERR_DECODE — video could not be decoded (codec/file issue).',
-          4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device.',
+          1: 'Playback was aborted. Please try again.',
+          2: 'Network error while loading the video. Please check your connection.',
+          3: 'This video could not be decoded. The file may be corrupted.',
+          4: 'This video format is not supported on your device. Please try on a desktop browser.',
         };
         detail = mediaMessages[mediaErr.code] ?? mediaErr.message ?? detail;
       }
@@ -97,15 +97,15 @@ function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnde
     if (!video) return;
     const mediaErr = video.error;
     const mediaMessages: Record<number, string> = {
-      1: 'MEDIA_ERR_ABORTED',
-      2: 'MEDIA_ERR_NETWORK — network error while loading.',
-      3: 'MEDIA_ERR_DECODE — codec or file corruption issue.',
-      4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device.',
+      1: 'Playback was aborted. Please try again.',
+      2: 'Network error while loading the video. Please check your connection.',
+      3: 'This video could not be decoded. The file may be corrupted.',
+      4: 'This video format is not supported on your device. Please try on a desktop browser.',
     };
     const detail = mediaErr
       ? (mediaMessages[mediaErr.code] ?? mediaErr.message ?? 'Unknown media error')
       : 'Unknown error loading video';
-    console.error('[VideoCard] video element error:', detail, video.src);
+    console.error('[VideoCard] video element error:', mediaErr?.code, detail, video.src);
     setError({ code: mediaErr?.code ?? 0, message: 'Load failed', detail });
   };
 
