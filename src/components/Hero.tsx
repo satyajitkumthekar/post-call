@@ -85,9 +85,10 @@ export default function Hero() {
   const handlePlay = async () => {
     if (!videoRef.current) return;
     setHasStarted(true);
-    videoRef.current.muted = false;
     try {
+      videoRef.current.muted = true;
       await videoRef.current.play();
+      videoRef.current.muted = false;
     } catch {
       setVideoError(true);
       setHasStarted(false);
