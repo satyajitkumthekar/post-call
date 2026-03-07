@@ -39,6 +39,185 @@ function VideoCardSkeleton() {
   );
 }
 
+interface VideoCardProps {
+  testimonial: Testimonial;
+  shouldLoad: boolean;
+  isPlaying: boolean;
+  onPlay: (id: string, el: HTMLVideoElement) => void;
+  onPause: (id: string) => void;
+  onEnded: (id: string) => void;
+}
+
+function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnded }: VideoCardProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [error, setError] = useState<VideoError | null>(null);
+
+  const handleClick = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+      return;
+    }
+
+    if (error) setError(null);
+
+    try {
+      await video.play();
+      onPlay(testimonial.id, video);
+    } catch (err: unknown) {
+      const domErr = err as DOMException;
+      const mediaErr = video.error;
+
+      console.error('[VideoCard] play() failed:', domErr?.name, domErr?.message, 'mediaError:', mediaErr?.code);
+
+      let detail = domErr?.message ?? 'Unknown error';
+
+      if (domErr?.name === 'NotAllowedError') {
+        detail = 'Playback blocked by browser policy. Please tap directly on the video.';
+      } else if (domErr?.name === 'AbortError') {
+        detail = 'Playback was interrupted. Please try again.';
+      } else if (mediaErr) {
+        const mediaMessages: Record<number, string> = {
+          1: 'MEDIA_ERR_ABORTED — playback was aborted.',
+          2: 'MEDIA_ERR_NETWORK — network error while loading video.',
+          3: 'MEDIA_ERR_DECODE — video could not be decoded (codec/file issue).',
+          4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device.',
+        };
+        detail = mediaMessages[mediaErr.code] ?? mediaErr.message ?? detail;
+      }
+
+      setError({ code: domErr?.code ?? 0, message: domErr?.name ?? 'Error', detail });
+    }
+  };
+
+  const handleVideoError = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const mediaErr = video.error;
+    const mediaMessages: Record<number, string> = {
+      1: 'MEDIA_ERR_ABORTED',
+      2: 'MEDIA_ERR_NETWORK — network error while loading.',
+      3: 'MEDIA_ERR_DECODE — codec or file corruption issue.',
+      4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device.',
+    };
+    const detail = mediaErr
+      ? (mediaMessages[mediaErr.code] ?? mediaErr.message ?? 'Unknown media error')
+      : 'Unknown error loading video';
+    console.error('[VideoCard] video element error:', detail, video.src);
+    setError({ code: mediaErr?.code ?? 0, message: 'Load failed', detail });
+  };
+
+  return (
+    <div className="group relative w-full max-w-sm">
+      <div
+        className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+        style={{
+          backgroundColor: '#131316',
+          borderRadius: '20px',
+          border: '1px solid rgba(255,255,255,0.06)',
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(201,168,76,0.3)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.5)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
+          (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+        }}
+      >
+        <div
+          className="aspect-[9/16] relative overflow-hidden cursor-pointer"
+          style={{ backgroundColor: '#0A0A0B' }}
+          onClick={handleClick}
+        >
+          {shouldLoad ? (
+            <video
+              ref={videoRef}
+              src={testimonial.url}
+              className="w-full h-full object-contain"
+              preload="metadata"
+              playsInline
+              onEnded={() => onEnded(testimonial.id)}
+              onPause={() => onPause(testimonial.id)}
+              onError={handleVideoError}
+            />
+          ) : (
+            <div className="w-full h-full animate-pulse" style={{ backgroundColor: '#1a1a1f' }} />
+          )}
+
+          {error && (
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center"
+              style={{ backgroundColor: 'rgba(10,10,11,0.92)' }}
+            >
+              <AlertCircle className="w-8 h-8" style={{ color: '#C9A84C' }} />
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.75rem', color: '#8A8680', lineHeight: 1.5 }}>
+                {error.detail}
+              </p>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.65rem', color: '#555', lineHeight: 1.4 }}>
+                Tap to retry
+              </p>
+            </div>
+          )}
+
+          {!isPlaying && !error && (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    border: '1.5px solid rgba(201,168,76,0.5)',
+                    backgroundColor: 'rgba(201,168,76,0.07)',
+                    backdropFilter: 'blur(6px)',
+                  }}
+                >
+                  <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                </div>
+              </div>
+            </>
+          )}
+          {isPlaying && (
+            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+              >
+                <PauseCircle className="w-5 h-5" style={{ color: '#C9A84C' }} />
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="px-5 py-4">
+          <h3
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 400,
+              fontSize: '1.1rem',
+              color: '#F0EDE8',
+              marginBottom: '2px',
+            }}
+          >
+            {testimonial.testimonial_name || 'Anonymous'}
+          </h3>
+          <p
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.78rem',
+              color: '#8A8680',
+            }}
+          >
+            {testimonial.testimonial_designation || 'Client'}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function VideoTestimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +225,7 @@ export default function VideoTestimonials() {
   const [hasMore, setHasMore] = useState(false);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [loadedVideos, setLoadedVideos] = useState<Set<string>>(new Set());
-  const [videoErrors, setVideoErrors] = useState<Map<string, VideoError>>(new Map());
+  const playingVideoRef = useRef<HTMLVideoElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
@@ -125,65 +304,21 @@ export default function VideoTestimonials() {
     setIsLoadingMore(false);
   };
 
-  const setVideoError = useCallback((id: string, err: VideoError) => {
-    setVideoErrors((prev) => {
-      const next = new Map(prev);
-      next.set(id, err);
-      return next;
-    });
+  const handlePlay = useCallback((id: string, el: HTMLVideoElement) => {
+    if (playingVideoRef.current && playingVideoRef.current !== el) {
+      playingVideoRef.current.pause();
+    }
+    playingVideoRef.current = el;
+    setPlayingVideo(id);
   }, []);
 
-  const handleVideoClick = async (testimonialId: string) => {
-    const videoElement = document.querySelector(`#video-${testimonialId}`) as HTMLVideoElement;
-    if (!videoElement) return;
+  const handlePause = useCallback((id: string) => {
+    setPlayingVideo((prev) => (prev === id ? null : prev));
+  }, []);
 
-    if (playingVideo === testimonialId) {
-      videoElement.pause();
-      setPlayingVideo(null);
-      return;
-    }
-
-    if (playingVideo) {
-      const currentPlaying = document.querySelector(`#video-${playingVideo}`) as HTMLVideoElement;
-      if (currentPlaying) currentPlaying.pause();
-    }
-
-    videoElement.muted = false;
-
-    try {
-      await videoElement.play();
-      setPlayingVideo(testimonialId);
-    } catch (err: unknown) {
-      console.error('[VideoTestimonials] play() failed:', err);
-
-      const mediaErr = videoElement.error;
-      const domErr = err as DOMException;
-
-      let code = domErr?.code ?? 0;
-      let message = domErr?.name ?? 'Unknown';
-      let detail = domErr?.message ?? 'No detail available';
-
-      if (mediaErr) {
-        code = mediaErr.code;
-        const mediaMessages: Record<number, string> = {
-          1: 'MEDIA_ERR_ABORTED - Playback was aborted by the user.',
-          2: 'MEDIA_ERR_NETWORK - A network error occurred while fetching the video.',
-          3: 'MEDIA_ERR_DECODE - The video could not be decoded (codec issue or corrupted file).',
-          4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - The video format or URL is not supported on this device.',
-        };
-        detail = mediaMessages[mediaErr.code] ?? mediaErr.message ?? detail;
-      }
-
-      if (domErr?.name === 'NotAllowedError') {
-        detail = 'Safari blocked autoplay. Tap directly on the video to play.';
-      } else if (domErr?.name === 'AbortError') {
-        detail = 'Playback was interrupted before it could start.';
-      }
-
-      setVideoError(testimonialId, { code, message, detail });
-      setPlayingVideo(null);
-    }
-  };
+  const handleEnded = useCallback((id: string) => {
+    setPlayingVideo((prev) => (prev === id ? null : prev));
+  }, []);
 
   if (isLoading) {
     return (
@@ -230,149 +365,24 @@ export default function VideoTestimonials() {
           {testimonials.map((testimonial, index) => {
             const isPlaying = playingVideo === testimonial.id;
             const shouldLoad = loadedVideos.has(testimonial.id) || index < 3;
-            const videoError = videoErrors.get(testimonial.id);
             return (
               <div
                 key={testimonial.id}
-                className="group relative w-full max-w-sm"
+                className="w-full"
                 ref={(el) => {
                   if (el && !shouldLoad) {
                     observeCard(el, testimonial.id);
                   }
                 }}
               >
-                <div
-                  className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    backgroundColor: '#131316',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(201,168,76,0.3)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-                  }}
-                >
-                  <div
-                    className="aspect-[9/16] relative overflow-hidden cursor-pointer"
-                    style={{ backgroundColor: '#0A0A0B' }}
-                    onClick={() => {
-                      if (videoError) {
-                        setVideoErrors((prev) => {
-                          const next = new Map(prev);
-                          next.delete(testimonial.id);
-                          return next;
-                        });
-                      }
-                      handleVideoClick(testimonial.id);
-                    }}
-                  >
-                    {shouldLoad ? (
-                      <video
-                        id={`video-${testimonial.id}`}
-                        src={testimonial.url}
-                        className="w-full h-full object-contain"
-                        preload="metadata"
-                        playsInline
-                        onEnded={() => setPlayingVideo(null)}
-                        onPause={() => {
-                          if (playingVideo === testimonial.id) {
-                            setPlayingVideo(null);
-                          }
-                        }}
-                        onLoadedMetadata={(e) => {
-                          const video = e.target as HTMLVideoElement;
-                          video.currentTime = 0.1;
-                        }}
-                        onError={(e) => {
-                          const video = e.target as HTMLVideoElement;
-                          const mediaErr = video.error;
-                          const mediaMessages: Record<number, string> = {
-                            1: 'MEDIA_ERR_ABORTED',
-                            2: 'MEDIA_ERR_NETWORK — network error while loading video',
-                            3: 'MEDIA_ERR_DECODE — codec or file corruption issue',
-                            4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device',
-                          };
-                          const detail = mediaErr
-                            ? (mediaMessages[mediaErr.code] ?? mediaErr.message)
-                            : 'Unknown error loading video';
-                          console.error('[VideoTestimonials] video error:', detail, video.src);
-                          setVideoError(testimonial.id, {
-                            code: mediaErr?.code ?? 0,
-                            message: 'Load failed',
-                            detail,
-                          });
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full animate-pulse" style={{ backgroundColor: '#1a1a1f' }} />
-                    )}
-
-                    {videoError && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center" style={{ backgroundColor: 'rgba(10,10,11,0.92)' }}>
-                        <AlertCircle className="w-8 h-8" style={{ color: '#C9A84C' }} />
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.75rem', color: '#8A8680', lineHeight: 1.5 }}>
-                          {videoError.detail}
-                        </p>
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.65rem', color: '#555', lineHeight: 1.4 }}>
-                          Tap to retry
-                        </p>
-                      </div>
-                    )}
-
-                    {!isPlaying && !videoError && (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div
-                            className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                            style={{
-                              border: '1.5px solid rgba(201,168,76,0.5)',
-                              backgroundColor: 'rgba(201,168,76,0.07)',
-                              backdropFilter: 'blur(6px)',
-                            }}
-                          >
-                            <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {isPlaying && (
-                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
-                          <PauseCircle className="w-5 h-5" style={{ color: '#C9A84C' }} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="px-5 py-4">
-                    <h3
-                      style={{
-                        fontFamily: "'Cormorant Garamond', serif",
-                        fontWeight: 400,
-                        fontSize: '1.1rem',
-                        color: '#F0EDE8',
-                        marginBottom: '2px',
-                      }}
-                    >
-                      {testimonial.testimonial_name || 'Anonymous'}
-                    </h3>
-                    <p
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontWeight: 300,
-                        fontSize: '0.78rem',
-                        color: '#8A8680',
-                      }}
-                    >
-                      {testimonial.testimonial_designation || 'Client'}
-                    </p>
-                  </div>
-                </div>
+                <VideoCard
+                  testimonial={testimonial}
+                  shouldLoad={shouldLoad}
+                  isPlaying={isPlaying}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onEnded={handleEnded}
+                />
               </div>
             );
           })}
