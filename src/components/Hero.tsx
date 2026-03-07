@@ -262,7 +262,7 @@ export default function Hero() {
                   src={mainVideo.url}
                   className="absolute inset-0 w-full h-full object-cover"
                   playsInline
-                  preload="none"
+                  preload="metadata"
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
