@@ -1,4 +1,4 @@
-import { RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Play, RotateCcw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -37,10 +37,10 @@ function formatTime(seconds: number) {
 
 export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [videoBuffering, setVideoBuffering] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -66,14 +66,6 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (!mainVideo) return;
-    const timer = setTimeout(() => {
-      setVideoLoaded(true);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [mainVideo]);
-
-  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -90,21 +82,21 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
-  const handleToggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+  const handlePlay = () => {
+    if (!videoRef.current) return;
+    setHasStarted(true);
+    videoRef.current.muted = false;
+    videoRef.current.play().catch(() => {});
   };
 
   const handleReplay = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
-      setVideoEnded(false);
-      setProgress(0);
-      setCurrentTime(0);
-    }
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    videoRef.current.muted = false;
+    videoRef.current.play().catch(() => {});
+    setVideoEnded(false);
+    setProgress(0);
+    setCurrentTime(0);
   };
 
   const handleTimeUpdate = () => {
@@ -118,18 +110,17 @@ export default function Hero() {
   };
 
   const handleLoadedMetadata = () => {
-    setVideoLoaded(true);
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
+      setVideoReady(true);
     }
   };
 
   const handleCanPlay = () => {
     setVideoBuffering(false);
-    setVideoLoaded(true);
     if (videoRef.current) {
       if (videoRef.current.duration) setDuration(videoRef.current.duration);
-      videoRef.current.play().catch(() => {});
+      setVideoReady(true);
     }
   };
 
@@ -230,7 +221,8 @@ export default function Hero() {
               aspectRatio: '16/9',
             }}
           >
-            {(!mainVideo || !videoLoaded) && (
+            {/* Loading state - no video URL yet */}
+            {!mainVideo && (
               <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: '#131316' }}>
                 <div className="flex flex-col items-center gap-3">
                   <svg className="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -244,14 +236,15 @@ export default function Hero() {
                     letterSpacing: '0.15em',
                     color: 'rgba(201,168,76,0.5)',
                   }}>
-                    Loading video...
+                    Loading...
                   </span>
                 </div>
               </div>
             )}
 
-            {mainVideo && videoLoaded && videoBuffering && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+            {/* Buffering overlay while playing */}
+            {hasStarted && videoBuffering && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
                 <svg className="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,0.2)" strokeWidth="2" />
                   <path d="M12 2a10 10 0 0 1 10 10" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" />
@@ -263,42 +256,60 @@ export default function Hero() {
               <>
                 <video
                   ref={videoRef}
-                  id="main-video"
                   src={mainVideo.url}
                   className="absolute inset-0 w-full h-full object-cover"
                   playsInline
-                  autoPlay
                   muted
                   preload="metadata"
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
-                  onTimeUpdate={handleTimeUpdate}
                   onCanPlay={handleCanPlay}
-                  onCanPlayThrough={handleCanPlay}
+                  onTimeUpdate={handleTimeUpdate}
                   onWaiting={() => setVideoBuffering(true)}
-                  onPlaying={() => { setVideoBuffering(false); setVideoLoaded(true); }}
+                  onPlaying={() => setVideoBuffering(false)}
                   onEnded={() => setVideoEnded(true)}
                 />
 
-                {videoLoaded && !videoEnded && (
+                {/* Play button overlay - shown until user taps play */}
+                {!hasStarted && (
                   <button
-                    onClick={handleToggleMute}
-                    className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
-                    style={{
-                      backgroundColor: 'rgba(0,0,0,0.55)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      backdropFilter: 'blur(6px)',
-                    }}
-                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                    onClick={handlePlay}
+                    className="absolute inset-0 flex flex-col items-center justify-center w-full h-full group"
+                    style={{ backgroundColor: 'rgba(10,10,11,0.45)' }}
+                    aria-label="Play video"
                   >
-                    {isMuted
-                      ? <VolumeX className="w-4 h-4" style={{ color: '#C9A84C' }} />
-                      : <Volume2 className="w-4 h-4" style={{ color: '#C9A84C' }} />
-                    }
+                    <div
+                      className="flex items-center justify-center w-20 h-20 rounded-full transition-all duration-300 group-hover:scale-110"
+                      style={{
+                        backgroundColor: 'rgba(201,168,76,0.15)',
+                        border: '2px solid rgba(201,168,76,0.6)',
+                        backdropFilter: 'blur(8px)',
+                      }}
+                    >
+                      <Play
+                        className="w-8 h-8"
+                        style={{ color: '#C9A84C', marginLeft: '3px' }}
+                        fill="currentColor"
+                      />
+                    </div>
+                    <span
+                      className="mt-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(201,168,76,0.7)',
+                      }}
+                    >
+                      {videoReady ? 'Tap to watch' : 'Loading...'}
+                    </span>
                   </button>
                 )}
 
+                {/* Ended overlay */}
                 {videoEnded && (
                   <div
                     className="absolute inset-0 flex flex-col items-center justify-center"
@@ -310,14 +321,11 @@ export default function Hero() {
                       aria-label="Replay video"
                     >
                       <div
-                        className="flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 group-hover:shadow-lg"
+                        className="flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300"
                         style={{
                           border: '1.5px solid rgba(201,168,76,0.5)',
                           backgroundColor: 'rgba(201,168,76,0.08)',
-                          boxShadow: '0 0 0 0 rgba(201,168,76,0)',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 24px rgba(201,168,76,0.25)')}
-                        onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 0 0 0 rgba(201,168,76,0)')}
                       >
                         <RotateCcw className="w-5 h-5 transition-transform duration-500 group-hover:-rotate-180" style={{ color: '#C9A84C' }} />
                       </div>
@@ -338,8 +346,8 @@ export default function Hero() {
             )}
           </div>
 
-          {/* Progress bar + controls */}
-          {videoLoaded && (
+          {/* Progress bar + controls - shown once video has started */}
+          {hasStarted && (
             <div className="mt-2.5 px-1">
               <div
                 ref={progressBarRef}
@@ -350,15 +358,14 @@ export default function Hero() {
                 onMouseMove={(e) => { if (isScrubbing) seekTo(e); }}
                 onMouseUp={() => setIsScrubbing(false)}
                 onMouseLeave={() => setIsScrubbing(false)}
+                onTouchStart={() => setIsScrubbing(true)}
+                onTouchMove={seekTo}
+                onTouchEnd={() => setIsScrubbing(false)}
               >
                 <div
                   className="h-full rounded-full transition-all duration-100"
-                  style={{
-                    width: `${progress}%`,
-                    backgroundColor: '#C9A84C',
-                  }}
+                  style={{ width: `${progress}%`, backgroundColor: '#C9A84C' }}
                 />
-                {/* Scrub handle */}
                 <div
                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   style={{
@@ -378,15 +385,6 @@ export default function Hero() {
                   letterSpacing: '0.03em',
                 }}>
                   {formatTime(currentTime)}
-                </span>
-                <span style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.68rem',
-                  color: '#5A5855',
-                  letterSpacing: '0.03em',
-                }}>
-                  tap for sound
                 </span>
                 <span style={{
                   fontFamily: "'DM Sans', sans-serif",
