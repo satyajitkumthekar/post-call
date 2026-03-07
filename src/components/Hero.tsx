@@ -66,6 +66,14 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    if (!mainVideo) return;
+    const timer = setTimeout(() => {
+      setVideoLoaded(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [mainVideo]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -113,6 +121,15 @@ export default function Hero() {
     setVideoLoaded(true);
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
+    }
+  };
+
+  const handleCanPlay = () => {
+    setVideoBuffering(false);
+    setVideoLoaded(true);
+    if (videoRef.current) {
+      if (videoRef.current.duration) setDuration(videoRef.current.duration);
+      videoRef.current.play().catch(() => {});
     }
   };
 
@@ -257,12 +274,10 @@ export default function Hero() {
                   disablePictureInPicture
                   onLoadedMetadata={handleLoadedMetadata}
                   onTimeUpdate={handleTimeUpdate}
-                  onCanPlay={() => {
-                    setVideoBuffering(false);
-                    videoRef.current?.play().catch(() => {});
-                  }}
+                  onCanPlay={handleCanPlay}
+                  onCanPlayThrough={handleCanPlay}
                   onWaiting={() => setVideoBuffering(true)}
-                  onPlaying={() => setVideoBuffering(false)}
+                  onPlaying={() => { setVideoBuffering(false); setVideoLoaded(true); }}
                   onEnded={() => setVideoEnded(true)}
                 />
 
