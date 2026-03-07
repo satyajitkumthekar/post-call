@@ -1,4 +1,4 @@
-import { Volume2, VolumeX } from 'lucide-react';
+import { RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -39,6 +39,7 @@ export default function Hero() {
   const [mainVideo, setMainVideo] = useState<UploadedFile | null>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoBuffering, setVideoBuffering] = useState(false);
+  const [videoEnded, setVideoEnded] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -85,6 +86,16 @@ export default function Hero() {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  const handleReplay = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+      setVideoEnded(false);
+      setProgress(0);
+      setCurrentTime(0);
     }
   };
 
@@ -252,9 +263,10 @@ export default function Hero() {
                   }}
                   onWaiting={() => setVideoBuffering(true)}
                   onPlaying={() => setVideoBuffering(false)}
+                  onEnded={() => setVideoEnded(true)}
                 />
 
-                {videoLoaded && (
+                {videoLoaded && !videoEnded && (
                   <button
                     onClick={handleToggleMute}
                     className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
@@ -270,6 +282,42 @@ export default function Hero() {
                       : <Volume2 className="w-4 h-4" style={{ color: '#C9A84C' }} />
                     }
                   </button>
+                )}
+
+                {videoEnded && (
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center"
+                    style={{ backgroundColor: 'rgba(10,10,11,0.75)', backdropFilter: 'blur(4px)' }}
+                  >
+                    <button
+                      onClick={handleReplay}
+                      className="group flex flex-col items-center gap-3 transition-all duration-300 hover:scale-105"
+                      aria-label="Replay video"
+                    >
+                      <div
+                        className="flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 group-hover:shadow-lg"
+                        style={{
+                          border: '1.5px solid rgba(201,168,76,0.5)',
+                          backgroundColor: 'rgba(201,168,76,0.08)',
+                          boxShadow: '0 0 0 0 rgba(201,168,76,0)',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 24px rgba(201,168,76,0.25)')}
+                        onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 0 0 0 rgba(201,168,76,0)')}
+                      >
+                        <RotateCcw className="w-5 h-5 transition-transform duration-500 group-hover:-rotate-180" style={{ color: '#C9A84C' }} />
+                      </div>
+                      <span style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 300,
+                        fontSize: '0.68rem',
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(201,168,76,0.7)',
+                      }}>
+                        Replay
+                      </span>
+                    </button>
+                  </div>
                 )}
               </>
             )}
