@@ -51,6 +51,33 @@ interface VideoCardProps {
 function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnded }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<VideoError | null>(null);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+
+  const captureThumbnail = () => {
+    const video = videoRef.current;
+    if (!video || thumbnail) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 360;
+    canvas.height = video.videoHeight || 640;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      if (dataUrl && dataUrl !== 'data:,') setThumbnail(dataUrl);
+    } catch {
+    }
+  };
+
+  const handleSeeked = () => {
+    captureThumbnail();
+  };
+
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video || thumbnail) return;
+    video.currentTime = 0.1;
+  };
 
   const handleClick = async () => {
     const video = videoRef.current;
@@ -139,6 +166,9 @@ function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnde
               className="w-full h-full object-contain"
               preload="metadata"
               playsInline
+              poster={thumbnail ?? undefined}
+              onLoadedMetadata={handleLoadedMetadata}
+              onSeeked={handleSeeked}
               onEnded={() => onEnded(testimonial.id)}
               onPause={() => onPause(testimonial.id)}
               onError={handleVideoError}
