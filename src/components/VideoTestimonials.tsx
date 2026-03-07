@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, PauseCircle, ChevronDown } from 'lucide-react';
+import { Play, PauseCircle, ChevronDown, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Testimonial {
@@ -9,6 +9,12 @@ interface Testimonial {
   url: string;
   file_name: string;
 }
+
+type VideoError = {
+  code: number;
+  message: string;
+  detail: string;
+};
 
 const PAGE_SIZE = 6;
 
@@ -40,6 +46,7 @@ export default function VideoTestimonials() {
   const [hasMore, setHasMore] = useState(false);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [loadedVideos, setLoadedVideos] = useState<Set<string>>(new Set());
+  const [videoErrors, setVideoErrors] = useState<Map<string, VideoError>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
@@ -118,22 +125,63 @@ export default function VideoTestimonials() {
     setIsLoadingMore(false);
   };
 
-  const handleVideoClick = (testimonialId: string) => {
+  const setVideoError = useCallback((id: string, err: VideoError) => {
+    setVideoErrors((prev) => {
+      const next = new Map(prev);
+      next.set(id, err);
+      return next;
+    });
+  }, []);
+
+  const handleVideoClick = async (testimonialId: string) => {
     const videoElement = document.querySelector(`#video-${testimonialId}`) as HTMLVideoElement;
-    if (videoElement) {
-      if (playingVideo === testimonialId) {
-        videoElement.pause();
-        setPlayingVideo(null);
-      } else {
-        if (playingVideo) {
-          const currentPlaying = document.querySelector(`#video-${playingVideo}`) as HTMLVideoElement;
-          if (currentPlaying) {
-            currentPlaying.pause();
-          }
-        }
-        videoElement.play();
-        setPlayingVideo(testimonialId);
+    if (!videoElement) return;
+
+    if (playingVideo === testimonialId) {
+      videoElement.pause();
+      setPlayingVideo(null);
+      return;
+    }
+
+    if (playingVideo) {
+      const currentPlaying = document.querySelector(`#video-${playingVideo}`) as HTMLVideoElement;
+      if (currentPlaying) currentPlaying.pause();
+    }
+
+    videoElement.muted = false;
+
+    try {
+      await videoElement.play();
+      setPlayingVideo(testimonialId);
+    } catch (err: unknown) {
+      console.error('[VideoTestimonials] play() failed:', err);
+
+      const mediaErr = videoElement.error;
+      const domErr = err as DOMException;
+
+      let code = domErr?.code ?? 0;
+      let message = domErr?.name ?? 'Unknown';
+      let detail = domErr?.message ?? 'No detail available';
+
+      if (mediaErr) {
+        code = mediaErr.code;
+        const mediaMessages: Record<number, string> = {
+          1: 'MEDIA_ERR_ABORTED - Playback was aborted by the user.',
+          2: 'MEDIA_ERR_NETWORK - A network error occurred while fetching the video.',
+          3: 'MEDIA_ERR_DECODE - The video could not be decoded (codec issue or corrupted file).',
+          4: 'MEDIA_ERR_SRC_NOT_SUPPORTED - The video format or URL is not supported on this device.',
+        };
+        detail = mediaMessages[mediaErr.code] ?? mediaErr.message ?? detail;
       }
+
+      if (domErr?.name === 'NotAllowedError') {
+        detail = 'Safari blocked autoplay. Tap directly on the video to play.';
+      } else if (domErr?.name === 'AbortError') {
+        detail = 'Playback was interrupted before it could start.';
+      }
+
+      setVideoError(testimonialId, { code, message, detail });
+      setPlayingVideo(null);
     }
   };
 
@@ -182,6 +230,7 @@ export default function VideoTestimonials() {
           {testimonials.map((testimonial, index) => {
             const isPlaying = playingVideo === testimonial.id;
             const shouldLoad = loadedVideos.has(testimonial.id) || index < 3;
+            const videoError = videoErrors.get(testimonial.id);
             return (
               <div
                 key={testimonial.id}
@@ -211,7 +260,16 @@ export default function VideoTestimonials() {
                   <div
                     className="aspect-[9/16] relative overflow-hidden cursor-pointer"
                     style={{ backgroundColor: '#0A0A0B' }}
-                    onClick={() => handleVideoClick(testimonial.id)}
+                    onClick={() => {
+                      if (videoError) {
+                        setVideoErrors((prev) => {
+                          const next = new Map(prev);
+                          next.delete(testimonial.id);
+                          return next;
+                        });
+                      }
+                      handleVideoClick(testimonial.id);
+                    }}
                   >
                     {shouldLoad ? (
                       <video
@@ -230,11 +288,43 @@ export default function VideoTestimonials() {
                           const video = e.target as HTMLVideoElement;
                           video.currentTime = 0.1;
                         }}
+                        onError={(e) => {
+                          const video = e.target as HTMLVideoElement;
+                          const mediaErr = video.error;
+                          const mediaMessages: Record<number, string> = {
+                            1: 'MEDIA_ERR_ABORTED',
+                            2: 'MEDIA_ERR_NETWORK — network error while loading video',
+                            3: 'MEDIA_ERR_DECODE — codec or file corruption issue',
+                            4: 'MEDIA_ERR_SRC_NOT_SUPPORTED — format not supported on this device',
+                          };
+                          const detail = mediaErr
+                            ? (mediaMessages[mediaErr.code] ?? mediaErr.message)
+                            : 'Unknown error loading video';
+                          console.error('[VideoTestimonials] video error:', detail, video.src);
+                          setVideoError(testimonial.id, {
+                            code: mediaErr?.code ?? 0,
+                            message: 'Load failed',
+                            detail,
+                          });
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full animate-pulse" style={{ backgroundColor: '#1a1a1f' }} />
                     )}
-                    {!isPlaying && (
+
+                    {videoError && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center" style={{ backgroundColor: 'rgba(10,10,11,0.92)' }}>
+                        <AlertCircle className="w-8 h-8" style={{ color: '#C9A84C' }} />
+                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.75rem', color: '#8A8680', lineHeight: 1.5 }}>
+                          {videoError.detail}
+                        </p>
+                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.65rem', color: '#555', lineHeight: 1.4 }}>
+                          Tap to retry
+                        </p>
+                      </div>
+                    )}
+
+                    {!isPlaying && !videoError && (
                       <>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute inset-0 flex items-center justify-center">
