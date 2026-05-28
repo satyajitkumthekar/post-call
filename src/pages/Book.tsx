@@ -53,24 +53,34 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function openCalendlyPopup(url: string) {
-  const existing = document.querySelector('script[src*="calendly.com/assets/external/widget.js"]');
-  if (existing) {
-    if ((window as any).Calendly) {
-      (window as any).Calendly.initPopupWidget({ url });
-    }
-    return;
-  }
+let calendlyScriptLoaded = false;
 
-  const script = document.createElement('script');
-  script.src = 'https://assets.calendly.com/assets/external/widget.js';
-  script.async = true;
-  script.onload = () => {
-    if ((window as any).Calendly) {
-      (window as any).Calendly.initPopupWidget({ url });
-    }
-  };
-  document.head.appendChild(script);
+function ensureCalendlyScript(): Promise<void> {
+  if ((window as any).Calendly) {
+    calendlyScriptLoaded = true;
+    return Promise.resolve();
+  }
+  if (calendlyScriptLoaded) {
+    return new Promise((resolve) => {
+      const check = setInterval(() => {
+        if ((window as any).Calendly) { clearInterval(check); resolve(); }
+      }, 50);
+    });
+  }
+  calendlyScriptLoaded = true;
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
+
+function openCalendlyPopup(url: string) {
+  ensureCalendlyScript().then(() => {
+    (window as any).Calendly.initPopupWidget({ url });
+  });
 }
 
 export default function Book() {
@@ -100,6 +110,10 @@ export default function Book() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    ensureCalendlyScript();
+  }, []);
 
   useEffect(() => {
     const fetchVslUrl = async () => {
