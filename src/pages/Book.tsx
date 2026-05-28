@@ -7,23 +7,23 @@ import BookMessagesCarousel from '../components/BookMessagesCarousel';
 const pillars = [
   {
     heading: 'the bandwidth',
-    body: "You don't have a knowledge problem. You can figure anything out, you've done it a thousand times in every other part of your life. What you don't have is the bandwidth to do that on top of everything else you're already carrying. So we take it off your plate. Every time you walk into the gym, every time you sit down to eat, every habit you're trying to build, you know exactly what to do. No deciding, no figuring it out. We lay the path down. You walk it.",
+    body: "You and I both know you don't have a knowledge problem. You can figure things out, you've done it a thousand times in every other area of your life. What you don't have is the mental bandwidth to do it on top of everything else. So we take it off your plate completely. You get total clarity. A paved path. Every time you walk into the gym, every time you eat, every habit, you know exactly what to do. No guessing. No decisions. No energy spent figuring it out. We lay the path down for your body, your life, your goals. All you have to do is walk it.",
   },
   {
     heading: 'the team',
-    body: "This is the part nobody ever gave you. A dedicated team in your corner whose only job is to keep you winning. We're on the journey with you, every day. When life throws something at you, a brutal week, a trip, a stretch where everything is on fire at once, we're right there in your pocket. Most people who try to do this alone fall off because no one notices when they slip. With us, someone always notices the same day.",
+    body: "You stop doing this alone. We make this a team effort. You get a dedicated team in your corner whose only job is to make you win, a system of accountability that keeps you in check throughout the journey, and 24/7 access to your team. Every time life throws a curveball at you, we're right there with you. You're never doing this alone again.",
   },
   {
     heading: 'the food',
-    body: "We don't put you on a diet. We never will. Every diet you've tried has felt like a cage, and the more caged you feel, the more you eventually break out. You're never going to live a life where you eat the same ten foods forever, and we wouldn't want you to. So instead, you learn how to anchor your day around one meal that does the heavy lifting, and the rest of your eating stays free. You keep the food you love. You make progress anyway. That's the whole point.",
+    body: "Let's be honest. This is where you've struggled the most, because food has always been a love language for us. I still crave my mom's parothas every time I have a bad day. And every plan you've tried has only ever tried to restrict the food you love. Every time you broke the diet, you felt like you'd lost all your progress. Like you were back at zero. Caged. So we don't put you on a diet. You learn how to anchor your nutrition around one meal that does the heavy lifting, and that creates space for you to eat the food you love while still making progress.",
   },
   {
     heading: 'the way it bends',
-    body: "Every program you've tried was designed for a perfect week, and you don't get many of those. So the first hard week broke it, and you were back to zero. This works the opposite way. Your plan bends with your life, not the other way around. Travel, deadlines, weddings, the months where work tries to eat you alive, we reshape your training and your food around whatever's in front of you. You stop forcing your life into a plan. You never start over again.",
+    body: "Your fitness bends with your life, not the other way around. Every program you've tried was built for a perfect week. And you've been trying to force every imperfect week, the travel, the brutal stretches at work, the weddings, the functions, into that perfect plan. This works the opposite way. The plan bends every single week, around what your life actually looks like. And once you've navigated a few of those weeks with us, the travel, the chaos, the family obligations, you'll have something you've never had: the confidence that you can stay on track no matter what life throws at you.",
   },
   {
     heading: 'the voice',
-    body: "This is the work that makes all of it last, and it's the part most coaches never touch. Every time you've slipped, there was a voice in your head right before it. You've had a long day. You deserve this. You'll start Monday. You knew that voice wasn't good for you, but you listened anyway. We teach you how to catch that voice in the moment, see it for what it is, and beat it. Every single time. Until eventually it goes quiet, and fitness isn't a thing you have to force anymore. It's just who you are.",
+    body: "This is the work that makes all of it last. Everything you've ever tried has only focused on the external. Your body. Your training. Your schedule. But every time you slipped, there was a voice in your head right before it. You've had a long day. You deserve this. You'll start Monday. You knew that voice wasn't good for you. You listened anyway. So in this program, you also learn how to navigate the internal. We give you the exact tools to catch that voice in the moment, and to beat it, every single time. Because anyone can get you in shape for a few months. Our job is to make sure you stay in shape for the rest of your life. And more importantly, to make you the person who wants to stay in shape for the rest of their life. Once that happens, you don't need willpower anymore. Fitness just becomes automatic.",
   },
 ];
 
