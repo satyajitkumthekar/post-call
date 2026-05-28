@@ -53,6 +53,59 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex flex-col"
+      style={{ backgroundColor: '#0A0A0A' }}
+    >
+      <div
+        className="flex items-center justify-between px-5 h-14 flex-shrink-0"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <span
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 400,
+            fontSize: '0.85rem',
+            color: '#F0EDE8',
+          }}
+        >
+          Book Your Diagnostic Call
+        </span>
+        <button
+          onClick={onClose}
+          className="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+          style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
+          aria-label="Close booking"
+        >
+          <X className="w-5 h-5" style={{ color: '#F0EDE8' }} />
+        </button>
+      </div>
+      <div ref={containerRef} className="flex-1 overflow-hidden">
+        <div
+          className="calendly-inline-widget"
+          data-url={url}
+          style={{ minWidth: '320px', width: '100%', height: '100%' }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function Book() {
   const [vslUrl, setVslUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -109,9 +162,18 @@ export default function Book() {
   }, []);
 
   const calendlyUrl = (() => {
-    const base = 'https://calendly.com/satyajit-kumthekar/diagnostic-call?hide_gdpr_banner=1&background_color=0a0a0a&text_color=f5f5f5&primary_color=c9a14a';
-    if (!leadData) return base;
-    return `${base}&name=${encodeURIComponent(leadData.firstName)}&a1=${encodeURIComponent(leadData.whatsappNumber)}`;
+    const base = 'https://calendly.com/satyajit-kumthekar/diagnostic-call';
+    const params = new URLSearchParams({
+      hide_gdpr_banner: '1',
+      background_color: '0a0a0a',
+      text_color: 'f5f5f5',
+      primary_color: 'c9a14a',
+    });
+    if (leadData) {
+      params.set('name', leadData.firstName);
+      params.set('a1', leadData.whatsappNumber);
+    }
+    return `${base}?${params.toString()}`;
   })();
 
   const openBookingModal = useCallback(() => {
@@ -829,44 +891,7 @@ export default function Book() {
 
       {/* Booking Modal */}
       {showBookingModal && (
-        <div
-          className="fixed inset-0 z-[100] flex flex-col"
-          style={{ backgroundColor: '#0A0A0A' }}
-        >
-          <div
-            className="flex items-center justify-between px-5 h-14 flex-shrink-0"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: '0.85rem',
-                color: '#F0EDE8',
-              }}
-            >
-              Book Your Diagnostic Call
-            </span>
-            <button
-              onClick={closeBookingModal}
-              className="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
-              style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-              aria-label="Close booking"
-            >
-              <X className="w-5 h-5" style={{ color: '#F0EDE8' }} />
-            </button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <iframe
-              src={calendlyUrl}
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              title="Book Your Diagnostic Call"
-              style={{ display: 'block' }}
-            />
-          </div>
-        </div>
+        <CalendlyModal url={calendlyUrl} onClose={closeBookingModal} />
       )}
     </div>{/* end blur wrapper */}
     </div>

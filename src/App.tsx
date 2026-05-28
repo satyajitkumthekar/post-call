@@ -47,7 +47,7 @@ function App() {
   }
 
   if (currentPath === '/book') {
-    return <Book />;
+    return <Book key="book" />;
   }
 
   return (
