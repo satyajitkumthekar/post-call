@@ -216,12 +216,12 @@ export default function BookVideoTestimonials() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 flex flex-col items-center">
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl animate-pulse"
-            style={{ backgroundColor: '#131316', height: '480px' }}
+            className="rounded-2xl animate-pulse w-[72%]"
+            style={{ backgroundColor: '#131316', aspectRatio: '9/16' }}
           />
         ))}
       </div>
@@ -231,12 +231,13 @@ export default function BookVideoTestimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col items-center">
       {testimonials.map((testimonial, index) => {
         const shouldLoad = loadedVideos.has(testimonial.id) || index < 2;
         return (
           <div
             key={testimonial.id}
+            className="w-[72%]"
             ref={(el) => {
               if (el && !shouldLoad) {
                 el.setAttribute('data-video-id', testimonial.id);

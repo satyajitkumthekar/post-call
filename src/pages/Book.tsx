@@ -4,26 +4,26 @@ import { supabase } from '../lib/supabase';
 import BookVideoTestimonials from '../components/BookVideoTestimonials';
 import BookMessagesCarousel from '../components/BookMessagesCarousel';
 
-const mirrorPairs = [
+const pillars = [
   {
-    before: "You know exactly what to eat, what to train, what to fix. You just don't have the bandwidth left to actually do it.",
-    after: "We do all the thinking for you. The plan, the food, the adjustments. You just show up.",
+    heading: 'the bandwidth',
+    body: "You don't have a knowledge problem. You can figure anything out, you've done it a thousand times in every other part of your life. What you don't have is the bandwidth to do that on top of everything else you're already carrying. So we take it off your plate. Every time you walk into the gym, every time you sit down to eat, every habit you're trying to build, you know exactly what to do. No deciding, no figuring it out. We lay the path down. You walk it.",
   },
   {
-    before: "You start, it goes well, then one bad week happens and the whole thing falls apart.",
-    after: "You stop doing this alone. A dedicated team in your corner, 24/7. We catch the slip before it becomes a fall.",
+    heading: 'the team',
+    body: "This is the part nobody ever gave you. A dedicated team in your corner whose only job is to keep you winning. We're on the journey with you, every day. When life throws something at you, a brutal week, a trip, a stretch where everything is on fire at once, we're right there in your pocket. Most people who try to do this alone fall off because no one notices when they slip. With us, someone always notices the same day.",
   },
   {
-    before: "Every diet feels like a cage. The moment you slip, you spiral.",
-    after: "No diet. You learn how to anchor your day around one meal, and the rest stays free. You keep eating the food you love.",
+    heading: 'the food',
+    body: "We don't put you on a diet. We never will. Every diet you've tried has felt like a cage, and the more caged you feel, the more you eventually break out. You're never going to live a life where you eat the same ten foods forever, and we wouldn't want you to. So instead, you learn how to anchor your day around one meal that does the heavy lifting, and the rest of your eating stays free. You keep the food you love. You make progress anyway. That's the whole point.",
   },
   {
-    before: "You finally find your rhythm, and a trip or a brutal week wipes it out. You're back to zero.",
-    after: "The plan bends with your life. Travel, deadlines, weddings, we reshape around it. You never start over.",
+    heading: 'the way it bends',
+    body: "Every program you've tried was designed for a perfect week, and you don't get many of those. So the first hard week broke it, and you were back to zero. This works the opposite way. Your plan bends with your life, not the other way around. Travel, deadlines, weddings, the months where work tries to eat you alive, we reshape your training and your food around whatever's in front of you. You stop forcing your life into a plan. You never start over again.",
   },
   {
-    before: 'There\'s a voice in your head every time. "You\'ve had a long day. You deserve this. Start Monday." You listen to it every time.',
-    after: "We give you the tools to catch that voice, and beat it. Until fitness isn't willpower anymore. It's just who you are.",
+    heading: 'the voice',
+    body: "This is the work that makes all of it last, and it's the part most coaches never touch. Every time you've slipped, there was a voice in your head right before it. You've had a long day. You deserve this. You'll start Monday. You knew that voice wasn't good for you, but you listened anyway. We teach you how to catch that voice in the moment, see it for what it is, and beat it. Every single time. Until eventually it goes quiet, and fitness isn't a thing you have to force anymore. It's just who you are.",
   },
 ];
 
@@ -225,23 +225,8 @@ export default function Book() {
       {/* Section 1: Hero */}
       <section className="pt-20 md:pt-28 pb-12 px-5 md:px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="fade-up fade-up-1 mb-5">
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: '0.65rem',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: '#C9A84C',
-              }}
-            >
-              For Invited Applicants Only
-            </span>
-          </div>
-
           <h1
-            className="fade-up fade-up-2 mb-5"
+            className="fade-up fade-up-1 mb-10"
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
@@ -253,20 +238,6 @@ export default function Book() {
             The last piece of the puzzle,{' '}
             <em style={{ fontWeight: 400 }}>finally handled.</em>
           </h1>
-
-          <p
-            className="fade-up fade-up-3 max-w-lg mx-auto mb-8"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 300,
-              fontSize: '1rem',
-              color: '#8A8680',
-              lineHeight: 1.7,
-            }}
-          >
-            You've made it through. Spend the next few minutes with this video
-            before our call. It'll make our conversation a lot more useful.
-          </p>
         </div>
 
         {/* VSL Video */}
@@ -478,26 +449,15 @@ export default function Book() {
           >
             Book Your Diagnostic Call
           </button>
-          <p
-            className="text-center mt-3"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.8rem',
-              color: '#5A5855',
-            }}
-          >
-            30 minutes. No pitch. Clarity either way.
-          </p>
         </div>
       </section>
 
-      {/* Section 2: The Mirror */}
-      <section className="py-12 md:py-20 px-5 md:px-6" style={{ backgroundColor: '#0A0A0A' }}>
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
+      {/* Section 2: How We Handle It */}
+      <section className="py-16 md:py-24 px-5 md:px-6" style={{ backgroundColor: '#0A0A0A' }}>
+        <div className="max-w-xl mx-auto">
+          <div className="text-center mb-16 md:mb-20">
             <h2
-              className="mb-1"
+              className="mb-3"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
@@ -506,56 +466,56 @@ export default function Book() {
                 lineHeight: 1.15,
               }}
             >
-              You already know what to do.
+              How we handle the last piece.
             </h2>
             <p
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
-                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
                 color: '#5A5855',
               }}
             >
-              That was never the problem.
+              Five parts. We carry it now. You keep it for life.
             </p>
           </div>
 
-          {/* Compact two-column grid */}
-          <div className="grid grid-cols-2 gap-3 md:gap-4">
-            {mirrorPairs.map((pair, i) => (
-              <div
-                key={i}
-                className="rounded-lg p-4 md:p-5 flex flex-col"
-                style={{
-                  backgroundColor: '#111114',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
+          <div>
+            {pillars.map((pillar, i) => (
+              <div key={i}>
+                <h3
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontWeight: 300,
+                    fontStyle: 'italic',
+                    fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                    color: 'rgba(201,168,76,0.75)',
+                    marginBottom: '14px',
+                  }}
+                >
+                  {pillar.heading}
+                </h3>
                 <p
-                  className="mb-3 flex-1"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 300,
-                    fontSize: '0.82rem',
+                    fontSize: 'clamp(1rem, 2.5vw, 1.0625rem)',
                     color: '#8A8680',
-                    lineHeight: 1.6,
+                    lineHeight: 1.75,
                   }}
                 >
-                  {pair.before}
+                  {pillar.body}
                 </p>
-                <div className="h-px mb-3" style={{ backgroundColor: 'rgba(201,168,76,0.2)' }} />
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 300,
-                    fontSize: '0.82rem',
-                    color: '#F0EDE8',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {pair.after}
-                </p>
+                {i < pillars.length - 1 && (
+                  <div
+                    style={{
+                      height: '1px',
+                      backgroundColor: 'rgba(201,168,76,0.08)',
+                      margin: '52px 0',
+                    }}
+                  />
+                )}
               </div>
             ))}
           </div>
