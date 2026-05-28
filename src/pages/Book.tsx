@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, X } from 'lucide-react';
+import { Play, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import BookVideoTestimonials from '../components/BookVideoTestimonials';
 import BookMessagesCarousel from '../components/BookMessagesCarousel';
@@ -53,71 +53,24 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const existing = document.querySelector('script[src*="calendly.com/assets/external/widget.js"]');
-    if (existing) {
-      // Script already loaded, just init the widget
-      if ((window as any).Calendly && containerRef.current) {
-        (window as any).Calendly.initInlineWidget({
-          url,
-          parentElement: containerRef.current,
-        });
-      }
-      return;
+function openCalendlyPopup(url: string) {
+  const existing = document.querySelector('script[src*="calendly.com/assets/external/widget.js"]');
+  if (existing) {
+    if ((window as any).Calendly) {
+      (window as any).Calendly.initPopupWidget({ url });
     }
+    return;
+  }
 
-    const script = document.createElement('script');
-    script.src = 'https://assets.calendly.com/assets/external/widget.js';
-    script.async = true;
-    script.onload = () => {
-      if ((window as any).Calendly && containerRef.current) {
-        (window as any).Calendly.initInlineWidget({
-          url,
-          parentElement: containerRef.current,
-        });
-      }
-    };
-    document.head.appendChild(script);
-  }, [url]);
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col"
-      style={{ backgroundColor: '#0A0A0A' }}
-    >
-      <div
-        className="flex items-center justify-between px-5 h-14 flex-shrink-0"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        <span
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 400,
-            fontSize: '0.85rem',
-            color: '#F0EDE8',
-          }}
-        >
-          Book Your Diagnostic Call
-        </span>
-        <button
-          onClick={onClose}
-          className="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
-          style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-          aria-label="Close booking"
-        >
-          <X className="w-5 h-5" style={{ color: '#F0EDE8' }} />
-        </button>
-      </div>
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-hidden"
-        style={{ minWidth: '320px', width: '100%', height: '100%' }}
-      />
-    </div>
-  );
+  const script = document.createElement('script');
+  script.src = 'https://assets.calendly.com/assets/external/widget.js';
+  script.async = true;
+  script.onload = () => {
+    if ((window as any).Calendly) {
+      (window as any).Calendly.initPopupWidget({ url });
+    }
+  };
+  document.head.appendChild(script);
 }
 
 export default function Book() {
@@ -131,7 +84,6 @@ export default function Book() {
   const [duration, setDuration] = useState(0);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const [showLeadGate, setShowLeadGate] = useState<boolean>(() => {
     const params = new URLSearchParams(window.location.search);
@@ -148,7 +100,6 @@ export default function Book() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
-  const scrollPositionRef = useRef(0);
 
   useEffect(() => {
     const fetchVslUrl = async () => {
@@ -178,18 +129,8 @@ export default function Book() {
   })();
 
   const openBookingModal = useCallback(() => {
-    scrollPositionRef.current = window.scrollY;
-    setShowBookingModal(true);
-    document.body.style.overflow = 'hidden';
-  }, []);
-
-  const closeBookingModal = useCallback(() => {
-    setShowBookingModal(false);
-    document.body.style.overflow = '';
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPositionRef.current);
-    });
-  }, []);
+    openCalendlyPopup(calendlyUrl);
+  }, [calendlyUrl]);
 
   const handlePlay = async () => {
     if (!videoRef.current) return;
@@ -890,10 +831,6 @@ export default function Book() {
       {/* Bottom padding spacer for mobile sticky bar */}
       <div className="h-16 md:hidden" style={{ backgroundColor: '#0A0A0A' }} />
 
-      {/* Booking Modal */}
-      {showBookingModal && (
-        <CalendlyModal url={calendlyUrl} onClose={closeBookingModal} />
-      )}
     </div>{/* end blur wrapper */}
     </div>
   );
