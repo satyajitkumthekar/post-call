@@ -3,6 +3,7 @@ import { Play, RotateCcw, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import BookVideoTestimonials from '../components/BookVideoTestimonials';
 import BookMessagesCarousel from '../components/BookMessagesCarousel';
+import LeadGateModal from '../components/LeadGateModal';
 
 const pillars = [
   {
@@ -64,10 +65,33 @@ export default function Book() {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [leadData, setLeadData] = useState<{ firstName: string; whatsappNumber: string } | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef(0);
+
+  useEffect(() => {
+    // Check URL params first
+    const params = new URLSearchParams(window.location.search);
+    const urlName = params.get('name');
+    const urlWhatsapp = params.get('whatsapp');
+    if (urlName && urlWhatsapp) {
+      setLeadData({ firstName: urlName, whatsappNumber: urlWhatsapp });
+      window.history.replaceState({}, document.title, '/book');
+      return;
+    }
+    // Check session storage
+    if (sessionStorage.getItem('lead_submitted') === 'true') {
+      const storedName = sessionStorage.getItem('lead_first_name') ?? '';
+      const storedWa = sessionStorage.getItem('lead_whatsapp') ?? '';
+      if (storedName) setLeadData({ firstName: storedName, whatsappNumber: storedWa });
+      return;
+    }
+    // Show the gate
+    setShowLeadGate(true);
+  }, []);
 
   useEffect(() => {
     const fetchVslUrl = async () => {
@@ -80,6 +104,12 @@ export default function Book() {
     };
     fetchVslUrl();
   }, []);
+
+  const calendlyUrl = (() => {
+    const base = 'https://calendly.com/satyajit-kumthekar/diagnostic-call?hide_gdpr_banner=1&background_color=0a0a0a&text_color=f5f5f5&primary_color=c9a14a';
+    if (!leadData) return base;
+    return `${base}&name=${encodeURIComponent(leadData.firstName)}&a1=${encodeURIComponent(leadData.whatsappNumber)}`;
+  })();
 
   const openBookingModal = useCallback(() => {
     scrollPositionRef.current = window.scrollY;
@@ -164,7 +194,23 @@ export default function Book() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A', position: 'relative' }}>
+      {showLeadGate && (
+        <LeadGateModal
+          onComplete={(data) => {
+            setLeadData(data);
+            setShowLeadGate(false);
+          }}
+        />
+      )}
+    <div
+      style={{
+        filter: showLeadGate ? 'blur(10px)' : 'none',
+        pointerEvents: showLeadGate ? 'none' : 'auto',
+        transition: 'filter 300ms ease',
+        userSelect: showLeadGate ? 'none' : 'auto',
+      }}
+    >
       {/* Sticky Header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 h-14 md:h-[72px] flex items-center px-5 md:px-10"
@@ -807,25 +853,19 @@ export default function Book() {
               <X className="w-5 h-5" style={{ color: '#F0EDE8' }} />
             </button>
           </div>
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="text-center">
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '1rem',
-                  color: '#8A8680',
-                  lineHeight: 1.7,
-                }}
-              >
-                Booking widget will appear here.
-                <br />
-                Configure your Cal.com or Calendly embed URL.
-              </p>
-            </div>
+          <div className="flex-1 overflow-hidden">
+            <iframe
+              src={calendlyUrl}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              title="Book Your Diagnostic Call"
+              style={{ display: 'block' }}
+            />
           </div>
         </div>
       )}
+    </div>{/* end blur wrapper */}
     </div>
   );
 }
