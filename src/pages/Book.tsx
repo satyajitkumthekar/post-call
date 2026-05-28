@@ -653,9 +653,8 @@ export default function Book() {
               lineHeight: 1.7,
             }}
           >
-            This is a diagnostic call, not a sales call. By the end, you'll know
-            exactly what it would take to fix this, whether you work with us or
-            not.
+            By the end, you'll know exactly what it would take to fix this,
+            whether you work with us or not.
           </p>
         </div>
       </section>

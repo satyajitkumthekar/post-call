@@ -162,7 +162,7 @@ export default function BookVideoTestimonials() {
         .select('id, testimonial_name, testimonial_designation, url')
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(20);
       if (data) {
         setTestimonials(data);
         videoElsRef.current = new Array(data.length).fill(null);
@@ -235,7 +235,7 @@ export default function BookVideoTestimonials() {
     return (
       <div className="relative overflow-hidden" style={{ margin: '0 -20px' }}>
         <div className="flex gap-4 px-5">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <div
               key={i}
               className="rounded-2xl animate-pulse flex-shrink-0"
