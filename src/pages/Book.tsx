@@ -675,18 +675,6 @@ export default function Book() {
             If everything in the video sounded like your life, let's get the
             last piece handled.
           </h2>
-          <p
-            className="mb-8"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 300,
-              fontSize: '1rem',
-              color: '#5A5855',
-              lineHeight: 1.7,
-            }}
-          >
-            30 minutes. No pitch. You'll walk away with clarity, either way.
-          </p>
           <button
             onClick={openBookingModal}
             className="w-full max-w-md mx-auto block rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
