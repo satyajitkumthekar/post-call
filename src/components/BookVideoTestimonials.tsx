@@ -11,18 +11,18 @@ interface Testimonial {
 
 function VideoCard({
   testimonial,
-  shouldLoad,
   isPlaying,
   onPlay,
   onPause,
   onEnded,
+  onVideoMount,
 }: {
   testimonial: Testimonial;
-  shouldLoad: boolean;
   isPlaying: boolean;
   onPlay: (id: string, el: HTMLVideoElement) => void;
   onPause: (id: string) => void;
   onEnded: (id: string) => void;
+  onVideoMount: (el: HTMLVideoElement | null) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
@@ -75,22 +75,18 @@ function VideoCard({
           style={{ backgroundColor: '#0A0A0A' }}
           onClick={handleClick}
         >
-          {shouldLoad ? (
-            <video
-              ref={videoRef}
-              src={testimonial.url}
-              className="w-full h-full object-contain"
-              preload="metadata"
-              playsInline
-              poster={thumbnail ?? undefined}
-              onLoadedMetadata={handleLoadedMetadata}
-              onSeeked={handleSeeked}
-              onEnded={() => onEnded(testimonial.id)}
-              onPause={() => onPause(testimonial.id)}
-            />
-          ) : (
-            <div className="w-full h-full animate-pulse" style={{ backgroundColor: '#1a1a1f' }} />
-          )}
+          <video
+            ref={(el) => { (videoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el; onVideoMount(el); }}
+            src={testimonial.url}
+            className="w-full h-full object-contain"
+            preload="metadata"
+            playsInline
+            poster={thumbnail ?? undefined}
+            onLoadedMetadata={handleLoadedMetadata}
+            onSeeked={handleSeeked}
+            onEnded={() => onEnded(testimonial.id)}
+            onPause={() => onPause(testimonial.id)}
+          />
 
           {!isPlaying && (
             <>
@@ -152,37 +148,12 @@ function VideoCard({
 export default function BookVideoTestimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
-  const [loadedVideos, setLoadedVideos] = useState<Set<string>>(new Set());
+
+  const scrollRef = useRef<HTMLDivElement>(null);
   const playingVideoRef = useRef<HTMLVideoElement | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-
-  const markLoaded = useCallback((videoId: string) => {
-    setLoadedVideos((prev) => {
-      if (prev.has(videoId)) return prev;
-      const next = new Set(prev);
-      next.add(videoId);
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const videoId = entry.target.getAttribute('data-video-id');
-            if (videoId) {
-              markLoaded(videoId);
-              observerRef.current?.unobserve(entry.target);
-            }
-          }
-        });
-      },
-      { rootMargin: '300px' }
-    );
-    return () => { observerRef.current?.disconnect(); };
-  }, [markLoaded]);
+  const videoElsRef = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -192,11 +163,57 @@ export default function BookVideoTestimonials() {
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false })
         .limit(3);
-      if (data) setTestimonials(data);
+      if (data) {
+        setTestimonials(data);
+        videoElsRef.current = new Array(data.length).fill(null);
+      }
       setIsLoading(false);
     };
     fetchTestimonials();
   }, []);
+
+  const pauseCurrentVideo = useCallback(() => {
+    if (playingVideoRef.current) {
+      playingVideoRef.current.pause();
+      playingVideoRef.current = null;
+    }
+    setPlayingVideo(null);
+  }, []);
+
+  // Track active index via scroll position
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const handleScroll = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const cardWidth = el.scrollWidth / testimonials.length;
+        const newIndex = Math.round(el.scrollLeft / cardWidth);
+        if (newIndex !== activeIndex) {
+          pauseCurrentVideo();
+          setActiveIndex(newIndex);
+        }
+      }, 80);
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeout);
+    };
+  }, [testimonials.length, activeIndex, pauseCurrentVideo]);
+
+  const scrollToIndex = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    pauseCurrentVideo();
+    const cardWidth = el.scrollWidth / testimonials.length;
+    el.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
+    setActiveIndex(index);
+  };
 
   const handlePlay = useCallback((id: string, el: HTMLVideoElement) => {
     if (playingVideoRef.current && playingVideoRef.current !== el) {
@@ -216,14 +233,20 @@ export default function BookVideoTestimonials() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 flex flex-col items-center">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="rounded-2xl animate-pulse w-[72%]"
-            style={{ backgroundColor: '#131316', aspectRatio: '9/16' }}
-          />
-        ))}
+      <div className="relative overflow-hidden" style={{ margin: '0 -20px' }}>
+        <div className="flex gap-4 px-5">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl animate-pulse flex-shrink-0"
+              style={{
+                width: '75%',
+                backgroundColor: '#131316',
+                aspectRatio: '9/16',
+              }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
@@ -231,31 +254,63 @@ export default function BookVideoTestimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <div className="space-y-6 flex flex-col items-center">
-      {testimonials.map((testimonial, index) => {
-        const shouldLoad = loadedVideos.has(testimonial.id) || index < 2;
-        return (
+    <div>
+      {/* Carousel track */}
+      <div
+        ref={scrollRef}
+        className="bvt-scroll flex overflow-x-auto"
+        style={{
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          gap: '16px',
+          paddingLeft: 'calc(12.5% - 8px)',
+          paddingRight: 'calc(12.5% - 8px)',
+        }}
+      >
+        {testimonials.map((testimonial, index) => (
           <div
             key={testimonial.id}
-            className="w-[72%]"
-            ref={(el) => {
-              if (el && !shouldLoad) {
-                el.setAttribute('data-video-id', testimonial.id);
-                observerRef.current?.observe(el);
-              }
+            style={{
+              flex: '0 0 75%',
+              scrollSnapAlign: 'center',
             }}
           >
             <VideoCard
               testimonial={testimonial}
-              shouldLoad={shouldLoad}
               isPlaying={playingVideo === testimonial.id}
               onPlay={handlePlay}
               onPause={handlePause}
               onEnded={handleEnded}
+              onVideoMount={(el) => { videoElsRef.current[index] = el; }}
             />
           </div>
-        );
-      })}
+        ))}
+      </div>
+
+      <style>{`.bvt-scroll::-webkit-scrollbar { display: none; }`}</style>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-2 mt-5">
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToIndex(i)}
+            aria-label={`Go to testimonial ${i + 1}`}
+            style={{
+              width: i === activeIndex ? '20px' : '8px',
+              height: '8px',
+              borderRadius: '4px',
+              backgroundColor: i === activeIndex ? '#C9A84C' : 'rgba(255,255,255,0.18)',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'width 0.25s ease, background-color 0.25s ease',
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
