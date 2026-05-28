@@ -68,10 +68,10 @@ export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
 
     setSubmitting(true);
 
-    supabase.from('leads').insert({
+    supabase.from('leads').upsert({
       first_name: firstName.trim(),
       whatsapp_number: fullNumber,
-    }).then(({ error }) => {
+    }, { onConflict: 'first_name,whatsapp_number', ignoreDuplicates: true }).then(({ error }) => {
       if (error) console.error('Lead save error:', error);
     });
 
