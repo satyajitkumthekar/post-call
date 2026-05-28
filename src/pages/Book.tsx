@@ -57,15 +57,31 @@ function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const existing = document.querySelector('script[src*="calendly.com/assets/external/widget.js"]');
+    if (existing) {
+      // Script already loaded, just init the widget
+      if ((window as any).Calendly && containerRef.current) {
+        (window as any).Calendly.initInlineWidget({
+          url,
+          parentElement: containerRef.current,
+        });
+      }
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
+    script.onload = () => {
+      if ((window as any).Calendly && containerRef.current) {
+        (window as any).Calendly.initInlineWidget({
+          url,
+          parentElement: containerRef.current,
+        });
+      }
     };
-  }, []);
+    document.head.appendChild(script);
+  }, [url]);
 
   return (
     <div
@@ -95,13 +111,11 @@ function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
           <X className="w-5 h-5" style={{ color: '#F0EDE8' }} />
         </button>
       </div>
-      <div ref={containerRef} className="flex-1 overflow-hidden">
-        <div
-          className="calendly-inline-widget"
-          data-url={url}
-          style={{ minWidth: '320px', width: '100%', height: '100%' }}
-        />
-      </div>
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-hidden"
+        style={{ minWidth: '320px', width: '100%', height: '100%' }}
+      />
     </div>
   );
 }

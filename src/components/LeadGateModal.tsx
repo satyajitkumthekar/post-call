@@ -26,7 +26,6 @@ function isValidWhatsApp(full: string): boolean {
 }
 
 export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
-  const [visible, setVisible] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [countryCode, setCountryCode] = useState('+1');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -37,16 +36,10 @@ export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
   const firstNameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Trigger slide-in animation after mount
-    const t = setTimeout(() => setVisible(true), 20);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    if (visible && firstNameRef.current) {
+    if (firstNameRef.current) {
       firstNameRef.current.focus();
     }
-  }, [visible]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,11 +111,8 @@ export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
           borderRadius: '16px',
           padding: 'clamp(24px, 5vw, 32px)',
           boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
-          transform: visible && !exiting ? 'translateY(0)' : exiting ? 'translateY(0)' : 'translateY(40px)',
-          opacity: exiting ? 0 : visible ? 1 : 0,
-          transition: exiting
-            ? 'opacity 300ms ease-in'
-            : 'transform 300ms ease-out, opacity 300ms ease-out',
+          opacity: exiting ? 0 : 1,
+          transition: 'opacity 300ms ease-in',
         }}
       >
         {/* Gold caps label */}
