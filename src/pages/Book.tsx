@@ -490,7 +490,7 @@ export default function Book() {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
-                    color: 'rgba(201,168,76,0.75)',
+                    color: '#C9A84C',
                     marginBottom: '14px',
                   }}
                 >
@@ -501,7 +501,7 @@ export default function Book() {
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 300,
                     fontSize: 'clamp(1rem, 2.5vw, 1.0625rem)',
-                    color: '#8A8680',
+                    color: '#C8C4BE',
                     lineHeight: 1.75,
                   }}
                 >
