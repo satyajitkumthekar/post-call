@@ -135,9 +135,7 @@ export default function Book() {
 
   const [showLeadGate, setShowLeadGate] = useState<boolean>(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('name') && params.get('whatsapp')) return false;
-    if (sessionStorage.getItem('lead_submitted') === 'true') return false;
-    return true;
+    return !(params.get('name') && params.get('whatsapp'));
   });
 
   const [leadData, setLeadData] = useState<{ firstName: string; whatsappNumber: string } | null>(() => {
@@ -145,23 +143,12 @@ export default function Book() {
     const urlName = params.get('name');
     const urlWhatsapp = params.get('whatsapp');
     if (urlName && urlWhatsapp) return { firstName: urlName, whatsappNumber: urlWhatsapp };
-    const storedName = sessionStorage.getItem('lead_first_name');
-    const storedWa = sessionStorage.getItem('lead_whatsapp');
-    if (storedName) return { firstName: storedName, whatsappNumber: storedWa ?? '' };
     return null;
   });
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef(0);
-
-  useEffect(() => {
-    // Clean URL params after reading them
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('name') && params.get('whatsapp')) {
-      window.history.replaceState({}, document.title, '/book');
-    }
-  }, []);
 
   useEffect(() => {
     const fetchVslUrl = async () => {

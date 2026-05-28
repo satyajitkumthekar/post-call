@@ -68,21 +68,19 @@ export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
 
     setSubmitting(true);
 
-    const { error } = await supabase.from('leads').insert({
+    supabase.from('leads').insert({
       first_name: firstName.trim(),
       whatsapp_number: fullNumber,
+    }).then(({ error }) => {
+      if (error) console.error('Lead save error:', error);
     });
 
-    if (error) {
-      // Still let them through — don't block on DB errors
-      console.error('Lead save error:', error);
-    }
+    const params = new URLSearchParams({
+      name: firstName.trim(),
+      whatsapp: fullNumber,
+    });
+    window.history.replaceState({}, '', `/book?${params.toString()}`);
 
-    sessionStorage.setItem('lead_submitted', 'true');
-    sessionStorage.setItem('lead_first_name', firstName.trim());
-    sessionStorage.setItem('lead_whatsapp', fullNumber);
-
-    // Fade out then complete
     setExiting(true);
     setTimeout(() => {
       onComplete({ firstName: firstName.trim(), whatsappNumber: fullNumber });
