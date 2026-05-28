@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Upload as UploadIcon } from 'lucide-react';
+import { ArrowLeft, Upload as UploadIcon, Save, Link as LinkIcon } from 'lucide-react';
 import FileUploader from '../components/FileUploader';
 import FileManager from '../components/FileManager';
 import { supabase } from '../lib/supabase';
@@ -17,6 +17,9 @@ export default function Admin({ onBackToHome }: AdminProps) {
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [vslUrl, setVslUrl] = useState('');
+  const [vslSaving, setVslSaving] = useState(false);
+  const [vslSaved, setVslSaved] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -61,6 +64,35 @@ export default function Admin({ onBackToHome }: AdminProps) {
 
   const handleUploadComplete = () => {
     setRefreshKey(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchVslUrl();
+    }
+  }, [isAuthenticated]);
+
+  const fetchVslUrl = async () => {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'vsl_video_url')
+      .maybeSingle();
+    if (data) setVslUrl(data.value);
+  };
+
+  const handleSaveVslUrl = async () => {
+    setVslSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('site_settings')
+      .update({ value: vslUrl, updated_by: user?.id, updated_at: new Date().toISOString() })
+      .eq('key', 'vsl_video_url');
+    setVslSaving(false);
+    if (!error) {
+      setVslSaved(true);
+      setTimeout(() => setVslSaved(false), 2000);
+    }
   };
 
   if (isLoading) {
@@ -209,6 +241,33 @@ export default function Admin({ onBackToHome }: AdminProps) {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h2>
           <FileManager bucketId={selectedBucket} refreshTrigger={refreshKey} />
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6 mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <LinkIcon className="h-5 w-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">VSL Video URL</h2>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Set the video URL for the /book landing page. This can be a direct MP4 link or a hosted video URL.
+          </p>
+          <div className="flex gap-3">
+            <input
+              type="url"
+              value={vslUrl}
+              onChange={(e) => setVslUrl(e.target.value)}
+              placeholder="https://example.com/video.mp4"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleSaveVslUrl}
+              disabled={vslSaving}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" />
+              {vslSaving ? 'Saving...' : vslSaved ? 'Saved!' : 'Save'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import ProgramSection from './components/ProgramSection';
 import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
 import Admin from './pages/Admin';
+import Book from './pages/Book';
 
 const beforeCallItems = [
   {
@@ -43,6 +44,10 @@ function App() {
 
   if (currentPath === '/admin') {
     return <Admin onBackToHome={navigateHome} />;
+  }
+
+  if (currentPath === '/book') {
+    return <Book />;
   }
 
   return (
