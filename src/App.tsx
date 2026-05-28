@@ -6,6 +6,7 @@ import VideoTestimonials from './components/VideoTestimonials';
 import MessagesCollage from './components/MessagesCollage';
 import Admin from './pages/Admin';
 import Book from './pages/Book';
+import Leads from './pages/Leads';
 
 const beforeCallItems = [
   {
@@ -44,6 +45,10 @@ function App() {
 
   if (currentPath === '/admin') {
     return <Admin onBackToHome={navigateHome} />;
+  }
+
+  if (currentPath === '/leads') {
+    return <Leads />;
   }
 
   if (currentPath === '/book') {
