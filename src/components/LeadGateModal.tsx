@@ -11,8 +11,8 @@ interface LeadGateModalProps {
 }
 
 const COUNTRY_CODES = [
-  { code: '+91', label: '+91 IN' },
   { code: '+1', label: '+1 US' },
+  { code: '+91', label: '+91 IN' },
   { code: '+44', label: '+44 UK' },
   { code: '+61', label: '+61 AU' },
   { code: '+971', label: '+971 AE' },
@@ -28,7 +28,7 @@ function isValidWhatsApp(full: string): boolean {
 export default function LeadGateModal({ onComplete }: LeadGateModalProps) {
   const [visible, setVisible] = useState(false);
   const [firstName, setFirstName] = useState('');
-  const [countryCode, setCountryCode] = useState('+91');
+  const [countryCode, setCountryCode] = useState('+1');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [firstNameError, setFirstNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
