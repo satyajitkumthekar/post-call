@@ -65,32 +65,35 @@ export default function Book() {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showLeadGate, setShowLeadGate] = useState(false);
-  const [leadData, setLeadData] = useState<{ firstName: string; whatsappNumber: string } | null>(null);
+
+  const [showLeadGate, setShowLeadGate] = useState<boolean>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('name') && params.get('whatsapp')) return false;
+    if (sessionStorage.getItem('lead_submitted') === 'true') return false;
+    return true;
+  });
+
+  const [leadData, setLeadData] = useState<{ firstName: string; whatsappNumber: string } | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlName = params.get('name');
+    const urlWhatsapp = params.get('whatsapp');
+    if (urlName && urlWhatsapp) return { firstName: urlName, whatsappNumber: urlWhatsapp };
+    const storedName = sessionStorage.getItem('lead_first_name');
+    const storedWa = sessionStorage.getItem('lead_whatsapp');
+    if (storedName) return { firstName: storedName, whatsappNumber: storedWa ?? '' };
+    return null;
+  });
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef(0);
 
   useEffect(() => {
-    // Check URL params first
+    // Clean URL params after reading them
     const params = new URLSearchParams(window.location.search);
-    const urlName = params.get('name');
-    const urlWhatsapp = params.get('whatsapp');
-    if (urlName && urlWhatsapp) {
-      setLeadData({ firstName: urlName, whatsappNumber: urlWhatsapp });
+    if (params.get('name') && params.get('whatsapp')) {
       window.history.replaceState({}, document.title, '/book');
-      return;
     }
-    // Check session storage
-    if (sessionStorage.getItem('lead_submitted') === 'true') {
-      const storedName = sessionStorage.getItem('lead_first_name') ?? '';
-      const storedWa = sessionStorage.getItem('lead_whatsapp') ?? '';
-      if (storedName) setLeadData({ firstName: storedName, whatsappNumber: storedWa });
-      return;
-    }
-    // Show the gate
-    setShowLeadGate(true);
   }, []);
 
   useEffect(() => {
