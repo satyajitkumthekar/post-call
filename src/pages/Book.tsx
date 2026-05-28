@@ -64,10 +64,10 @@ export default function Book() {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef(0);
 
   useEffect(() => {
     const fetchVslUrl = async () => {
@@ -82,7 +82,7 @@ export default function Book() {
   }, []);
 
   const openBookingModal = useCallback(() => {
-    setScrollPosition(window.scrollY);
+    scrollPositionRef.current = window.scrollY;
     setShowBookingModal(true);
     document.body.style.overflow = 'hidden';
   }, []);
@@ -91,9 +91,9 @@ export default function Book() {
     setShowBookingModal(false);
     document.body.style.overflow = '';
     requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
+      window.scrollTo(0, scrollPositionRef.current);
     });
-  }, [scrollPosition]);
+  }, []);
 
   const handlePlay = async () => {
     if (!videoRef.current) return;
@@ -493,15 +493,15 @@ export default function Book() {
       </section>
 
       {/* Section 2: The Mirror */}
-      <section className="py-16 md:py-24 px-5 md:px-6" style={{ backgroundColor: '#0A0A0A' }}>
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-10">
+      <section className="py-12 md:py-20 px-5 md:px-6" style={{ backgroundColor: '#0A0A0A' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
             <h2
-              className="mb-2"
+              className="mb-1"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
-                fontSize: 'clamp(1.7rem, 4vw, 2.5rem)',
+                fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)',
                 color: '#F0EDE8',
                 lineHeight: 1.15,
               }}
@@ -509,99 +509,53 @@ export default function Book() {
               You already know what to do.
             </h2>
             <p
-              className="mb-5"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
-                fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
                 color: '#5A5855',
               }}
             >
               That was never the problem.
             </p>
-            <p
-              className="max-w-lg mx-auto"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 300,
-                fontSize: '1rem',
-                color: '#8A8680',
-                lineHeight: 1.7,
-              }}
-            >
-              Everyone who lands here has been doing the work of trying. Here's
-              what's actually been happening, and what changes when you work with
-              us.
-            </p>
           </div>
 
-          <div className="space-y-5">
+          {/* Compact two-column grid */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             {mirrorPairs.map((pair, i) => (
               <div
                 key={i}
-                className="rounded-xl overflow-hidden"
+                className="rounded-lg p-4 md:p-5 flex flex-col"
                 style={{
                   backgroundColor: '#111114',
                   border: '1px solid rgba(255,255,255,0.06)',
                 }}
               >
-                {/* Before half */}
-                <div className="px-6 pt-6 pb-5">
-                  <span
-                    className="block mb-3"
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontWeight: 300,
-                      fontStyle: 'italic',
-                      fontSize: '0.85rem',
-                      color: '#5A5855',
-                    }}
-                  >
-                    What's been happening
-                  </span>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '1rem',
-                      color: '#8A8680',
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {pair.before}
-                  </p>
-                </div>
-
-                {/* Divider */}
-                <div className="mx-6 h-px" style={{ backgroundColor: 'rgba(201,168,76,0.15)' }} />
-
-                {/* After half */}
-                <div className="px-6 pt-5 pb-6">
-                  <span
-                    className="block mb-3"
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontWeight: 400,
-                      fontStyle: 'italic',
-                      fontSize: '0.85rem',
-                      color: '#C9A84C',
-                    }}
-                  >
-                    What changes
-                  </span>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '1rem',
-                      color: '#F0EDE8',
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {pair.after}
-                  </p>
-                </div>
+                <p
+                  className="mb-3 flex-1"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.82rem',
+                    color: '#8A8680',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {pair.before}
+                </p>
+                <div className="h-px mb-3" style={{ backgroundColor: 'rgba(201,168,76,0.2)' }} />
+                <p
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.82rem',
+                    color: '#F0EDE8',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {pair.after}
+                </p>
               </div>
             ))}
           </div>

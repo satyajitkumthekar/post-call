@@ -64,7 +64,7 @@ export default function BookMessagesCarousel() {
     <div>
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-4 scroll-smooth cursor-grab active:cursor-grabbing"
+        className="carousel-hide-scrollbar flex gap-4 overflow-x-auto pb-4 scroll-smooth cursor-grab active:cursor-grabbing"
         style={{
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none',
@@ -135,7 +135,7 @@ export default function BookMessagesCarousel() {
 
       <style>{`
         .scroll-snap-start { scroll-snap-align: start; }
-        div::-webkit-scrollbar { display: none; }
+        .carousel-hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
   );
