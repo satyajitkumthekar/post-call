@@ -9,18 +9,17 @@ interface StoryPanelRow {
   sequence_order: number;
 }
 
-interface TestimonialPanelRow {
+interface Testimonial {
   id: string;
-  video_url: string;
-  client_name: string;
-  context_line: string;
-  sequence_order: number;
+  testimonial_name: string | null;
+  testimonial_designation: string | null;
+  url: string;
 }
 
 export default function Schedule() {
   const [vslUrl, setVslUrl] = useState<string | null>(null);
   const [storyPanels, setStoryPanels] = useState<StoryPanelRow[]>([]);
-  const [testimonials, setTestimonials] = useState<TestimonialPanelRow[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [vslPlaying, setVslPlaying] = useState(false);
   const [showScrollCue, setShowScrollCue] = useState(true);
   const [showSkipBtn, setShowSkipBtn] = useState(true);
@@ -68,9 +67,11 @@ export default function Schedule() {
     };
     const fetchTestimonials = async () => {
       const { data } = await supabase
-        .from('testimonial_panels')
-        .select('id, video_url, client_name, context_line, sequence_order')
-        .order('sequence_order', { ascending: true });
+        .from('uploaded_files')
+        .select('id, testimonial_name, testimonial_designation, url')
+        .eq('bucket_id', 'video-testimonials')
+        .order('created_at', { ascending: false })
+        .limit(10);
       if (data) setTestimonials(data);
     };
     fetchVsl();
@@ -426,7 +427,7 @@ export default function Schedule() {
           )}
         </section>
 
-        {/* Story Panels - full-bleed images from database */}
+        {/* Story Panels - vertical images from database */}
         {storyPanels.map((panel) => (
           <section
             key={panel.id}
@@ -443,7 +444,7 @@ export default function Schedule() {
             <img
               src={panel.image_url}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              className="w-full h-full object-contain"
               loading="lazy"
             />
           </section>
@@ -517,7 +518,7 @@ export default function Schedule() {
             {/* Video */}
             <video
               ref={(el) => { testimonialRefs.current[testimonial.id] = el; }}
-              src={testimonial.video_url}
+              src={testimonial.url}
               className="absolute inset-0 w-full h-full object-cover"
               playsInline
               muted
@@ -590,7 +591,7 @@ export default function Schedule() {
                   marginBottom: '4px',
                 }}
               >
-                {testimonial.client_name}
+                {testimonial.testimonial_name || 'Client'}
               </h3>
               <p
                 style={{
@@ -600,7 +601,7 @@ export default function Schedule() {
                   color: '#8A8680',
                 }}
               >
-                {testimonial.context_line}
+                {testimonial.testimonial_designation || ''}
               </p>
             </div>
           </section>
