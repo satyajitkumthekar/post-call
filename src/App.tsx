@@ -7,6 +7,7 @@ import MessagesCollage from './components/MessagesCollage';
 import Admin from './pages/Admin';
 import Book from './pages/Book';
 import Leads from './pages/Leads';
+import Schedule from './pages/Schedule';
 
 const beforeCallItems = [
   {
@@ -49,6 +50,10 @@ function App() {
 
   if (currentPath === '/leads') {
     return <Leads />;
+  }
+
+  if (currentPath === '/schedule') {
+    return <Schedule />;
   }
 
   if (currentPath === '/book') {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 import BookVideoTestimonials from '../components/BookVideoTestimonials';
 import BookMessagesCarousel from '../components/BookMessagesCarousel';
 import LeadGateModal from '../components/LeadGateModal';
@@ -53,35 +54,6 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-let calendlyScriptLoaded = false;
-
-function ensureCalendlyScript(): Promise<void> {
-  if ((window as any).Calendly) {
-    calendlyScriptLoaded = true;
-    return Promise.resolve();
-  }
-  if (calendlyScriptLoaded) {
-    return new Promise((resolve) => {
-      const check = setInterval(() => {
-        if ((window as any).Calendly) { clearInterval(check); resolve(); }
-      }, 50);
-    });
-  }
-  calendlyScriptLoaded = true;
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://assets.calendly.com/assets/external/widget.js';
-    script.async = true;
-    script.onload = () => resolve();
-    document.head.appendChild(script);
-  });
-}
-
-function openCalendlyPopup(url: string) {
-  ensureCalendlyScript().then(() => {
-    (window as any).Calendly.initPopupWidget({ url });
-  });
-}
 
 export default function Book() {
   const [vslUrl, setVslUrl] = useState<string | null>(null);
@@ -127,20 +99,7 @@ export default function Book() {
     fetchVslUrl();
   }, []);
 
-  const calendlyUrl = (() => {
-    const base = 'https://calendly.com/satyajit-kumthekar/diagnostic-call';
-    const params = new URLSearchParams({
-      hide_gdpr_banner: '1',
-      background_color: '0a0a0a',
-      text_color: 'f5f5f5',
-      primary_color: 'c9a14a',
-    });
-    if (leadData) {
-      params.set('name', leadData.firstName);
-      params.set('a1', leadData.whatsappNumber);
-    }
-    return `${base}?${params.toString()}`;
-  })();
+  const calendlyUrl = buildCalendlyUrl(leadData);
 
   const openBookingModal = useCallback(() => {
     openCalendlyPopup(calendlyUrl);
