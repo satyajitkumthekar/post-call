@@ -249,23 +249,29 @@ export default function Schedule() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Track scroll to hide "Skip to testimonials" once user reaches that section
+  // Show/hide "Skip to testimonials" based on whether user is in testimonials area
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const target = testimonialsStartRef.current;
-    if (!container || !target) return;
+    if (!container || testimonials.length === 0) return;
+
+    const testimonialSections = container.querySelectorAll('[data-testimonial-id]');
+    if (testimonialSections.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setShowSkipBtn(false);
-        });
+        const anyVisible = entries.some((e) => e.isIntersecting);
+        if (anyVisible) {
+          setShowSkipBtn(false);
+        } else {
+          setShowSkipBtn(true);
+        }
       },
       { root: container, threshold: 0.3 }
     );
-    observer.observe(target);
+
+    testimonialSections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [testimonials.length]);
+  }, [testimonials]);
 
   // Testimonial video autoplay/pause and lazy preload
   useEffect(() => {
