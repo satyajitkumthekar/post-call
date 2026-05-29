@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Upload as UploadIcon, Save, Link as LinkIcon } from 'lucide-react';
 import FileUploader from '../components/FileUploader';
 import FileManager from '../components/FileManager';
+import StoryManager from '../components/StoryManager';
 import { supabase } from '../lib/supabase';
 
 interface AdminProps {
   onBackToHome: () => void;
 }
 
-type Tab = 'main-videos' | 'video-testimonials' | 'text-testimonial-images' | 'vsl-video';
+type Tab = 'main-videos' | 'video-testimonials' | 'text-testimonial-images' | 'vsl-video' | 'story-manager';
 
 export default function Admin({ onBackToHome }: AdminProps) {
   const [activeTab, setActiveTab] = useState<Tab>('main-videos');
@@ -147,9 +148,10 @@ export default function Admin({ onBackToHome }: AdminProps) {
     { id: 'video-testimonials' as const, label: 'Video Testimonials' },
     { id: 'text-testimonial-images' as const, label: 'Text Testimonial Images' },
     { id: 'vsl-video' as const, label: 'VSL Video' },
+    { id: 'story-manager' as const, label: 'Story Manager' },
   ];
 
-  const isFileBucket = activeTab !== 'vsl-video';
+  const isFileBucket = activeTab !== 'vsl-video' && activeTab !== 'story-manager';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -192,7 +194,9 @@ export default function Admin({ onBackToHome }: AdminProps) {
           </div>
         </div>
 
-        {isFileBucket ? (
+        {activeTab === 'story-manager' ? (
+          <StoryManager />
+        ) : isFileBucket ? (
           <>
             <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Files</h2>
@@ -211,12 +215,12 @@ export default function Admin({ onBackToHome }: AdminProps) {
                   </div>
                 </div>
               )}
-              <FileUploader bucketId={activeTab} onUploadComplete={handleUploadComplete} />
+              <FileUploader bucketId={activeTab as 'main-videos' | 'video-testimonials' | 'text-testimonial-images'} onUploadComplete={handleUploadComplete} />
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h2>
-              <FileManager bucketId={activeTab} refreshTrigger={refreshKey} />
+              <FileManager bucketId={activeTab as 'main-videos' | 'video-testimonials' | 'text-testimonial-images'} refreshTrigger={refreshKey} />
             </div>
           </>
         ) : (
