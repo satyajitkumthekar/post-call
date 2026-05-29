@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ChevronDown, Volume2, VolumeX, Play } from 'lucide-react';
+import { X, ChevronDown, Volume2, VolumeX, Play, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 
@@ -168,11 +168,13 @@ export default function Schedule() {
   const [showSkipBtn, setShowSkipBtn] = useState(true);
   const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
   const [muteIconVisible, setMuteIconVisible] = useState<Record<string, boolean>>({});
+  const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
+  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const vslVideoRef = useRef<HTMLVideoElement>(null);
   const testimonialRefs = useRef<Record<string, HTMLVideoElement | null>>({});
-  const panelRefs = useRef<(HTMLElement | null)[]>([]);
+  const testimonialSectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const testimonialsStartRef = useRef<HTMLElement | null>(null);
   const muteTimeouts = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
@@ -212,8 +214,11 @@ export default function Schedule() {
     fetchTestimonials();
   }, []);
 
-  // Staggered entrance animations via IntersectionObserver
+  // Panel entrance animations via IntersectionObserver (rooted in scroll container)
   useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -222,12 +227,11 @@ export default function Schedule() {
           }
         });
       },
-      { threshold: 0.4 }
+      { root: container, threshold: 0.3 }
     );
 
-    panelRefs.current.forEach((panel) => {
-      if (panel) observer.observe(panel);
-    });
+    const panels = container.querySelectorAll('.schedule-panel');
+    panels.forEach((panel) => observer.observe(panel));
 
     return () => observer.disconnect();
   }, [testimonials.length]);
@@ -263,31 +267,82 @@ export default function Schedule() {
     return () => observer.disconnect();
   }, [testimonials.length]);
 
-  // Testimonial video autoplay/pause via IntersectionObserver
+  // Testimonial video autoplay/pause and lazy preload
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container || testimonials.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) {
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { root: container, threshold: 0.6 }
-    );
+    // Wait a frame for refs to be populated after render
+    const frameId = requestAnimationFrame(() => {
+      // Autoplay observer: play when 60% visible, pause when not
+      const playObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const section = entry.target as HTMLElement;
+            const video = section.querySelector('video');
+            if (!video) return;
 
-    Object.values(testimonialRefs.current).forEach((video) => {
-      if (video) observer.observe(video);
+            if (entry.isIntersecting) {
+              setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: true }));
+              video.play().then(() => {
+                setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: false }));
+              }).catch(() => {
+                setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: false }));
+              });
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { root: container, threshold: 0.6 }
+      );
+
+      // Preload observer: start loading video 1 panel ahead
+      const preloadObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const section = entry.target as HTMLElement;
+              const video = section.querySelector('video');
+              if (video && video.preload === 'none') {
+                video.preload = 'auto';
+              }
+            }
+          });
+        },
+        { root: container, rootMargin: '100% 0px 100% 0px', threshold: 0 }
+      );
+
+      Object.values(testimonialSectionRefs.current).forEach((section) => {
+        if (section) {
+          playObserver.observe(section);
+          preloadObserver.observe(section);
+        }
+      });
+
+      return () => {
+        playObserver.disconnect();
+        preloadObserver.disconnect();
+      };
     });
 
-    return () => observer.disconnect();
+    return () => cancelAnimationFrame(frameId);
   }, [testimonials]);
+
+  // Pause VSL when scrolled away from panel 0
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const video = vslVideoRef.current;
+    if (!container || !video) return;
+
+    const handleScroll = () => {
+      if (container.scrollTop > window.innerHeight * 0.5 && !video.paused) {
+        video.pause();
+      }
+    };
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [vslUrl]);
 
   const handleVslPlay = async () => {
     const video = vslVideoRef.current;
@@ -312,19 +367,25 @@ export default function Schedule() {
     }, 1500);
   };
 
-  const scrollToTestimonials = () => {
-    testimonialsStartRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollToTestimonials = useCallback(() => {
+    const container = scrollContainerRef.current;
+    const target = testimonialsStartRef.current;
+    if (!container || !target) return;
+    const offset = target.offsetTop;
+    container.scrollTo({ top: offset, behavior: 'smooth' });
+  }, []);
+
+  const scrollToFirstTestimonial = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const target = container.querySelector('#testimonial-panel-0') as HTMLElement | null;
+    if (!target) return;
+    container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+  }, []);
 
   const navigateHome = () => {
     window.history.pushState({}, '', '/');
     window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
-  const registerPanel = (el: HTMLElement | null) => {
-    if (el && !panelRefs.current.includes(el)) {
-      panelRefs.current.push(el);
-    }
   };
 
   return (
@@ -344,7 +405,7 @@ export default function Schedule() {
       </button>
 
       {/* Fixed UI - Skip to Testimonials */}
-      {showSkipBtn && (
+      {showSkipBtn && testimonials.length > 0 && (
         <button
           onClick={scrollToTestimonials}
           className="fixed top-4 right-4 z-50 transition-opacity duration-300"
@@ -404,12 +465,12 @@ export default function Schedule() {
       >
         {/* Panel 0: VSL */}
         <section
-          ref={registerPanel}
           className="schedule-panel relative flex flex-col items-center justify-center"
           style={{
             minHeight: '100svh',
             height: '100svh',
             scrollSnapAlign: 'start',
+            scrollSnapStop: 'always',
             padding: '56px 24px 80px',
             backgroundColor: '#0A0A0A',
           }}
@@ -499,12 +560,12 @@ export default function Schedule() {
         {storyPanels.map((panel, idx) => (
           <section
             key={`story-${idx}`}
-            ref={registerPanel}
             className="schedule-panel relative flex flex-col items-center justify-center"
             style={{
               minHeight: '100svh',
               height: '100svh',
               scrollSnapAlign: 'start',
+              scrollSnapStop: 'always',
               padding: '56px 24px 80px',
               backgroundColor: '#0A0A0A',
               backgroundImage: getSceneGradient(panel.scene),
@@ -533,12 +594,13 @@ export default function Schedule() {
 
         {/* Transition Panel */}
         <section
-          ref={(el) => { registerPanel(el); testimonialsStartRef.current = el; }}
+          ref={(el) => { testimonialsStartRef.current = el; }}
           className="schedule-panel relative flex flex-col items-center justify-center"
           style={{
             minHeight: '100svh',
             height: '100svh',
             scrollSnapAlign: 'start',
+            scrollSnapStop: 'always',
             padding: '56px 24px 80px',
             backgroundColor: '#0A0A0A',
           }}
@@ -556,26 +618,25 @@ export default function Schedule() {
             >
               But you don't have to take my word for it.
             </p>
-            <button
-              onClick={() => {
-                const firstTestimonialPanel = document.getElementById('testimonial-panel-0');
-                firstTestimonialPanel?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="panel-line flex items-center gap-2 transition-transform active:scale-95"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: '0.9rem',
-                color: '#C9A14A',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                border: '1px solid rgba(201,161,74,0.4)',
-                animationDelay: '160ms',
-              }}
-            >
-              Watch their stories
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            {testimonials.length > 0 && (
+              <button
+                onClick={scrollToFirstTestimonial}
+                className="panel-line flex items-center gap-2 transition-transform active:scale-95"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 400,
+                  fontSize: '0.9rem',
+                  color: '#C9A14A',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(201,161,74,0.4)',
+                  animationDelay: '160ms',
+                }}
+              >
+                Watch their stories
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </section>
 
@@ -584,16 +645,19 @@ export default function Schedule() {
           <section
             key={testimonial.id}
             id={`testimonial-panel-${idx}`}
-            ref={registerPanel}
+            ref={(el) => { testimonialSectionRefs.current[testimonial.id] = el; }}
+            data-testimonial-id={testimonial.id}
             className="schedule-panel relative flex items-end"
             style={{
               minHeight: '100svh',
               height: '100svh',
               scrollSnapAlign: 'start',
+              scrollSnapStop: 'always',
               backgroundColor: '#0A0A0A',
               overflow: 'hidden',
             }}
           >
+            {/* Video */}
             <video
               ref={(el) => { testimonialRefs.current[testimonial.id] = el; }}
               src={testimonial.url}
@@ -603,11 +667,39 @@ export default function Schedule() {
               loop
               preload="none"
               onClick={() => toggleMute(testimonial.id)}
+              onWaiting={() => setVideoLoading((prev) => ({ ...prev, [testimonial.id]: true }))}
+              onPlaying={() => setVideoLoading((prev) => ({ ...prev, [testimonial.id]: false }))}
+              onError={() => setVideoErrors((prev) => ({ ...prev, [testimonial.id]: true }))}
             />
+
+            {/* Loading indicator */}
+            {videoLoading[testimonial.id] && !videoErrors[testimonial.id] && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <Loader2
+                  className="w-8 h-8 animate-spin"
+                  style={{ color: 'rgba(201,161,74,0.7)' }}
+                />
+              </div>
+            )}
+
+            {/* Error state */}
+            {videoErrors[testimonial.id] && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <p
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '0.85rem',
+                    color: '#5A5855',
+                  }}
+                >
+                  Video unavailable
+                </p>
+              </div>
+            )}
 
             {/* Mute/Unmute indicator */}
             <div
-              className="absolute top-16 right-4 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-opacity duration-300"
+              className="absolute top-16 right-4 z-20 w-9 h-9 rounded-full flex items-center justify-center transition-opacity duration-300 cursor-pointer"
               style={{
                 backgroundColor: 'rgba(0,0,0,0.5)',
                 backdropFilter: 'blur(4px)',
@@ -659,12 +751,12 @@ export default function Schedule() {
 
         {/* Final CTA Panel */}
         <section
-          ref={registerPanel}
           className="schedule-panel relative flex flex-col items-center justify-center"
           style={{
             minHeight: '100svh',
             height: '100svh',
             scrollSnapAlign: 'start',
+            scrollSnapStop: 'always',
             padding: '56px 24px 80px',
             backgroundColor: '#0A0A0A',
           }}
@@ -743,11 +835,6 @@ export default function Schedule() {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-
-        @keyframes bounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(6px); }
         }
       `}</style>
     </div>
