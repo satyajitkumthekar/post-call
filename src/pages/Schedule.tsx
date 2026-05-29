@@ -79,6 +79,14 @@ export default function Schedule() {
     fetchTestimonials();
   }, []);
 
+  // Preload all story panel images as soon as URLs are available
+  useEffect(() => {
+    storyPanels.forEach((panel) => {
+      const img = new Image();
+      img.src = panel.image_url;
+    });
+  }, [storyPanels]);
+
   // Panel entrance animations via IntersectionObserver (rooted in scroll container)
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -445,7 +453,6 @@ export default function Schedule() {
               src={panel.image_url}
               alt=""
               className="w-full h-full object-contain"
-              loading="lazy"
             />
           </section>
         ))}
