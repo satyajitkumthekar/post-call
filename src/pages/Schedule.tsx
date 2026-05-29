@@ -100,7 +100,7 @@ export default function Schedule() {
           }
         });
       },
-      { root: container, threshold: 0.3 }
+      { root: container, threshold: 0.15 }
     );
 
     const panels = container.querySelectorAll('.schedule-panel');
@@ -684,17 +684,17 @@ export default function Schedule() {
 
         .schedule-panel .panel-line {
           opacity: 0;
-          transform: translateY(16px);
+          transform: translateY(12px);
         }
 
         .schedule-panel.panel-visible .panel-line {
-          animation: fadeRiseIn 400ms ease-out forwards;
+          animation: fadeRiseIn 280ms ease-out forwards;
         }
 
         @keyframes fadeRiseIn {
           from {
             opacity: 0;
-            transform: translateY(16px);
+            transform: translateY(12px);
           }
           to {
             opacity: 1;
