@@ -383,16 +383,18 @@ export default function Schedule() {
     container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
   }, []);
 
-  const navigateHome = () => {
-    window.history.pushState({}, '', '/');
-    window.dispatchEvent(new PopStateEvent('popstate'));
+  const handleClose = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
     <div className="fixed inset-0" style={{ backgroundColor: '#070707' }}>
       {/* Fixed UI - Close Button */}
       <button
-        onClick={navigateHome}
+        onClick={handleClose}
         className="fixed top-4 left-4 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-opacity hover:opacity-100"
         style={{
           backgroundColor: 'rgba(255,255,255,0.06)',
