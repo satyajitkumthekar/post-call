@@ -151,10 +151,12 @@ export default function Schedule() {
         {/* SECTION 3 — Testimonials */}
         {testimonials.length > 0 && (
           <section className="schedule-testimonials">
-            <span className="schedule-eyebrow">THE PROOF</span>
             <h2 className="schedule-testimonials-heading">
-              Building a new generation of Indians. Weapons of intellect and physicality.
+              Building a new generation of Indians.
             </h2>
+            <p className="schedule-testimonials-sub">
+              Weapons of intellect and physicality.
+            </p>
           </section>
         )}
       </div>
@@ -384,6 +386,14 @@ export default function Schedule() {
           color: #F0EDE8;
           margin: 0;
         }
+        .schedule-testimonials-sub {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 15px;
+          line-height: 1.5;
+          color: #8A8680;
+          margin: 6px 0 0 0;
+        }
 
         /* ========== CAROUSEL ========== */
         .schedule-carousel {
@@ -416,7 +426,8 @@ export default function Schedule() {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
+          background-color: #131316;
         }
         .schedule-card-play-overlay {
           position: absolute;
