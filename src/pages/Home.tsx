@@ -19,40 +19,35 @@ interface Testimonial {
 
 const journeySteps = [
   {
-    label: 'STEP 01',
-    time: 'Before we begin',
+    label: 'ASSESS',
+    time: 'before we begin',
     name: 'Assess',
-    whatWeDo:
-      'Before a single instruction, we learn how your body actually works. How it handles fatigue, how it moves, what your days and your food really look like.',
-    whatYouGet:
-      'A plan built on your body, not pulled off a shelf. The reason this fits when nothing else did.',
+    painQuote: null,
+    body: "First, we learn how your body actually works. How it handles fatigue, how it moves, what your days and your food really look like. Everything that follows is built on that, on your body, not pulled off a shelf. It's the reason this fits when nothing else ever did.",
   },
   {
     label: 'PHASE 01',
-    time: 'Month 1',
+    time: 'month 1',
     name: 'Simplify',
-    whatWeDo:
-      'We take fitness off your plate. A training plan and a way of eating built around your real life, plus a team in your corner so you stop guessing.',
-    whatYouGet:
-      'The noise stops. Belly fat starts moving, energy comes back, and the first results land fast.',
+    painQuote:
+      "I knew exactly what to eat. I'd researched all of it. I still didn't do it. And the moment my schedule broke, a work trip, a hard week, the whole thing fell apart.",
+    body: "So first, we take all of it off your plate. A training plan and a way of eating built around your real life, one that bends with a hard week instead of breaking. A team in your corner so you stop carrying it alone. You stop deciding, you just execute, and the belly fat starts to move fast.",
   },
   {
     label: 'PHASE 02',
-    time: 'Months 2 to 4',
+    time: 'months 2 to 4',
     name: 'Master',
-    whatWeDo:
-      'We go after the real reason it never stuck, the voice that talks you out of it on hard days. You learn to quiet it, while we dial in your sleep, recovery, stress, and lifestyle.',
-    whatYouGet:
-      'Fitness starts to feel effortless. The change in your body gets undeniable, and showing up stops taking willpower.',
+    painQuote:
+      "It was going well, then one bad week happened and I just stopped. I couldn't even explain why. One rough day, I'd eat badly, feel guilty, and somehow that made the next day worse too.",
+    body: "That was never about willpower. It was the voice on the hard days, and the spiral that follows when you listen to it. This is where we go after it. You learn to catch it, to create space from it, and to stop the one bad day from becoming a bad week. Fitness starts to feel effortless, and the change in your body becomes the kind other people notice.",
   },
   {
     label: 'PHASE 03',
-    time: 'Months 5 to 6',
+    time: 'months 5 to 6',
     name: 'Own',
-    whatWeDo:
-      'We hand you the wheel. We pull back the support on purpose, so the habits run on their own and bend around any week life throws at you.',
-    whatYouGet:
-      'It is automatic. You do not need us anymore, and that is the point. You walk in needing the system. You walk out being it.',
+    painQuote:
+      "I've been consistent before. I know I can do it. That's what makes it so frustrating to be here again.",
+    body: "Because every time before, it lasted exactly as long as the support did. This is the part nobody else builds. We hand you the wheel on purpose, pull back slowly, and leave you with habits that run on their own. You don't end up needing us. You walk in needing the system, and you walk out being it.",
   },
 ];
 
@@ -105,7 +100,6 @@ export default function Home() {
     fetchTestimonials();
   }, []);
 
-  // Intersection Observer for journey steps
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
@@ -128,7 +122,7 @@ export default function Home() {
           }
         });
       },
-      { rootMargin: '-30% 0px -30% 0px' }
+      { rootMargin: '-35% 0px -35% 0px' }
     );
 
     stepRefs.current.forEach((el) => {
@@ -230,25 +224,25 @@ export default function Home() {
   };
 
   return (
-    <div className="home-page">
-      <div className="home-column">
+    <div className="hp">
+      <div className="hp-col">
 
-        {/* === SECTION 1: HEADER === */}
-        <section className="home-header">
-          <span className="home-eyebrow">YOU'RE IN</span>
-          <h1 className="home-headline">
+        {/* === 1. HEADER === */}
+        <section className="hp-header">
+          <span className="hp-eyebrow">YOU'RE IN</span>
+          <h1 className="hp-headline">
             Your call is booked. Here's exactly what we do.
           </h1>
-          <p className="home-subheader">
+          <p className="hp-sub">
             Take five minutes with this before we talk. It will make our conversation far more valuable.
           </p>
         </section>
 
-        {/* === SECTION 2: VIDEO === */}
-        <section className="home-video-section">
-          <div className="home-video-wrap">
+        {/* === 2. VIDEO === */}
+        <section className="hp-video-section">
+          <div className="hp-video-wrap">
             {!mainVideo && (
-              <div className="home-video-loading">
+              <div className="hp-video-loading">
                 <svg className="w-7 h-7 animate-spin" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,0.2)" strokeWidth="2" />
                   <path d="M12 2a10 10 0 0 1 10 10" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" />
@@ -257,7 +251,7 @@ export default function Home() {
             )}
 
             {hasStarted && videoBuffering && (
-              <div className="home-video-buffering">
+              <div className="hp-video-buffering">
                 <svg className="w-7 h-7 animate-spin" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,0.2)" strokeWidth="2" />
                   <path d="M12 2a10 10 0 0 1 10 10" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" />
@@ -270,7 +264,7 @@ export default function Home() {
                 <video
                   ref={videoRef}
                   src={mainVideo.url}
-                  className="home-video-el"
+                  className="hp-video-el"
                   playsInline
                   preload="metadata"
                   poster={thumbnail ?? undefined}
@@ -287,27 +281,27 @@ export default function Home() {
                 />
 
                 {videoError && (
-                  <div className="home-video-error">
+                  <div className="hp-video-error">
                     <span>Video unavailable. Please try again later.</span>
                   </div>
                 )}
 
                 {!hasStarted && !videoError && (
-                  <button onClick={handlePlay} className="home-video-play-overlay" aria-label="Play video">
-                    <div className="home-video-play-circle">
+                  <button onClick={handlePlay} className="hp-video-play-overlay" aria-label="Play video">
+                    <div className="hp-video-play-circle">
                       <Play className="w-7 h-7 ml-0.5" style={{ color: '#C9A84C' }} fill="currentColor" />
                     </div>
-                    <span className="home-video-tap-label">Tap to watch</span>
+                    <span className="hp-video-tap-label">Tap to watch</span>
                   </button>
                 )}
 
                 {videoEnded && (
-                  <div className="home-video-ended">
-                    <button onClick={handleReplay} className="home-video-replay-btn" aria-label="Replay video">
-                      <div className="home-video-replay-circle">
+                  <div className="hp-video-ended">
+                    <button onClick={handleReplay} className="hp-video-replay-btn" aria-label="Replay video">
+                      <div className="hp-video-replay-circle">
                         <RotateCcw className="w-5 h-5" style={{ color: '#C9A84C' }} />
                       </div>
-                      <span className="home-video-tap-label">Replay</span>
+                      <span className="hp-video-tap-label">Replay</span>
                     </button>
                   </div>
                 )}
@@ -316,10 +310,10 @@ export default function Home() {
           </div>
 
           {hasStarted && (
-            <div className="home-progress-wrap">
+            <div className="hp-progress-wrap">
               <div
                 ref={progressBarRef}
-                className="home-progress-bar group"
+                className="hp-progress-bar group"
                 onClick={seekTo}
                 onMouseDown={() => setIsScrubbing(true)}
                 onMouseMove={(e) => { if (isScrubbing) seekTo(e); }}
@@ -329,83 +323,81 @@ export default function Home() {
                 onTouchMove={seekTo}
                 onTouchEnd={() => setIsScrubbing(false)}
               >
-                <div className="home-progress-fill" style={{ width: `${progress}%` }} />
+                <div className="hp-progress-fill" style={{ width: `${progress}%` }} />
                 <div
-                  className="home-progress-thumb opacity-0 group-hover:opacity-100"
+                  className="hp-progress-thumb opacity-0 group-hover:opacity-100"
                   style={{ left: `${progress}%` }}
                 />
               </div>
-              <div className="home-progress-times">
+              <div className="hp-progress-times">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
             </div>
           )}
 
-          <p className="home-video-caption">Watch this first.</p>
+          <p className="hp-video-caption">Watch this first.</p>
         </section>
 
-        {/* === SECTION 3: THE JOURNEY === */}
-        <section className="home-journey">
-          <span className="home-eyebrow">THE PROGRAM</span>
-          <h2 className="home-journey-heading">Six months. One clear path.</h2>
-          <p className="home-journey-intro">
-            We take down every barrier between you and your body, in order. First we understand you. Then we clear what is outside you, what is inside you, and finally your need for us at all.
+        {/* === 3. THE JOURNEY === */}
+        <section className="hp-journey">
+          <span className="hp-eyebrow">THE PROGRAM</span>
+          <h2 className="hp-journey-heading">Six months. One clear path.</h2>
+          <p className="hp-journey-hook">
+            It was never that you didn't care. You care a lot. That's almost the problem.
           </p>
 
-          <div className="home-roadmap">
+          <div className="hp-roadmap">
             {journeySteps.map((step, i) => {
               const isActive = activeSteps[i];
-              const segmentActive = i === 0 ? isActive : activeSteps[i];
+              const segmentActive = isActive;
               return (
                 <div
                   key={i}
-                  className="home-roadmap-step"
+                  className="hp-roadmap-step"
                   data-step-index={i}
                   ref={(el) => { stepRefs.current[i] = el; }}
                   style={{
-                    opacity: isActive ? 1 : 0.25,
+                    opacity: isActive ? 1 : 0.2,
                     transform: isActive ? 'translateY(0)' : 'translateY(16px)',
                     transition: 'opacity 500ms ease-out, transform 500ms ease-out',
                   }}
                 >
-                  {/* Line segment */}
-                  <div className="home-roadmap-rail">
+                  <div className="hp-roadmap-rail">
                     {i > 0 && (
                       <div
-                        className="home-roadmap-segment"
-                        style={{ backgroundColor: segmentActive ? '#C9A84C' : 'rgba(201,168,76,0.15)' }}
+                        className="hp-roadmap-segment"
+                        style={{
+                          backgroundColor: segmentActive
+                            ? '#C9A84C'
+                            : 'rgba(201,168,76,0.12)',
+                          transition: 'background-color 500ms ease-out',
+                        }}
                       />
                     )}
                     <div
-                      className="home-roadmap-node"
+                      className="hp-roadmap-node"
                       style={{
-                        borderColor: isActive ? '#C9A84C' : 'rgba(201,168,76,0.3)',
+                        borderColor: isActive ? '#C9A84C' : 'rgba(201,168,76,0.25)',
                         backgroundColor: isActive ? '#C9A84C' : 'transparent',
                         transform: isActive ? 'scale(1)' : 'scale(0.8)',
                         transition: 'all 500ms ease-out',
                       }}
                     />
                     {i < journeySteps.length - 1 && (
-                      <div className="home-roadmap-segment-below" />
+                      <div className="hp-roadmap-tail" />
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className="home-roadmap-content">
-                    <div className="home-roadmap-label-row">
-                      <span className="home-roadmap-label">{step.label}</span>
-                      <span className="home-roadmap-time">{step.time}</span>
-                    </div>
-                    <h3 className="home-roadmap-name">{step.name}</h3>
-                    <div className="home-roadmap-block">
-                      <span className="home-roadmap-block-label">WHAT WE DO</span>
-                      <p className="home-roadmap-block-text">{step.whatWeDo}</p>
-                    </div>
-                    <div className="home-roadmap-block">
-                      <span className="home-roadmap-block-label home-roadmap-block-label--gold">WHAT YOU GET</span>
-                      <p className="home-roadmap-block-text home-roadmap-block-text--bright">{step.whatYouGet}</p>
-                    </div>
+                  <div className="hp-roadmap-content">
+                    <span className="hp-roadmap-label">
+                      {step.label} <span className="hp-roadmap-time">&middot; {step.time}</span>
+                    </span>
+                    <h3 className="hp-roadmap-name">{step.name}</h3>
+                    {step.painQuote && (
+                      <p className="hp-roadmap-pain">"{step.painQuote}"</p>
+                    )}
+                    <p className="hp-roadmap-body">{step.body}</p>
                   </div>
                 </div>
               );
@@ -413,66 +405,68 @@ export default function Home() {
           </div>
         </section>
 
-        {/* === SECTION 4: TESTIMONIALS INTRO === */}
+        {/* === 4. TESTIMONIALS INTRO === */}
         {testimonials.length > 0 && (
-          <section className="home-proof">
-            <span className="home-eyebrow">THE PROOF</span>
-            <h2 className="home-proof-heading">
+          <section className="hp-proof">
+            <span className="hp-eyebrow">THE PROOF</span>
+            <h2 className="hp-proof-heading">
               Building a new generation of Indians. Weapons of intellect and physicality.
             </h2>
           </section>
         )}
       </div>
 
-      {/* Carousel (breaks out of column for edge-to-edge scroll) */}
+      {/* Carousel breaks out of column */}
       {testimonials.length > 0 && (
-        <div className="home-carousel">
+        <div className="hp-carousel">
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="home-carousel-card"
+              className="hp-card"
               onClick={() => playTestimonial(t.id)}
             >
-              <video
-                ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
-                src={t.url}
-                className="home-carousel-video"
-                playsInline
-                muted
-                loop
-                preload="metadata"
-                onWaiting={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
-                onPlaying={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
-              />
+              <div className="hp-card-media">
+                <video
+                  ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
+                  src={t.url}
+                  className="hp-card-video"
+                  playsInline
+                  muted
+                  loop
+                  preload="metadata"
+                  onWaiting={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
+                  onPlaying={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
+                />
 
-              {activeTestimonial !== t.id && (
-                <div className="home-carousel-play-overlay">
-                  <div className="home-carousel-play-circle">
-                    <Play className="w-4 h-4 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                {activeTestimonial !== t.id && (
+                  <div className="hp-card-play-overlay">
+                    <div className="hp-card-play-circle">
+                      <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {tVideoLoading[t.id] && activeTestimonial === t.id && (
-                <div className="home-carousel-loader">
-                  <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
-                </div>
-              )}
+                {tVideoLoading[t.id] && activeTestimonial === t.id && (
+                  <div className="hp-card-loader">
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                  </div>
+                )}
 
-              {activeTestimonial === t.id && (
-                <button onClick={(e) => toggleMute(t.id, e)} className="home-carousel-mute">
-                  {mutedStates[t.id] === false ? (
-                    <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                  ) : (
-                    <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                  )}
-                </button>
-              )}
+                {activeTestimonial === t.id && (
+                  <button onClick={(e) => toggleMute(t.id, e)} className="hp-card-mute">
+                    {mutedStates[t.id] === false ? (
+                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    ) : (
+                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    )}
+                  </button>
+                )}
+              </div>
 
-              <div className="home-carousel-caption">
-                <p className="home-carousel-name">{t.testimonial_name || 'Client'}</p>
+              <div className="hp-card-info">
+                <p className="hp-card-name">{t.testimonial_name || 'Client'}</p>
                 {t.testimonial_designation && (
-                  <p className="home-carousel-designation">{t.testimonial_designation}</p>
+                  <p className="hp-card-role">{t.testimonial_designation}</p>
                 )}
               </div>
             </div>
@@ -480,46 +474,48 @@ export default function Home() {
         </div>
       )}
 
-      {/* === SECTION 5: CLOSING === */}
-      <div className="home-column">
-        <section className="home-closing">
-          <h2 className="home-closing-heading">See you on the call.</h2>
-          <p className="home-closing-sub">
+      {/* === 5. CLOSING === */}
+      <div className="hp-col">
+        <section className="hp-closing">
+          <h2 className="hp-closing-heading">See you on the call.</h2>
+          <p className="hp-closing-sub">
             Check your email for the confirmation, and add it to your calendar.
           </p>
         </section>
       </div>
 
       <style>{`
-        .home-page {
+        .hp {
           min-height: 100vh;
           min-height: 100svh;
           background-color: #0A0A0A;
         }
-        .home-column {
+        .hp-col {
           max-width: 480px;
           margin: 0 auto;
           padding-left: 20px;
           padding-right: 20px;
         }
 
-        /* === HEADER === */
-        .home-header {
-          padding-top: 72px;
-          padding-bottom: 48px;
-          text-align: center;
-        }
-        .home-eyebrow {
+        /* === EYEBROW (reusable) === */
+        .hp-eyebrow {
           display: block;
           font-family: 'DM Sans', sans-serif;
           font-weight: 500;
           font-size: 11px;
           letter-spacing: 0.14em;
-          color: #C9A14A;
+          color: #C9A84C;
           text-transform: uppercase;
           margin-bottom: 14px;
         }
-        .home-headline {
+
+        /* === 1. HEADER === */
+        .hp-header {
+          padding-top: 72px;
+          padding-bottom: 56px;
+          text-align: center;
+        }
+        .hp-headline {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 28px;
@@ -528,25 +524,23 @@ export default function Home() {
           margin: 0 0 16px 0;
         }
         @media (min-width: 640px) {
-          .home-headline { font-size: 34px; }
+          .hp-headline { font-size: 34px; }
         }
-        .home-subheader {
+        .hp-sub {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 15px;
           line-height: 1.6;
           color: #8A8680;
-          margin: 0;
-          max-width: 380px;
-          margin-left: auto;
-          margin-right: auto;
+          margin: 0 auto;
+          max-width: 360px;
         }
 
-        /* === VIDEO === */
-        .home-video-section {
+        /* === 2. VIDEO === */
+        .hp-video-section {
           padding-bottom: 80px;
         }
-        .home-video-wrap {
+        .hp-video-wrap {
           position: relative;
           width: 100%;
           aspect-ratio: 16/9;
@@ -555,15 +549,15 @@ export default function Home() {
           background-color: #131316;
           border: 1px solid rgba(255,255,255,0.06);
         }
-        .home-video-el {
+        .hp-video-el {
           position: absolute;
           inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
-        .home-video-loading,
-        .home-video-buffering {
+        .hp-video-loading,
+        .hp-video-buffering {
           position: absolute;
           inset: 0;
           display: flex;
@@ -572,12 +566,12 @@ export default function Home() {
           background-color: #131316;
           z-index: 5;
         }
-        .home-video-buffering {
+        .hp-video-buffering {
           background-color: rgba(0,0,0,0.4);
           pointer-events: none;
           z-index: 10;
         }
-        .home-video-error {
+        .hp-video-error {
           position: absolute;
           inset: 0;
           display: flex;
@@ -585,7 +579,7 @@ export default function Home() {
           justify-content: center;
           background-color: rgba(10,10,10,0.85);
         }
-        .home-video-error span {
+        .hp-video-error span {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 13px;
@@ -593,7 +587,7 @@ export default function Home() {
           text-align: center;
           padding: 0 24px;
         }
-        .home-video-play-overlay {
+        .hp-video-play-overlay {
           position: absolute;
           inset: 0;
           display: flex;
@@ -606,7 +600,7 @@ export default function Home() {
           width: 100%;
           height: 100%;
         }
-        .home-video-play-circle {
+        .hp-video-play-circle {
           width: 64px;
           height: 64px;
           border-radius: 50%;
@@ -614,15 +608,15 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           border: 2px solid rgba(201,168,76,0.6);
-          background-color: rgba(201,168,76,0.12);
+          background-color: rgba(201,168,76,0.1);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           transition: transform 200ms ease;
         }
-        .home-video-play-overlay:hover .home-video-play-circle {
+        .hp-video-play-overlay:hover .hp-video-play-circle {
           transform: scale(1.08);
         }
-        .home-video-tap-label {
+        .hp-video-tap-label {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 11px;
@@ -631,7 +625,7 @@ export default function Home() {
           color: rgba(201,168,76,0.7);
           margin-top: 14px;
         }
-        .home-video-ended {
+        .hp-video-ended {
           position: absolute;
           inset: 0;
           display: flex;
@@ -641,7 +635,7 @@ export default function Home() {
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
         }
-        .home-video-replay-btn {
+        .hp-video-replay-btn {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -651,10 +645,8 @@ export default function Home() {
           cursor: pointer;
           transition: transform 200ms ease;
         }
-        .home-video-replay-btn:hover {
-          transform: scale(1.05);
-        }
-        .home-video-replay-circle {
+        .hp-video-replay-btn:hover { transform: scale(1.05); }
+        .hp-video-replay-circle {
           width: 52px;
           height: 52px;
           border-radius: 50%;
@@ -664,24 +656,24 @@ export default function Home() {
           border: 1.5px solid rgba(201,168,76,0.5);
           background-color: rgba(201,168,76,0.08);
         }
-        .home-progress-wrap {
+        .hp-progress-wrap {
           margin-top: 10px;
           padding: 0 2px;
         }
-        .home-progress-bar {
+        .hp-progress-bar {
           position: relative;
           height: 4px;
           border-radius: 4px;
           background-color: rgba(255,255,255,0.08);
           cursor: pointer;
         }
-        .home-progress-fill {
+        .hp-progress-fill {
           height: 100%;
           border-radius: 4px;
           background-color: #C9A84C;
           transition: width 100ms linear;
         }
-        .home-progress-thumb {
+        .hp-progress-thumb {
           position: absolute;
           top: 50%;
           width: 12px;
@@ -692,163 +684,141 @@ export default function Home() {
           transform: translate(-50%, -50%);
           transition: opacity 200ms;
         }
-        .home-progress-times {
+        .hp-progress-times {
           display: flex;
           justify-content: space-between;
           margin-top: 6px;
         }
-        .home-progress-times span {
+        .hp-progress-times span {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 11px;
           color: #5A5855;
         }
-        .home-video-caption {
+        .hp-video-caption {
           text-align: center;
           margin-top: 16px;
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 13px;
           color: #5A5855;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.03em;
         }
 
-        /* === JOURNEY === */
-        .home-journey {
-          padding-bottom: 64px;
+        /* === 3. JOURNEY === */
+        .hp-journey {
+          padding-bottom: 72px;
         }
-        .home-journey-heading {
+        .hp-journey-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 24px;
           line-height: 1.2;
           color: #F0EDE8;
-          margin: 0 0 12px 0;
+          margin: 0 0 20px 0;
         }
-        .home-journey-intro {
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 300;
-          font-size: 15px;
-          line-height: 1.6;
-          color: #8A8680;
-          margin: 0 0 48px 0;
+        .hp-journey-hook {
+          font-family: 'Playfair Display', serif;
+          font-weight: 400;
+          font-style: italic;
+          font-size: 17px;
+          line-height: 1.5;
+          color: #B0ACA6;
+          margin: 0 0 56px 0;
         }
 
         /* Roadmap */
-        .home-roadmap {
+        .hp-roadmap {
           position: relative;
           display: flex;
           flex-direction: column;
-          gap: 0;
         }
-        .home-roadmap-step {
+        .hp-roadmap-step {
           display: flex;
           gap: 20px;
           position: relative;
-          padding-bottom: 56px;
+          padding-bottom: 64px;
         }
-        .home-roadmap-step:last-child {
-          padding-bottom: 0;
-        }
-        .home-roadmap-rail {
+        .hp-roadmap-step:last-child { padding-bottom: 0; }
+        .hp-roadmap-rail {
           display: flex;
           flex-direction: column;
           align-items: center;
           width: 14px;
           flex-shrink: 0;
-          position: relative;
         }
-        .home-roadmap-segment {
+        .hp-roadmap-segment {
           width: 1.5px;
           flex: 1;
-          min-height: 24px;
-          background-color: rgba(201,168,76,0.15);
-          transition: background-color 500ms ease-out;
+          min-height: 20px;
           margin-bottom: 6px;
         }
-        .home-roadmap-segment-below {
+        .hp-roadmap-tail {
           width: 1.5px;
           flex: 1;
-          background-color: rgba(201,168,76,0.15);
+          background-color: rgba(201,168,76,0.12);
           margin-top: 6px;
         }
-        .home-roadmap-node {
+        .hp-roadmap-node {
           width: 14px;
           height: 14px;
           border-radius: 50%;
-          border: 2px solid rgba(201,168,76,0.3);
+          border: 2px solid rgba(201,168,76,0.25);
           flex-shrink: 0;
         }
-        .home-roadmap-content {
+        .hp-roadmap-content {
           flex: 1;
-          padding-top: 0;
+          min-width: 0;
         }
-        .home-roadmap-label-row {
-          display: flex;
-          align-items: baseline;
-          gap: 10px;
-          margin-bottom: 6px;
-        }
-        .home-roadmap-label {
+        .hp-roadmap-label {
           font-family: 'DM Sans', sans-serif;
           font-weight: 500;
           font-size: 10px;
           letter-spacing: 0.14em;
-          color: #C9A14A;
+          color: #C9A84C;
           text-transform: uppercase;
+          display: block;
+          margin-bottom: 6px;
         }
-        .home-roadmap-time {
-          font-family: 'DM Sans', sans-serif;
+        .hp-roadmap-time {
           font-weight: 300;
-          font-size: 12px;
           color: #5A5855;
+          letter-spacing: 0.06em;
         }
-        .home-roadmap-name {
+        .hp-roadmap-name {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 22px;
-          color: #C9A14A;
-          margin: 0 0 20px 0;
+          color: #C9A84C;
+          margin: 0 0 16px 0;
           line-height: 1.2;
         }
-        .home-roadmap-block {
-          margin-bottom: 16px;
-        }
-        .home-roadmap-block:last-child {
-          margin-bottom: 0;
-        }
-        .home-roadmap-block-label {
-          display: block;
+        .hp-roadmap-pain {
           font-family: 'DM Sans', sans-serif;
-          font-weight: 500;
-          font-size: 9px;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          color: #5A5855;
-          margin-bottom: 6px;
+          font-weight: 300;
+          font-style: italic;
+          font-size: 15px;
+          line-height: 1.6;
+          color: #A8A4A0;
+          margin: 0 0 18px 0;
+          padding-left: 14px;
+          border-left: 2px solid rgba(201,168,76,0.35);
         }
-        .home-roadmap-block-label--gold {
-          color: #C9A14A;
-        }
-        .home-roadmap-block-text {
+        .hp-roadmap-body {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 15px;
-          line-height: 1.6;
-          color: #C8C4BE;
+          line-height: 1.65;
+          color: #E0DDD8;
           margin: 0;
         }
-        .home-roadmap-block-text--bright {
-          color: #F0EDE8;
-          font-weight: 400;
-        }
 
-        /* === PROOF / TESTIMONIALS === */
-        .home-proof {
+        /* === 4. PROOF === */
+        .hp-proof {
           padding-top: 16px;
-          padding-bottom: 20px;
+          padding-bottom: 24px;
         }
-        .home-proof-heading {
+        .hp-proof-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 22px;
@@ -858,38 +828,39 @@ export default function Home() {
         }
 
         /* Carousel */
-        .home-carousel {
+        .hp-carousel {
           display: flex;
-          gap: 12px;
+          gap: 14px;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
-          padding: 0 20px 24px;
+          padding: 0 20px 32px;
           scrollbar-width: none;
         }
-        .home-carousel::-webkit-scrollbar { display: none; }
-        .home-carousel-card {
+        .hp-carousel::-webkit-scrollbar { display: none; }
+        .hp-card {
           flex-shrink: 0;
-          width: 82vw;
+          width: 80vw;
           max-width: 340px;
-          aspect-ratio: 4/5;
           border-radius: 16px;
           overflow: hidden;
-          position: relative;
           background-color: #131316;
           border: 1px solid rgba(255,255,255,0.06);
           scroll-snap-align: start;
           cursor: pointer;
         }
-        .home-carousel-video {
-          position: absolute;
-          inset: 0;
+        .hp-card-media {
+          position: relative;
           width: 100%;
-          height: 100%;
-          object-fit: cover;
-          background-color: #131316;
+          background-color: #0A0A0A;
         }
-        .home-carousel-play-overlay {
+        .hp-card-video {
+          display: block;
+          width: 100%;
+          height: auto;
+          background-color: #0A0A0A;
+        }
+        .hp-card-play-overlay {
           position: absolute;
           inset: 0;
           display: flex;
@@ -897,17 +868,17 @@ export default function Home() {
           justify-content: center;
           background: rgba(0,0,0,0.25);
         }
-        .home-carousel-play-circle {
-          width: 44px;
-          height: 44px;
+        .hp-card-play-circle {
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: rgba(201,161,74,0.12);
-          border: 1px solid rgba(201,161,74,0.4);
+          background-color: rgba(201,161,74,0.1);
+          border: 1.5px solid rgba(201,161,74,0.45);
         }
-        .home-carousel-loader {
+        .hp-card-loader {
           position: absolute;
           inset: 0;
           display: flex;
@@ -916,7 +887,7 @@ export default function Home() {
           z-index: 10;
           pointer-events: none;
         }
-        .home-carousel-mute {
+        .hp-card-mute {
           position: absolute;
           top: 10px;
           right: 10px;
@@ -927,29 +898,23 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: rgba(0,0,0,0.5);
+          background-color: rgba(0,0,0,0.55);
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
           border: none;
           cursor: pointer;
         }
-        .home-carousel-caption {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 36px 14px 14px;
-          background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-          pointer-events: none;
+        .hp-card-info {
+          padding: 14px 16px 16px;
         }
-        .home-carousel-name {
+        .hp-card-name {
           font-family: 'DM Sans', sans-serif;
           font-weight: 700;
           font-size: 16px;
           color: #FFFFFF;
           margin: 0;
         }
-        .home-carousel-designation {
+        .hp-card-role {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 13px;
@@ -957,14 +922,14 @@ export default function Home() {
           margin: 3px 0 0 0;
         }
 
-        /* === CLOSING === */
-        .home-closing {
+        /* === 5. CLOSING === */
+        .hp-closing {
           padding-top: 64px;
           padding-bottom: 80px;
           padding-bottom: calc(80px + env(safe-area-inset-bottom));
           text-align: center;
         }
-        .home-closing-heading {
+        .hp-closing-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 22px;
@@ -972,7 +937,7 @@ export default function Home() {
           color: #F0EDE8;
           margin: 0 0 10px 0;
         }
-        .home-closing-sub {
+        .hp-closing-sub {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 14px;
@@ -981,21 +946,22 @@ export default function Home() {
           margin: 0;
         }
 
+        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
-          .home-roadmap-step {
+          .hp-roadmap-step {
             opacity: 1 !important;
             transform: none !important;
             transition: none !important;
           }
-          .home-roadmap-node {
+          .hp-roadmap-node {
             border-color: #C9A84C !important;
             background-color: #C9A84C !important;
             transform: none !important;
             transition: none !important;
           }
-          .home-roadmap-segment {
+          .hp-roadmap-segment,
+          .hp-roadmap-tail {
             background-color: #C9A84C !important;
-            transition: none !important;
           }
         }
       `}</style>
