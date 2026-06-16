@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Volume2, VolumeX, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 
@@ -19,7 +19,6 @@ export default function Schedule() {
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
 
   const vslVideoRef = useRef<HTMLVideoElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
   const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   const params = new URLSearchParams(window.location.search);
@@ -95,92 +94,33 @@ export default function Schedule() {
     setMutedStates((prev) => ({ ...prev, [id]: newMuted }));
   };
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const scrollAmount = el.clientWidth * 0.75;
-    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
-  };
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#070707' }}>
-      {/* Sticky CTA */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center"
-        style={{
-          backgroundColor: 'rgba(10,10,10,0.95)',
-          backdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(201,161,74,0.3)',
-          padding: '12px 24px',
-          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
-        }}
-      >
-        <button
-          onClick={openBooking}
-          className="w-full transition-transform active:scale-[0.97]"
-          style={{
-            maxWidth: '480px',
-            backgroundColor: '#C9A14A',
-            color: '#0A0A0A',
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 600,
-            fontSize: '0.9rem',
-            letterSpacing: '0.03em',
-            padding: '14px 24px',
-            borderRadius: '10px',
-          }}
-        >
+    <div className="schedule-page">
+      {/* Sticky bottom CTA */}
+      <div className="schedule-sticky-cta">
+        <button onClick={openBooking} className="schedule-cta-btn">
           Book Your Free Clarity Call
         </button>
       </div>
 
-      {/* SECTION 1 — VSL */}
-      <section
-        className="relative flex flex-col items-center justify-center px-6"
-        style={{ minHeight: '100svh', paddingTop: '64px', paddingBottom: '96px' }}
-      >
-        <div className="w-full max-w-2xl flex flex-col items-center gap-8">
-          <div className="text-center flex flex-col gap-3">
-            <h1
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 400,
-                fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
-                color: '#F0EDE8',
-                lineHeight: 1.2,
-              }}
-            >
-              The last piece, finally handled.
-            </h1>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
-                color: '#8A8680',
-                lineHeight: 1.6,
-                maxWidth: '520px',
-                margin: '0 auto',
-              }}
-            >
-              Watch this before your call. It explains exactly how we crack the Indian body and make fitness run on its own.
-            </p>
-          </div>
+      {/* Centered column */}
+      <div className="schedule-column">
+
+        {/* SECTION 1 — VSL */}
+        <section className="schedule-vsl">
+          <h1 className="schedule-vsl-heading">
+            The last piece, finally handled.
+          </h1>
+          <p className="schedule-vsl-sub">
+            Watch this before your call. It explains exactly how we crack the Indian body and make fitness run on its own.
+          </p>
 
           {vslUrl ? (
-            <div
-              className="relative w-full rounded-xl overflow-hidden cursor-pointer"
-              style={{
-                aspectRatio: '16/9',
-                backgroundColor: '#131316',
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}
-              onClick={handleVslPlay}
-            >
+            <div className="schedule-video-wrap" onClick={handleVslPlay}>
               <video
                 ref={vslVideoRef}
                 src={vslUrl}
-                className="w-full h-full object-contain"
+                className="schedule-video"
                 playsInline
                 preload="metadata"
                 onPlay={() => setVslPlaying(true)}
@@ -188,277 +128,434 @@ export default function Schedule() {
                 onEnded={() => setVslPlaying(false)}
               />
               {!vslPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center transition-transform hover:scale-105"
-                    style={{
-                      border: '1.5px solid rgba(201,168,76,0.5)',
-                      backgroundColor: 'rgba(201,168,76,0.07)',
-                      backdropFilter: 'blur(6px)',
-                    }}
-                  >
-                    <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                <div className="schedule-video-overlay">
+                  <div className="schedule-play-btn">
+                    <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div
-              className="w-full rounded-xl animate-pulse"
-              style={{ aspectRatio: '16/9', backgroundColor: '#131316' }}
-            />
+            <div className="schedule-video-placeholder" />
           )}
-        </div>
-      </section>
+        </section>
 
-      {/* SECTION 2 — What You Get On The Call */}
-      <section className="px-6 py-24 flex justify-center">
-        <div className="w-full max-w-xl flex flex-col gap-10">
-          <div className="flex flex-col gap-4">
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 500,
-                fontSize: '0.75rem',
-                color: '#C9A14A',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-              }}
-            >
-              The Clarity Call
-            </p>
-            <h2
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 400,
-                fontSize: 'clamp(1.4rem, 4vw, 2rem)',
-                color: '#F0EDE8',
-                lineHeight: 1.25,
-              }}
-            >
-              A working session, not a sales pitch.
-            </h2>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
-                color: '#8A8680',
-                lineHeight: 1.7,
-              }}
-            >
-              This is a working session. We get to the bottom of why your body hasn't changed, map exactly what it will take to crack it, and you leave with a clear picture of your next step — whether or not we end up working together.
-            </p>
+        {/* SECTION 2 — The Clarity Call */}
+        <section className="schedule-clarity">
+          <span className="schedule-eyebrow">THE CLARITY CALL</span>
+          <h2 className="schedule-clarity-heading">
+            A working session, not a sales pitch.
+          </h2>
+          <p className="schedule-clarity-body">
+            We get to the bottom of why your body hasn't changed, map exactly what it'll take to crack it, and you leave with a clear next step — whether or not we work together.
+          </p>
+
+          <div className="schedule-points">
+            <div className="schedule-point">
+              <span className="schedule-point-marker" />
+              <span>We diagnose what's actually been stopping you.</span>
+            </div>
+            <div className="schedule-point">
+              <span className="schedule-point-marker" />
+              <span>We map the exact path: stubborn fat off, real muscle on.</span>
+            </div>
+            <div className="schedule-point">
+              <span className="schedule-point-marker" />
+              <span>You leave with total clarity on your next move — with us or not.</span>
+            </div>
           </div>
+        </section>
 
-          <div className="flex flex-col gap-5">
-            {[
-              'We diagnose what\u2019s actually been stopping your progress.',
-              'We map the exact path to take the stubborn fat off and put real muscle on.',
-              'You leave with total clarity on your next move — working with us or not.',
-            ].map((point, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <span
-                  className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-2.5"
-                  style={{ backgroundColor: '#C9A14A' }}
+        {/* SECTION 3 — Testimonials */}
+        {testimonials.length > 0 && (
+          <section className="schedule-testimonials">
+            <h2 className="schedule-testimonials-heading">
+              Building a new generation of Indians. Weapons of intellect and physicality.
+            </h2>
+          </section>
+        )}
+      </div>
+
+      {/* Carousel breaks out of column for edge-to-edge scroll */}
+      {testimonials.length > 0 && (
+        <div className="schedule-carousel-wrapper">
+          <div className="schedule-carousel">
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                className="schedule-card"
+                onClick={() => playTestimonial(t.id)}
+              >
+                <video
+                  ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
+                  src={t.url}
+                  className="schedule-card-video"
+                  playsInline
+                  muted
+                  loop
+                  preload="metadata"
+                  onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
+                  onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
                 />
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 400,
-                    fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
-                    color: '#D4D0CC',
-                    lineHeight: 1.65,
-                  }}
-                >
-                  {point}
-                </p>
+
+                {activeTestimonial !== t.id && (
+                  <div className="schedule-card-play-overlay">
+                    <div className="schedule-card-play-circle">
+                      <Play className="w-4 h-4 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                    </div>
+                  </div>
+                )}
+
+                {videoLoading[t.id] && activeTestimonial === t.id && (
+                  <div className="schedule-card-loader">
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                  </div>
+                )}
+
+                {activeTestimonial === t.id && (
+                  <button
+                    onClick={(e) => toggleMute(t.id, e)}
+                    className="schedule-card-mute"
+                  >
+                    {mutedStates[t.id] === false ? (
+                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    ) : (
+                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    )}
+                  </button>
+                )}
+
+                <div className="schedule-card-caption">
+                  <p className="schedule-card-name">
+                    {t.testimonial_name || 'Client'}
+                  </p>
+                  {t.testimonial_designation && (
+                    <p className="schedule-card-designation">
+                      {t.testimonial_designation}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      )}
 
-      {/* SECTION 3 — Testimonials Carousel */}
+      {/* Static CTA below testimonials */}
       {testimonials.length > 0 && (
-        <section className="py-24 pb-40">
-          <div className="px-6 max-w-2xl mx-auto mb-10">
-            <h2
-              className="text-center"
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 400,
-                fontSize: 'clamp(1.3rem, 4vw, 1.85rem)',
-                color: '#F0EDE8',
-                lineHeight: 1.3,
-              }}
-            >
-              Building a new generation of Indians. Weapons of intellect and physicality.
-            </h2>
-          </div>
-
-          {/* Carousel navigation */}
-          <div className="relative">
-            <button
-              onClick={() => scrollCarousel('left')}
-              className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full transition-opacity hover:opacity-100"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(8px)',
-                opacity: 0.7,
-              }}
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-5 h-5" style={{ color: '#F0EDE8' }} />
-            </button>
-            <button
-              onClick={() => scrollCarousel('right')}
-              className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full transition-opacity hover:opacity-100"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(8px)',
-                opacity: 0.7,
-              }}
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-5 h-5" style={{ color: '#F0EDE8' }} />
-            </button>
-
-            {/* Scrollable row */}
-            <div
-              ref={carouselRef}
-              className="flex gap-4 overflow-x-auto px-6 pb-4 snap-x snap-mandatory"
-              style={{
-                scrollbarWidth: 'none',
-                WebkitOverflowScrolling: 'touch',
-              }}
-            >
-              {testimonials.map((t) => (
-                <div
-                  key={t.id}
-                  className="flex-shrink-0 snap-start relative rounded-xl overflow-hidden cursor-pointer group"
-                  style={{
-                    width: 'clamp(260px, 70vw, 300px)',
-                    aspectRatio: '9/16',
-                    backgroundColor: '#131316',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                  }}
-                  onClick={() => playTestimonial(t.id)}
-                >
-                  <video
-                    ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
-                    src={t.url}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    playsInline
-                    muted
-                    loop
-                    preload="metadata"
-                    onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
-                    onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
-                  />
-
-                  {/* Play overlay when not active */}
-                  {activeTestimonial !== t.id && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center"
-                        style={{
-                          backgroundColor: 'rgba(201,161,74,0.15)',
-                          border: '1px solid rgba(201,161,74,0.4)',
-                        }}
-                      >
-                        <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Loading */}
-                  {videoLoading[t.id] && activeTestimonial === t.id && (
-                    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                      <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
-                    </div>
-                  )}
-
-                  {/* Mute toggle */}
-                  {activeTestimonial === t.id && (
-                    <button
-                      onClick={(e) => toggleMute(t.id, e)}
-                      className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        backdropFilter: 'blur(4px)',
-                      }}
-                    >
-                      {mutedStates[t.id] === false ? (
-                        <Volume2 className="w-4 h-4" style={{ color: '#F0EDE8' }} />
-                      ) : (
-                        <VolumeX className="w-4 h-4" style={{ color: '#F0EDE8' }} />
-                      )}
-                    </button>
-                  )}
-
-                  {/* Bottom gradient + name */}
-                  <div
-                    className="absolute bottom-0 left-0 right-0 p-4 pt-12 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontWeight: 500,
-                        fontSize: '0.9rem',
-                        color: '#F0EDE8',
-                      }}
-                    >
-                      {t.testimonial_name || 'Client'}
-                    </p>
-                    {t.testimonial_designation && (
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontWeight: 300,
-                          fontSize: '0.75rem',
-                          color: '#8A8680',
-                          marginTop: '2px',
-                        }}
-                      >
-                        {t.testimonial_designation}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Static CTA below testimonials */}
-          <div className="flex justify-center px-6 mt-12">
-            <button
-              onClick={openBooking}
-              className="w-full transition-transform active:scale-[0.97]"
-              style={{
-                maxWidth: '480px',
-                backgroundColor: '#C9A14A',
-                color: '#0A0A0A',
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
-                fontSize: '0.95rem',
-                letterSpacing: '0.03em',
-                padding: '16px 32px',
-                borderRadius: '10px',
-              }}
-            >
+        <div className="schedule-column">
+          <div className="schedule-bottom-cta">
+            <button onClick={openBooking} className="schedule-cta-btn">
               Book Your Free Clarity Call
             </button>
           </div>
-        </section>
+        </div>
       )}
 
-      {/* Hide carousel scrollbar */}
       <style>{`
-        .snap-x::-webkit-scrollbar { display: none; }
+        .schedule-page {
+          min-height: 100vh;
+          min-height: 100svh;
+          background-color: #070707;
+          padding-bottom: 80px;
+        }
+
+        .schedule-column {
+          max-width: 480px;
+          margin: 0 auto;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+
+        /* ========== STICKY CTA ========== */
+        .schedule-sticky-cta {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 50;
+          background-color: rgba(10,10,10,0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-top: 1px solid rgba(201,161,74,0.25);
+          padding: 10px 16px;
+          padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        }
+        .schedule-cta-btn {
+          display: block;
+          width: 100%;
+          max-width: 480px;
+          margin: 0 auto;
+          background-color: #C9A14A;
+          color: #0A0A0A;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 600;
+          font-size: 15px;
+          letter-spacing: 0.02em;
+          padding: 14px 20px;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .schedule-cta-btn:active {
+          transform: scale(0.97);
+        }
+
+        /* ========== SECTION 1 — VSL ========== */
+        .schedule-vsl {
+          padding-top: 32px;
+          padding-bottom: 48px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+        .schedule-vsl-heading {
+          font-family: 'Playfair Display', serif;
+          font-weight: 400;
+          font-size: 28px;
+          line-height: 1.1;
+          color: #F0EDE8;
+          margin: 0;
+        }
+        .schedule-vsl-sub {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 15px;
+          line-height: 1.5;
+          color: #8A8680;
+          margin: 0;
+          max-width: 360px;
+        }
+        .schedule-video-wrap {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16/9;
+          border-radius: 12px;
+          overflow: hidden;
+          background-color: #131316;
+          border: 1px solid rgba(255,255,255,0.06);
+          cursor: pointer;
+          margin-top: 8px;
+        }
+        .schedule-video {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+        .schedule-video-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.2);
+        }
+        .schedule-play-btn {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1.5px solid rgba(201,168,76,0.5);
+          background-color: rgba(201,168,76,0.07);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+        }
+        .schedule-video-placeholder {
+          width: 100%;
+          aspect-ratio: 16/9;
+          border-radius: 12px;
+          background-color: #131316;
+          animation: pulse 2s infinite;
+          margin-top: 8px;
+        }
+
+        /* ========== SECTION 2 — CLARITY ========== */
+        .schedule-clarity {
+          padding-bottom: 48px;
+          text-align: left;
+        }
+        .schedule-eyebrow {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 500;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          color: #C9A14A;
+          text-transform: uppercase;
+          display: block;
+          margin-bottom: 12px;
+        }
+        .schedule-clarity-heading {
+          font-family: 'Playfair Display', serif;
+          font-weight: 400;
+          font-size: 24px;
+          line-height: 1.15;
+          color: #F0EDE8;
+          margin: 0 0 14px 0;
+        }
+        .schedule-clarity-body {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 15px;
+          line-height: 1.55;
+          color: #8A8680;
+          margin: 0 0 24px 0;
+        }
+        .schedule-points {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .schedule-point {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 400;
+          font-size: 15px;
+          line-height: 1.5;
+          color: #D4D0CC;
+        }
+        .schedule-point-marker {
+          flex-shrink: 0;
+          width: 6px;
+          height: 2px;
+          margin-top: 10px;
+          background-color: #C9A14A;
+          border-radius: 1px;
+        }
+
+        /* ========== SECTION 3 — TESTIMONIALS ========== */
+        .schedule-testimonials {
+          padding-bottom: 20px;
+          text-align: left;
+        }
+        .schedule-testimonials-heading {
+          font-family: 'Playfair Display', serif;
+          font-weight: 400;
+          font-size: 20px;
+          line-height: 1.3;
+          color: #F0EDE8;
+          margin: 0;
+        }
+
+        /* Carousel */
+        .schedule-carousel-wrapper {
+          padding-bottom: 48px;
+        }
+        .schedule-carousel {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          padding: 16px 20px 4px;
+          scrollbar-width: none;
+        }
+        .schedule-carousel::-webkit-scrollbar {
+          display: none;
+        }
+        .schedule-card {
+          flex-shrink: 0;
+          width: 78vw;
+          max-width: 320px;
+          aspect-ratio: 9/16;
+          border-radius: 14px;
+          overflow: hidden;
+          position: relative;
+          background-color: #131316;
+          border: 1px solid rgba(255,255,255,0.06);
+          scroll-snap-align: start;
+          cursor: pointer;
+        }
+        .schedule-card-video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .schedule-card-play-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.3);
+        }
+        .schedule-card-play-circle {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(201,161,74,0.12);
+          border: 1px solid rgba(201,161,74,0.4);
+        }
+        .schedule-card-loader {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          pointer-events: none;
+        }
+        .schedule-card-mute {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          z-index: 20;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(0,0,0,0.5);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: none;
+          cursor: pointer;
+        }
+        .schedule-card-caption {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 32px 14px 14px;
+          background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+          pointer-events: none;
+        }
+        .schedule-card-name {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 500;
+          font-size: 14px;
+          color: #F0EDE8;
+          margin: 0;
+        }
+        .schedule-card-designation {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 12px;
+          color: #8A8680;
+          margin: 2px 0 0 0;
+        }
+
+        /* Bottom static CTA */
+        .schedule-bottom-cta {
+          padding-bottom: 48px;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
       `}</style>
     </div>
   );
