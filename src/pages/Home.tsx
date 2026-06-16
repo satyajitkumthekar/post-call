@@ -23,31 +23,38 @@ const journeySteps = [
     time: 'before we begin',
     name: 'Assess',
     painQuote: null,
-    body: "First, we learn how your body actually works. How it handles fatigue, how it moves, what your days and your food really look like. Everything that follows is built on that, on your body, not pulled off a shelf. It's the reason this fits when nothing else ever did.",
+    body: "Before anything else, we get to know your body. How it handles a hard day, how it moves, how much you're really moving, what you actually eat on a normal day. Everything we build comes from that. A plan made for your body, not pulled off a shelf. It's why this works when nothing else has.",
+    endState: null,
   },
   {
     label: 'PHASE 01',
     time: 'month 1',
     name: 'Simplify',
     painQuote:
-      "I knew exactly what to eat. I'd researched all of it. I still didn't do it. And the moment my schedule broke, a work trip, a hard week, the whole thing fell apart.",
-    body: "So first, we take all of it off your plate. A training plan and a way of eating built around your real life, one that bends with a hard week instead of breaking. A team in your corner so you stop carrying it alone. You stop deciding, you just execute, and the belly fat starts to move fast.",
+      "There's too much noise. I'm never sure I'm on the right path, or which of the hundred things I could be doing is the right one. I can't hold myself accountable on my own, my training falls apart the second life gets in the way, and every plan I've tried felt like a restrictive diet I couldn't keep up.",
+    body: "So the first thing we do is take all of it off your plate. You get one clear plan, so you stop wondering if you're doing the right thing. We tell you what to do and when, so you stop weighing a hundred options and just follow the path. You get a team that checks in and holds you to it, so it's not all on you anymore. Your training bends around your week, so a work trip or a hard stretch can't break it. And you eat in a way built around your real life, not a strict diet you have to force.",
+    endState:
+      "The noise goes quiet, and you start moving fast. The belly fat starts coming off, you get stronger, your energy comes back, and seeing it work is what makes you want to keep going.",
   },
   {
     label: 'PHASE 02',
     time: 'months 2 to 4',
     name: 'Master',
     painQuote:
-      "It was going well, then one bad week happened and I just stopped. I couldn't even explain why. One rough day, I'd eat badly, feel guilty, and somehow that made the next day worse too.",
-    body: "That was never about willpower. It was the voice on the hard days, and the spiral that follows when you listen to it. This is where we go after it. You learn to catch it, to create space from it, and to stop the one bad day from becoming a bad week. Fitness starts to feel effortless, and the change in your body becomes the kind other people notice.",
+      "I know exactly what to do. I just don't do it on the hard days. It would be going well, then one bad day would turn into a bad week, and I couldn't even explain why. And every time I slipped, I'd feel guilty, and the guilt made the next day worse.",
+    body: "That was never about willpower. On the hard days there's a voice in your head that talks you out of it, and the moment you listen, one bad day turns into a bad week. So we teach you to catch that voice the moment it shows up, and to step back from it instead of obeying it. A bad day stays just a bad day. At the same time, we fix the things quietly working against you, your sleep, your stress, how well you recover, how much you move in a day.",
+    endState:
+      "This is when it clicks. Showing up stops taking willpower. The change in your body gets big enough that people stop you to ask what you're doing. And your head feels clearer than it has in years.",
   },
   {
     label: 'PHASE 03',
     time: 'months 5 to 6',
     name: 'Own',
     painQuote:
-      "I've been consistent before. I know I can do it. That's what makes it so frustrating to be here again.",
-    body: "Because every time before, it lasted exactly as long as the support did. This is the part nobody else builds. We hand you the wheel on purpose, pull back slowly, and leave you with habits that run on their own. You don't end up needing us. You walk in needing the system, and you walk out being it.",
+      "I've been consistent before. I know I can do it. That's what's so frustrating about being here again. Every program worked right up until it stopped, and the second the support was gone, so was I. I don't want to need a coach for the rest of my life.",
+    body: "That's the right fear, and it's the one nobody else solves. Every time before, your results lasted only as long as the support did. So in the last stretch, we do the opposite of what most coaches do. We slowly step back. We hand you the controls and pull back the check-ins on purpose, so the habits start running on their own, and you learn to keep them going through any week, on your own.",
+    endState:
+      "You don't need us anymore. That is the whole point. You walked in needing the system. You walk out being it.",
   },
 ];
 
@@ -291,7 +298,7 @@ export default function Home() {
                     <div className="hp-video-play-circle">
                       <Play className="w-7 h-7 ml-0.5" style={{ color: '#C9A84C' }} fill="currentColor" />
                     </div>
-                    <span className="hp-video-tap-label">Tap to watch</span>
+                    <span className="hp-tap-label">Tap to watch</span>
                   </button>
                 )}
 
@@ -301,7 +308,7 @@ export default function Home() {
                       <div className="hp-video-replay-circle">
                         <RotateCcw className="w-5 h-5" style={{ color: '#C9A84C' }} />
                       </div>
-                      <span className="hp-video-tap-label">Replay</span>
+                      <span className="hp-tap-label">Replay</span>
                     </button>
                   </div>
                 )}
@@ -350,11 +357,10 @@ export default function Home() {
           <div className="hp-roadmap">
             {journeySteps.map((step, i) => {
               const isActive = activeSteps[i];
-              const segmentActive = isActive;
               return (
                 <div
                   key={i}
-                  className="hp-roadmap-step"
+                  className="hp-step"
                   data-step-index={i}
                   ref={(el) => { stepRefs.current[i] = el; }}
                   style={{
@@ -363,20 +369,18 @@ export default function Home() {
                     transition: 'opacity 500ms ease-out, transform 500ms ease-out',
                   }}
                 >
-                  <div className="hp-roadmap-rail">
+                  <div className="hp-rail">
                     {i > 0 && (
                       <div
-                        className="hp-roadmap-segment"
+                        className="hp-segment"
                         style={{
-                          backgroundColor: segmentActive
-                            ? '#C9A84C'
-                            : 'rgba(201,168,76,0.12)',
+                          backgroundColor: isActive ? '#C9A84C' : 'rgba(201,168,76,0.12)',
                           transition: 'background-color 500ms ease-out',
                         }}
                       />
                     )}
                     <div
-                      className="hp-roadmap-node"
+                      className="hp-node"
                       style={{
                         borderColor: isActive ? '#C9A84C' : 'rgba(201,168,76,0.25)',
                         backgroundColor: isActive ? '#C9A84C' : 'transparent',
@@ -385,19 +389,22 @@ export default function Home() {
                       }}
                     />
                     {i < journeySteps.length - 1 && (
-                      <div className="hp-roadmap-tail" />
+                      <div className="hp-tail" />
                     )}
                   </div>
 
-                  <div className="hp-roadmap-content">
-                    <span className="hp-roadmap-label">
-                      {step.label} <span className="hp-roadmap-time">&middot; {step.time}</span>
+                  <div className="hp-step-content">
+                    <span className="hp-step-label">
+                      {step.label} <span className="hp-step-time">&middot; {step.time}</span>
                     </span>
-                    <h3 className="hp-roadmap-name">{step.name}</h3>
+                    <h3 className="hp-step-name">{step.name}</h3>
                     {step.painQuote && (
-                      <p className="hp-roadmap-pain">"{step.painQuote}"</p>
+                      <p className="hp-pain">"{step.painQuote}"</p>
                     )}
-                    <p className="hp-roadmap-body">{step.body}</p>
+                    <p className="hp-body">{step.body}</p>
+                    {step.endState && (
+                      <p className="hp-end-state">{step.endState}</p>
+                    )}
                   </div>
                 </div>
               );
@@ -416,7 +423,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* Carousel breaks out of column */}
+      {/* Carousel (edge-to-edge scroll) */}
       {testimonials.length > 0 && (
         <div className="hp-carousel">
           {testimonials.map((t) => (
@@ -439,8 +446,8 @@ export default function Home() {
                 />
 
                 {activeTestimonial !== t.id && (
-                  <div className="hp-card-play-overlay">
-                    <div className="hp-card-play-circle">
+                  <div className="hp-card-overlay">
+                    <div className="hp-card-play">
                       <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
                     </div>
                   </div>
@@ -448,7 +455,7 @@ export default function Home() {
 
                 {tVideoLoading[t.id] && activeTestimonial === t.id && (
                   <div className="hp-card-loader">
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,168,76,0.7)' }} />
                   </div>
                 )}
 
@@ -497,13 +504,13 @@ export default function Home() {
           padding-right: 20px;
         }
 
-        /* === EYEBROW (reusable) === */
+        /* Eyebrow */
         .hp-eyebrow {
           display: block;
           font-family: 'DM Sans', sans-serif;
           font-weight: 500;
           font-size: 11px;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.16em;
           color: #C9A84C;
           text-transform: uppercase;
           margin-bottom: 14px;
@@ -537,9 +544,7 @@ export default function Home() {
         }
 
         /* === 2. VIDEO === */
-        .hp-video-section {
-          padding-bottom: 80px;
-        }
+        .hp-video-section { padding-bottom: 80px; }
         .hp-video-wrap {
           position: relative;
           width: 100%;
@@ -616,7 +621,7 @@ export default function Home() {
         .hp-video-play-overlay:hover .hp-video-play-circle {
           transform: scale(1.08);
         }
-        .hp-video-tap-label {
+        .hp-tap-label {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 11px;
@@ -656,10 +661,7 @@ export default function Home() {
           border: 1.5px solid rgba(201,168,76,0.5);
           background-color: rgba(201,168,76,0.08);
         }
-        .hp-progress-wrap {
-          margin-top: 10px;
-          padding: 0 2px;
-        }
+        .hp-progress-wrap { margin-top: 10px; padding: 0 2px; }
         .hp-progress-bar {
           position: relative;
           height: 4px;
@@ -706,9 +708,7 @@ export default function Home() {
         }
 
         /* === 3. JOURNEY === */
-        .hp-journey {
-          padding-bottom: 72px;
-        }
+        .hp-journey { padding-bottom: 72px; }
         .hp-journey-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
@@ -733,44 +733,44 @@ export default function Home() {
           display: flex;
           flex-direction: column;
         }
-        .hp-roadmap-step {
+        .hp-step {
           display: flex;
           gap: 20px;
           position: relative;
           padding-bottom: 64px;
         }
-        .hp-roadmap-step:last-child { padding-bottom: 0; }
-        .hp-roadmap-rail {
+        .hp-step:last-child { padding-bottom: 0; }
+        .hp-rail {
           display: flex;
           flex-direction: column;
           align-items: center;
           width: 14px;
           flex-shrink: 0;
         }
-        .hp-roadmap-segment {
+        .hp-segment {
           width: 1.5px;
           flex: 1;
           min-height: 20px;
           margin-bottom: 6px;
         }
-        .hp-roadmap-tail {
+        .hp-tail {
           width: 1.5px;
           flex: 1;
           background-color: rgba(201,168,76,0.12);
           margin-top: 6px;
         }
-        .hp-roadmap-node {
+        .hp-node {
           width: 14px;
           height: 14px;
           border-radius: 50%;
           border: 2px solid rgba(201,168,76,0.25);
           flex-shrink: 0;
         }
-        .hp-roadmap-content {
+        .hp-step-content {
           flex: 1;
           min-width: 0;
         }
-        .hp-roadmap-label {
+        .hp-step-label {
           font-family: 'DM Sans', sans-serif;
           font-weight: 500;
           font-size: 10px;
@@ -780,12 +780,12 @@ export default function Home() {
           display: block;
           margin-bottom: 6px;
         }
-        .hp-roadmap-time {
+        .hp-step-time {
           font-weight: 300;
           color: #5A5855;
           letter-spacing: 0.06em;
         }
-        .hp-roadmap-name {
+        .hp-step-name {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
           font-size: 22px;
@@ -793,24 +793,32 @@ export default function Home() {
           margin: 0 0 16px 0;
           line-height: 1.2;
         }
-        .hp-roadmap-pain {
+        .hp-pain {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-style: italic;
           font-size: 15px;
           line-height: 1.6;
           color: #A8A4A0;
-          margin: 0 0 18px 0;
+          margin: 0 0 20px 0;
           padding-left: 14px;
           border-left: 2px solid rgba(201,168,76,0.35);
         }
-        .hp-roadmap-body {
+        .hp-body {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 15px;
           line-height: 1.65;
-          color: #E0DDD8;
+          color: #D8D4CE;
           margin: 0;
+        }
+        .hp-end-state {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 400;
+          font-size: 15px;
+          line-height: 1.6;
+          color: #F0EDE8;
+          margin: 20px 0 0 0;
         }
 
         /* === 4. PROOF === */
@@ -860,7 +868,7 @@ export default function Home() {
           height: auto;
           background-color: #0A0A0A;
         }
-        .hp-card-play-overlay {
+        .hp-card-overlay {
           position: absolute;
           inset: 0;
           display: flex;
@@ -868,15 +876,15 @@ export default function Home() {
           justify-content: center;
           background: rgba(0,0,0,0.25);
         }
-        .hp-card-play-circle {
+        .hp-card-play {
           width: 48px;
           height: 48px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: rgba(201,161,74,0.1);
-          border: 1.5px solid rgba(201,161,74,0.45);
+          background-color: rgba(201,168,76,0.1);
+          border: 1.5px solid rgba(201,168,76,0.45);
         }
         .hp-card-loader {
           position: absolute;
@@ -904,9 +912,7 @@ export default function Home() {
           border: none;
           cursor: pointer;
         }
-        .hp-card-info {
-          padding: 14px 16px 16px;
-        }
+        .hp-card-info { padding: 14px 16px 16px; }
         .hp-card-name {
           font-family: 'DM Sans', sans-serif;
           font-weight: 700;
@@ -948,19 +954,19 @@ export default function Home() {
 
         /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
-          .hp-roadmap-step {
+          .hp-step {
             opacity: 1 !important;
             transform: none !important;
             transition: none !important;
           }
-          .hp-roadmap-node {
+          .hp-node {
             border-color: #C9A84C !important;
             background-color: #C9A84C !important;
             transform: none !important;
             transition: none !important;
           }
-          .hp-roadmap-segment,
-          .hp-roadmap-tail {
+          .hp-segment,
+          .hp-tail {
             background-color: #C9A84C !important;
           }
         }
