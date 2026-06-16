@@ -151,9 +151,7 @@ export default function Schedule() {
         {/* SECTION 3 — Testimonials */}
         {testimonials.length > 0 && (
           <section className="schedule-testimonials">
-            <h2 className="schedule-testimonials-heading">
-              Building a new generation of Indians.
-            </h2>
+            <span className="schedule-eyebrow">BUILDING A NEW GENERATION OF INDIANS</span>
             <p className="schedule-testimonials-sub">
               Weapons of intellect and physicality.
             </p>
