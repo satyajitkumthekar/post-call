@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ChevronDown, Volume2, VolumeX, Play, Loader2 } from 'lucide-react';
+import { Play, Volume2, VolumeX, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
-
-interface StoryPanelRow {
-  id: string;
-  image_url: string;
-  sequence_order: number;
-}
 
 interface Testimonial {
   id: string;
@@ -18,22 +12,15 @@ interface Testimonial {
 
 export default function Schedule() {
   const [vslUrl, setVslUrl] = useState<string | null>(null);
-  const [storyPanels, setStoryPanels] = useState<StoryPanelRow[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [vslPlaying, setVslPlaying] = useState(false);
-  const [showScrollCue, setShowScrollCue] = useState(true);
-  const [showSkipBtn, setShowSkipBtn] = useState(true);
+  const [activeTestimonial, setActiveTestimonial] = useState<string | null>(null);
   const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
-  const [muteIconVisible, setMuteIconVisible] = useState<Record<string, boolean>>({});
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
-  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const vslVideoRef = useRef<HTMLVideoElement>(null);
-  const testimonialRefs = useRef<Record<string, HTMLVideoElement | null>>({});
-  const testimonialSectionRefs = useRef<Record<string, HTMLElement | null>>({});
-  const testimonialsStartRef = useRef<HTMLElement | null>(null);
-  const muteTimeouts = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   const params = new URLSearchParams(window.location.search);
   const urlName = params.get('name');
@@ -58,13 +45,6 @@ export default function Schedule() {
         .maybeSingle();
       if (data?.value) setVslUrl(data.value);
     };
-    const fetchStoryPanels = async () => {
-      const { data } = await supabase
-        .from('story_panels')
-        .select('id, image_url, sequence_order')
-        .order('sequence_order', { ascending: true });
-      if (data) setStoryPanels(data);
-    };
     const fetchTestimonials = async () => {
       const { data } = await supabase
         .from('uploaded_files')
@@ -75,150 +55,8 @@ export default function Schedule() {
       if (data) setTestimonials(data);
     };
     fetchVsl();
-    fetchStoryPanels();
     fetchTestimonials();
   }, []);
-
-  // Preload all story panel images as soon as URLs are available
-  useEffect(() => {
-    storyPanels.forEach((panel) => {
-      const img = new Image();
-      img.src = panel.image_url;
-    });
-  }, [storyPanels]);
-
-  // Panel entrance animations via IntersectionObserver (rooted in scroll container)
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('panel-visible');
-          }
-        });
-      },
-      { root: container, threshold: 0.15 }
-    );
-
-    const panels = container.querySelectorAll('.schedule-panel');
-    panels.forEach((panel) => observer.observe(panel));
-
-    return () => observer.disconnect();
-  }, [storyPanels.length, testimonials.length]);
-
-  // Hide scroll cue on first scroll
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const handleScroll = () => {
-      if (container.scrollTop > 50) {
-        setShowScrollCue(false);
-      }
-    };
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Show/hide "Skip to testimonials" based on whether user is in testimonials area
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || testimonials.length === 0) return;
-
-    const testimonialSections = container.querySelectorAll('[data-testimonial-id]');
-    if (testimonialSections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const anyVisible = entries.some((e) => e.isIntersecting);
-        if (anyVisible) {
-          setShowSkipBtn(false);
-        } else {
-          setShowSkipBtn(true);
-        }
-      },
-      { root: container, threshold: 0.3 }
-    );
-
-    testimonialSections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, [testimonials]);
-
-  // Testimonial video autoplay/pause and lazy preload
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || testimonials.length === 0) return;
-
-    const frameId = requestAnimationFrame(() => {
-      const playObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const section = entry.target as HTMLElement;
-            const video = section.querySelector('video');
-            if (!video) return;
-
-            if (entry.isIntersecting) {
-              setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: true }));
-              video.play().then(() => {
-                setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: false }));
-              }).catch(() => {
-                setVideoLoading((prev) => ({ ...prev, [section.dataset.testimonialId || '']: false }));
-              });
-            } else {
-              video.pause();
-            }
-          });
-        },
-        { root: container, threshold: 0.6 }
-      );
-
-      const preloadObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const section = entry.target as HTMLElement;
-              const video = section.querySelector('video');
-              if (video && video.preload === 'none') {
-                video.preload = 'auto';
-              }
-            }
-          });
-        },
-        { root: container, rootMargin: '100% 0px 100% 0px', threshold: 0 }
-      );
-
-      Object.values(testimonialSectionRefs.current).forEach((section) => {
-        if (section) {
-          playObserver.observe(section);
-          preloadObserver.observe(section);
-        }
-      });
-
-      return () => {
-        playObserver.disconnect();
-        preloadObserver.disconnect();
-      };
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, [testimonials]);
-
-  // Pause VSL when scrolled away from panel 0
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    const video = vslVideoRef.current;
-    if (!container || !video) return;
-
-    const handleScroll = () => {
-      if (container.scrollTop > window.innerHeight * 0.5 && !video.paused) {
-        video.pause();
-      }
-    };
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [vslUrl]);
 
   const handleVslPlay = async () => {
     const video = vslVideoRef.current;
@@ -230,77 +68,43 @@ export default function Schedule() {
     }
   };
 
-  const toggleMute = (id: string) => {
-    const video = testimonialRefs.current[id];
+  const playTestimonial = (id: string) => {
+    if (activeTestimonial && activeTestimonial !== id) {
+      const prev = testimonialVideoRefs.current[activeTestimonial];
+      if (prev) { prev.pause(); prev.currentTime = 0; }
+    }
+    const video = testimonialVideoRefs.current[id];
+    if (!video) return;
+    if (activeTestimonial === id) {
+      video.pause();
+      setActiveTestimonial(null);
+    } else {
+      video.muted = true;
+      setMutedStates((prev) => ({ ...prev, [id]: true }));
+      video.play().catch(() => {});
+      setActiveTestimonial(id);
+    }
+  };
+
+  const toggleMute = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = testimonialVideoRefs.current[id];
     if (!video) return;
     const newMuted = !video.muted;
     video.muted = newMuted;
     setMutedStates((prev) => ({ ...prev, [id]: newMuted }));
-    setMuteIconVisible((prev) => ({ ...prev, [id]: true }));
-    if (muteTimeouts.current[id]) clearTimeout(muteTimeouts.current[id]);
-    muteTimeouts.current[id] = setTimeout(() => {
-      setMuteIconVisible((prev) => ({ ...prev, [id]: false }));
-    }, 1500);
   };
 
-  const scrollToTestimonials = useCallback(() => {
-    const container = scrollContainerRef.current;
-    const target = testimonialsStartRef.current;
-    if (!container || !target) return;
-    container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-  }, []);
-
-  const scrollToFirstTestimonial = useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const target = container.querySelector('#testimonial-panel-0') as HTMLElement | null;
-    if (!target) return;
-    container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-  }, []);
-
-  const handleClose = () => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.75;
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
   };
-
-  const hasTestimonials = testimonials.length > 0;
 
   return (
-    <div className="fixed inset-0" style={{ backgroundColor: '#070707' }}>
-      {/* Fixed UI - Close Button */}
-      <button
-        onClick={handleClose}
-        className="fixed top-4 left-4 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-opacity hover:opacity-100"
-        style={{
-          backgroundColor: 'rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(8px)',
-          opacity: 0.7,
-        }}
-        aria-label="Close"
-      >
-        <X className="w-4 h-4" style={{ color: '#F0EDE8' }} />
-      </button>
-
-      {/* Fixed UI - Skip to Testimonials */}
-      {showSkipBtn && hasTestimonials && (
-        <button
-          onClick={scrollToTestimonials}
-          className="fixed top-4 right-4 z-50 transition-opacity duration-300"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 400,
-            fontSize: '0.75rem',
-            color: 'rgba(201,161,74,0.7)',
-            letterSpacing: '0.02em',
-          }}
-        >
-          Skip to testimonials
-        </button>
-      )}
-
-      {/* Fixed UI - Bottom Book Bar */}
+    <div className="min-h-screen" style={{ backgroundColor: '#070707' }}>
+      {/* Sticky CTA */}
       <div
         className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center"
         style={{
@@ -319,388 +123,342 @@ export default function Schedule() {
             backgroundColor: '#C9A14A',
             color: '#0A0A0A',
             fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 500,
+            fontWeight: 600,
             fontSize: '0.9rem',
             letterSpacing: '0.03em',
             padding: '14px 24px',
             borderRadius: '10px',
           }}
         >
-          Book Your Call
+          Book Your Free Clarity Call
         </button>
       </div>
 
-      {/* Scroll Container */}
-      <div
-        ref={scrollContainerRef}
-        className="schedule-scroll-container h-full overflow-y-auto"
-        style={{
-          scrollSnapType: 'y mandatory',
-          overscrollBehaviorY: 'contain',
-          WebkitOverflowScrolling: 'touch',
-          maxWidth: '480px',
-          margin: '0 auto',
-        }}
+      {/* SECTION 1 — VSL */}
+      <section
+        className="relative flex flex-col items-center justify-center px-6"
+        style={{ minHeight: '100svh', paddingTop: '64px', paddingBottom: '96px' }}
       >
-        {/* Panel 0: VSL */}
-        <section
-          className="schedule-panel relative flex flex-col items-center justify-center"
-          style={{
-            minHeight: '100svh',
-            height: '100svh',
-            scrollSnapAlign: 'start',
-            scrollSnapStop: 'always',
-            padding: '56px 24px 80px',
-            backgroundColor: '#0A0A0A',
-          }}
-        >
-          <div className="w-full max-w-sm flex flex-col items-center gap-6">
+        <div className="w-full max-w-2xl flex flex-col items-center gap-8">
+          <div className="text-center flex flex-col gap-3">
             <h1
-              className="panel-line text-center"
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.5rem, 6vw, 1.9rem)',
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 400,
+                fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
                 color: '#F0EDE8',
-                lineHeight: 1.3,
+                lineHeight: 1.2,
               }}
             >
-              Before we talk, watch this.
+              The last piece, finally handled.
             </h1>
-
-            {vslUrl ? (
-              <div
-                className="relative w-full rounded-xl overflow-hidden cursor-pointer"
-                style={{
-                  aspectRatio: '16/9',
-                  backgroundColor: '#131316',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-                onClick={handleVslPlay}
-              >
-                <video
-                  ref={vslVideoRef}
-                  src={vslUrl}
-                  className="w-full h-full object-contain"
-                  playsInline
-                  preload="metadata"
-                  onPlay={() => setVslPlaying(true)}
-                  onPause={() => setVslPlaying(false)}
-                  onEnded={() => setVslPlaying(false)}
-                />
-                {!vslPlaying && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                    <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center"
-                      style={{
-                        border: '1.5px solid rgba(201,168,76,0.5)',
-                        backgroundColor: 'rgba(201,168,76,0.07)',
-                        backdropFilter: 'blur(6px)',
-                      }}
-                    >
-                      <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div
-                className="w-full rounded-xl animate-pulse"
-                style={{ aspectRatio: '16/9', backgroundColor: '#131316' }}
-              />
-            )}
-
             <p
-              className="panel-line text-center"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontWeight: 300,
-                fontSize: '0.85rem',
-                color: '#5A5855',
+                fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
+                color: '#8A8680',
                 lineHeight: 1.6,
+                maxWidth: '520px',
+                margin: '0 auto',
               }}
             >
-              Prefer to read instead? Just keep scrolling.
+              Watch this before your call. It explains exactly how we crack the Indian body and make fitness run on its own.
             </p>
           </div>
 
-          {/* Scroll Cue */}
-          {showScrollCue && (
+          {vslUrl ? (
             <div
-              className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce"
-              style={{ opacity: 0.5 }}
+              className="relative w-full rounded-xl overflow-hidden cursor-pointer"
+              style={{
+                aspectRatio: '16/9',
+                backgroundColor: '#131316',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+              onClick={handleVslPlay}
             >
-              <ChevronDown className="w-5 h-5" style={{ color: '#C9A14A' }} />
+              <video
+                ref={vslVideoRef}
+                src={vslUrl}
+                className="w-full h-full object-contain"
+                playsInline
+                preload="metadata"
+                onPlay={() => setVslPlaying(true)}
+                onPause={() => setVslPlaying(false)}
+                onEnded={() => setVslPlaying(false)}
+              />
+              {!vslPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center transition-transform hover:scale-105"
+                    style={{
+                      border: '1.5px solid rgba(201,168,76,0.5)',
+                      backgroundColor: 'rgba(201,168,76,0.07)',
+                      backdropFilter: 'blur(6px)',
+                    }}
+                  >
+                    <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                  </div>
+                </div>
+              )}
             </div>
+          ) : (
+            <div
+              className="w-full rounded-xl animate-pulse"
+              style={{ aspectRatio: '16/9', backgroundColor: '#131316' }}
+            />
           )}
-        </section>
+        </div>
+      </section>
 
-        {/* Story Panels - vertical images from database */}
-        {storyPanels.map((panel) => (
-          <section
-            key={panel.id}
-            className="schedule-panel relative flex items-center justify-center"
-            style={{
-              minHeight: '100svh',
-              height: '100svh',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
-              backgroundColor: '#0A0A0A',
-              overflow: 'hidden',
-            }}
-          >
-            <img
-              src={panel.image_url}
-              alt=""
-              className="w-full h-full object-contain"
-            />
-          </section>
-        ))}
+      {/* SECTION 2 — What You Get On The Call */}
+      <section className="px-6 py-24 flex justify-center">
+        <div className="w-full max-w-xl flex flex-col gap-10">
+          <div className="flex flex-col gap-4">
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 500,
+                fontSize: '0.75rem',
+                color: '#C9A14A',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+              }}
+            >
+              The Clarity Call
+            </p>
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 400,
+                fontSize: 'clamp(1.4rem, 4vw, 2rem)',
+                color: '#F0EDE8',
+                lineHeight: 1.25,
+              }}
+            >
+              A working session, not a sales pitch.
+            </h2>
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 300,
+                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+                color: '#8A8680',
+                lineHeight: 1.7,
+              }}
+            >
+              This is a working session. We get to the bottom of why your body hasn't changed, map exactly what it will take to crack it, and you leave with a clear picture of your next step — whether or not we end up working together.
+            </p>
+          </div>
 
-        {/* Transition Panel - only show if there are testimonials */}
-        {hasTestimonials && (
-          <section
-            ref={(el) => { testimonialsStartRef.current = el; }}
-            className="schedule-panel relative flex flex-col items-center justify-center"
-            style={{
-              minHeight: '100svh',
-              height: '100svh',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
-              padding: '56px 24px 80px',
-              backgroundColor: '#0A0A0A',
-            }}
-          >
-            <div className="flex flex-col items-center gap-8">
-              <p
-                className="panel-line text-center"
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontWeight: 300,
-                  fontSize: 'clamp(1.5rem, 6vw, 1.9rem)',
-                  color: '#F0EDE8',
-                  lineHeight: 1.3,
-                }}
-              >
-                But you don't have to take my word for it.
-              </p>
-              <button
-                onClick={scrollToFirstTestimonial}
-                className="panel-line flex items-center gap-2 transition-transform active:scale-95"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 400,
-                  fontSize: '0.9rem',
-                  color: '#C9A14A',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(201,161,74,0.4)',
-                  animationDelay: '160ms',
-                }}
-              >
-                Watch their stories
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* Testimonial Panels */}
-        {testimonials.map((testimonial, idx) => (
-          <section
-            key={testimonial.id}
-            id={`testimonial-panel-${idx}`}
-            ref={(el) => { testimonialSectionRefs.current[testimonial.id] = el; }}
-            data-testimonial-id={testimonial.id}
-            className="schedule-panel relative flex items-end"
-            style={{
-              minHeight: '100svh',
-              height: '100svh',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always',
-              backgroundColor: '#0A0A0A',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Video */}
-            <video
-              ref={(el) => { testimonialRefs.current[testimonial.id] = el; }}
-              src={testimonial.url}
-              className="absolute inset-0 w-full h-full object-cover"
-              playsInline
-              muted
-              loop
-              preload="none"
-              onClick={() => toggleMute(testimonial.id)}
-              onWaiting={() => setVideoLoading((prev) => ({ ...prev, [testimonial.id]: true }))}
-              onPlaying={() => setVideoLoading((prev) => ({ ...prev, [testimonial.id]: false }))}
-              onError={() => setVideoErrors((prev) => ({ ...prev, [testimonial.id]: true }))}
-            />
-
-            {/* Loading indicator */}
-            {videoLoading[testimonial.id] && !videoErrors[testimonial.id] && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <Loader2
-                  className="w-8 h-8 animate-spin"
-                  style={{ color: 'rgba(201,161,74,0.7)' }}
+          <div className="flex flex-col gap-5">
+            {[
+              'We diagnose what\u2019s actually been stopping your progress.',
+              'We map the exact path to take the stubborn fat off and put real muscle on.',
+              'You leave with total clarity on your next move — working with us or not.',
+            ].map((point, i) => (
+              <div key={i} className="flex items-start gap-4">
+                <span
+                  className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-2.5"
+                  style={{ backgroundColor: '#C9A14A' }}
                 />
-              </div>
-            )}
-
-            {/* Error state */}
-            {videoErrors[testimonial.id] && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                 <p
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '0.85rem',
-                    color: '#5A5855',
+                    fontWeight: 400,
+                    fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+                    color: '#D4D0CC',
+                    lineHeight: 1.65,
                   }}
                 >
-                  Video unavailable
+                  {point}
                 </p>
               </div>
-            )}
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Mute/Unmute indicator */}
-            <div
-              className="absolute top-16 right-4 z-20 w-9 h-9 rounded-full flex items-center justify-center transition-opacity duration-300 cursor-pointer"
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(4px)',
-                opacity: muteIconVisible[testimonial.id] ? 1 : 0.6,
-              }}
-              onClick={(e) => { e.stopPropagation(); toggleMute(testimonial.id); }}
-            >
-              {mutedStates[testimonial.id] === false ? (
-                <Volume2 className="w-4 h-4" style={{ color: '#F0EDE8' }} />
-              ) : (
-                <VolumeX className="w-4 h-4" style={{ color: '#F0EDE8' }} />
-              )}
-            </div>
-
-            {/* Dark gradient overlay - lower third */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 35%, transparent 65%)',
-              }}
-            />
-
-            {/* Caption overlay */}
-            <div className="relative z-10 w-full px-6 pb-24">
-              <h3
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontWeight: 400,
-                  fontSize: 'clamp(1.5rem, 6vw, 1.75rem)',
-                  color: '#F0EDE8',
-                  marginBottom: '4px',
-                }}
-              >
-                {testimonial.testimonial_name || 'Client'}
-              </h3>
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.85rem',
-                  color: '#8A8680',
-                }}
-              >
-                {testimonial.testimonial_designation || ''}
-              </p>
-            </div>
-          </section>
-        ))}
-
-        {/* Final CTA Panel */}
-        <section
-          className="schedule-panel relative flex flex-col items-center justify-center"
-          style={{
-            minHeight: '100svh',
-            height: '100svh',
-            scrollSnapAlign: 'start',
-            scrollSnapStop: 'always',
-            padding: '56px 24px 80px',
-            backgroundColor: '#0A0A0A',
-          }}
-        >
-          <div className="flex flex-col items-center gap-6 text-center">
+      {/* SECTION 3 — Testimonials Carousel */}
+      {testimonials.length > 0 && (
+        <section className="py-24 pb-40">
+          <div className="px-6 max-w-2xl mx-auto mb-10">
             <h2
-              className="panel-line"
+              className="text-center"
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.5rem, 6vw, 1.9rem)',
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 400,
+                fontSize: 'clamp(1.3rem, 4vw, 1.85rem)',
                 color: '#F0EDE8',
                 lineHeight: 1.3,
               }}
             >
-              If this sounded like your life, let's get the last piece handled.
+              Building a new generation of Indians. Weapons of intellect and physicality.
             </h2>
-            <p
-              className="panel-line"
+          </div>
+
+          {/* Carousel navigation */}
+          <div className="relative">
+            <button
+              onClick={() => scrollCarousel('left')}
+              className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full transition-opacity hover:opacity-100"
               style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
-                color: '#8A8680',
-                lineHeight: 1.65,
-                animationDelay: '80ms',
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(8px)',
+                opacity: 0.7,
+              }}
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-5 h-5" style={{ color: '#F0EDE8' }} />
+            </button>
+            <button
+              onClick={() => scrollCarousel('right')}
+              className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full transition-opacity hover:opacity-100"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(8px)',
+                opacity: 0.7,
+              }}
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-5 h-5" style={{ color: '#F0EDE8' }} />
+            </button>
+
+            {/* Scrollable row */}
+            <div
+              ref={carouselRef}
+              className="flex gap-4 overflow-x-auto px-6 pb-4 snap-x snap-mandatory"
+              style={{
+                scrollbarWidth: 'none',
+                WebkitOverflowScrolling: 'touch',
               }}
             >
-              It starts with a 30-minute diagnostic call. We'll look at where you are, where you want to be, and exactly what it would take to finally fix this.
-            </p>
+              {testimonials.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex-shrink-0 snap-start relative rounded-xl overflow-hidden cursor-pointer group"
+                  style={{
+                    width: 'clamp(260px, 70vw, 300px)',
+                    aspectRatio: '9/16',
+                    backgroundColor: '#131316',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                  onClick={() => playTestimonial(t.id)}
+                >
+                  <video
+                    ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
+                    src={t.url}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    playsInline
+                    muted
+                    loop
+                    preload="metadata"
+                    onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
+                    onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
+                  />
+
+                  {/* Play overlay when not active */}
+                  {activeTestimonial !== t.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: 'rgba(201,161,74,0.15)',
+                          border: '1px solid rgba(201,161,74,0.4)',
+                        }}
+                      >
+                        <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Loading */}
+                  {videoLoading[t.id] && activeTestimonial === t.id && (
+                    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                      <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                    </div>
+                  )}
+
+                  {/* Mute toggle */}
+                  {activeTestimonial === t.id && (
+                    <button
+                      onClick={(e) => toggleMute(t.id, e)}
+                      className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)',
+                      }}
+                    >
+                      {mutedStates[t.id] === false ? (
+                        <Volume2 className="w-4 h-4" style={{ color: '#F0EDE8' }} />
+                      ) : (
+                        <VolumeX className="w-4 h-4" style={{ color: '#F0EDE8' }} />
+                      )}
+                    </button>
+                  )}
+
+                  {/* Bottom gradient + name */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 p-4 pt-12 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '0.9rem',
+                        color: '#F0EDE8',
+                      }}
+                    >
+                      {t.testimonial_name || 'Client'}
+                    </p>
+                    {t.testimonial_designation && (
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 300,
+                          fontSize: '0.75rem',
+                          color: '#8A8680',
+                          marginTop: '2px',
+                        }}
+                      >
+                        {t.testimonial_designation}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Static CTA below testimonials */}
+          <div className="flex justify-center px-6 mt-12">
             <button
               onClick={openBooking}
-              className="panel-line mt-4 transition-transform active:scale-[0.97]"
+              className="w-full transition-transform active:scale-[0.97]"
               style={{
+                maxWidth: '480px',
                 backgroundColor: '#C9A14A',
                 color: '#0A0A0A',
                 fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 500,
-                fontSize: '1rem',
+                fontWeight: 600,
+                fontSize: '0.95rem',
                 letterSpacing: '0.03em',
-                padding: '16px 40px',
+                padding: '16px 32px',
                 borderRadius: '10px',
-                animationDelay: '160ms',
               }}
             >
-              Book Your Call
+              Book Your Free Clarity Call
             </button>
           </div>
         </section>
-      </div>
+      )}
 
-      {/* Scoped styles */}
+      {/* Hide carousel scrollbar */}
       <style>{`
-        .schedule-scroll-container::-webkit-scrollbar {
-          display: none;
-        }
-        .schedule-scroll-container {
-          scrollbar-width: none;
-        }
-
-        .schedule-panel .panel-line {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-
-        .schedule-panel.panel-visible .panel-line {
-          animation: fadeRiseIn 280ms ease-out forwards;
-        }
-
-        @keyframes fadeRiseIn {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+        .snap-x::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
   );
