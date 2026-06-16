@@ -112,7 +112,7 @@ export default function Schedule() {
             The last piece, finally handled.
           </h1>
           <p className="schedule-vsl-sub">
-            Watch this before your call. It explains exactly how we crack the Indian body and make fitness run on its own.
+            Before we talk, watch this.
           </p>
 
           {vslUrl ? (
@@ -383,7 +383,7 @@ export default function Schedule() {
           font-weight: 400;
           font-size: 20px;
           line-height: 1.3;
-          color: #F0EDE8;
+          color: #C9A14A;
           margin: 0;
         }
         .schedule-testimonials-sub {
