@@ -17,19 +17,12 @@ interface Testimonial {
   url: string;
 }
 
-interface BodyLine {
-  gold: string;
-  white: string;
-}
-
 interface JourneyStep {
   label: string;
   time: string;
   name: string;
   painQuote: string | null;
-  intro: string | null;
-  lines: BodyLine[] | null;
-  body: string | null;
+  paragraphs: string[];
   endState: string | null;
 }
 
@@ -39,9 +32,10 @@ const journeySteps: JourneyStep[] = [
     time: 'before we begin',
     name: 'Assess',
     painQuote: null,
-    intro: null,
-    lines: null,
-    body: "Before anything else, we get to know your body. How it handles a hard day, how it moves, how much you're really moving, what you actually eat on a normal day. Everything we build comes from that. A plan made for your body, not pulled off a shelf. It's why this works when nothing else has.",
+    paragraphs: [
+      "Before anything else, we get to know your body. How it handles a hard day, how it moves, how much you're really moving, what you actually eat on a normal day. Everything we build comes from that.",
+      "A plan made for your body, not pulled off a shelf. It's why this works when nothing else has.",
+    ],
     endState: null,
   },
   {
@@ -50,15 +44,10 @@ const journeySteps: JourneyStep[] = [
     name: 'Simplify',
     painQuote:
       "There's too much noise. I'm never sure I'm on the right path, or which of the hundred things I could be doing is the right one. I can't hold myself accountable on my own, my training falls apart the second life gets in the way, and every plan I've tried felt like a restrictive diet I couldn't keep up.",
-    intro: "So the first thing we do is take all of it off your plate.",
-    lines: [
-      { gold: "One clear plan.", white: "You stop wondering if you're doing the right thing." },
-      { gold: "We make the calls.", white: "You stop weighing a hundred options and just follow the path." },
-      { gold: "A real team in your corner.", white: "You're held to it, so it's not all on you anymore." },
-      { gold: "Training that bends.", white: "A work trip or a hard week can't break it." },
-      { gold: "Eating you don't fight.", white: "Built around your real life, not a strict diet you force." },
+    paragraphs: [
+      "So the first thing we do is take all of it off your plate. You get one clear plan, so you stop wondering if you're on the right path, and we tell you what to do and when, so you stop weighing a hundred options. A team checks in and holds you to it, so it's not all on you anymore.",
+      "Your training bends around your week, so a work trip or a hard stretch can't break it. And you eat in a way built around your real life, not a strict diet you have to force.",
     ],
-    body: null,
     endState:
       "The noise goes quiet, and you start moving fast. The belly fat starts coming off, you get stronger, your energy comes back, and seeing it work is what makes you want to keep going.",
   },
@@ -68,13 +57,10 @@ const journeySteps: JourneyStep[] = [
     name: 'Master',
     painQuote:
       "I know exactly what to do. I just don't do it on the hard days. It would be going well, then one bad day would turn into a bad week, and I couldn't even explain why. And every time I slipped, I'd feel guilty, and the guilt made the next day worse.",
-    intro: "That was never about willpower.",
-    lines: [
-      { gold: "We expose the voice.", white: "You learn to catch it the moment it shows up, and step back instead of obeying it." },
-      { gold: "A bad day stays a bad day.", white: "One slip stops turning into a lost week." },
-      { gold: "We fix what's underneath.", white: "Your sleep, your stress, your recovery, how much you move in a day." },
+    paragraphs: [
+      "That was never about willpower. On the hard days there's a voice that talks you out of it, and the moment you listen, one bad day turns into a bad week. So we teach you to catch that voice the moment it shows up, and step back from it instead of obeying it. A bad day stays just a bad day.",
+      "At the same time, we fix the things quietly working against you. Your sleep, your stress, how well you recover, how much you move in a day.",
     ],
-    body: null,
     endState:
       "This is when it clicks. Showing up stops taking willpower. The change in your body gets big enough that people stop you to ask what you're doing. And your head feels clearer than it has in years.",
   },
@@ -84,13 +70,10 @@ const journeySteps: JourneyStep[] = [
     name: 'Own',
     painQuote:
       "I've been consistent before. I know I can do it. That's what's so frustrating about being here again. Every program worked right up until it stopped, and the second the support was gone, so was I. I don't want to need a coach for the rest of my life.",
-    intro: "That's the right fear, and it's the one nobody else solves.",
-    lines: [
-      { gold: "We hand you the wheel.", white: "Slowly, on purpose, the opposite of what most coaches do." },
-      { gold: "We pull back the support.", white: "The check-ins and tracking ease off as you take over." },
-      { gold: "The habits run on their own.", white: "You keep them going through any week, without us." },
+    paragraphs: [
+      "That's the right fear, and it's the one nobody else solves. Every time before, your results lasted only as long as the support did. So in the last stretch, we do the opposite of what most coaches do.",
+      "We slowly hand you the wheel. We pull back the check-ins and the tracking on purpose, so the habits start running on their own, and you learn to keep them going through any week, without us.",
     ],
-    body: null,
     endState:
       "You don't need us anymore. That is the whole point. You walked in needing the system. You walk out being it.",
   },
@@ -439,27 +422,13 @@ export default function Home() {
                     {step.painQuote && (
                       <p className="hp-pain">"{step.painQuote}"</p>
                     )}
-                    {step.intro && (
-                      <p className="hp-intro">{step.intro}</p>
-                    )}
-                    {step.lines && (
-                      <div className="hp-lines">
-                        {step.lines.map((line, li) => (
-                          <p key={li} className="hp-line">
-                            <span className="hp-line-gold">{line.gold}</span>{' '}
-                            <span className="hp-line-white">{line.white}</span>
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    {step.body && (
-                      <p className="hp-body">{step.body}</p>
-                    )}
+                    <div className="hp-paragraphs">
+                      {step.paragraphs.map((p, pi) => (
+                        <p key={pi} className="hp-body">{p}</p>
+                      ))}
+                    </div>
                     {step.endState && (
-                      <div className="hp-end-state">
-                        <span className="hp-end-dot" />
-                        <p className="hp-end-text">{step.endState}</p>
-                      </div>
+                      <p className="hp-end-state">{step.endState}</p>
                     )}
                   </div>
                 </div>
@@ -856,70 +825,30 @@ export default function Home() {
           font-size: 15px;
           line-height: 1.45;
           color: #A8A4A0;
-          margin: 0 0 14px 0;
+          margin: 0 0 18px 0;
           padding-left: 14px;
           border-left: 2px solid rgba(201,168,76,0.35);
         }
-        .hp-intro {
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 300;
-          font-size: 15px;
-          line-height: 1.5;
-          color: #D8D4CE;
-          margin: 0 0 14px 0;
-        }
-        .hp-lines {
+        .hp-paragraphs {
           display: flex;
           flex-direction: column;
           gap: 14px;
-          margin: 0;
-        }
-        .hp-line {
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 300;
-          font-size: 15px;
-          line-height: 1.5;
-          color: #D8D4CE;
-          margin: 0;
-        }
-        .hp-line-gold {
-          font-weight: 500;
-          color: #C9A84C;
-        }
-        .hp-line-white {
-          color: #D8D4CE;
         }
         .hp-body {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 15px;
-          line-height: 1.5;
+          line-height: 1.6;
           color: #D8D4CE;
           margin: 0;
         }
         .hp-end-state {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          margin-top: 24px;
-          padding-top: 20px;
-          border-top: 1px solid rgba(201,168,76,0.2);
-        }
-        .hp-end-dot {
-          flex-shrink: 0;
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background-color: #C9A84C;
-          margin-top: 5px;
-        }
-        .hp-end-text {
           font-family: 'DM Sans', sans-serif;
-          font-weight: 400;
+          font-weight: 300;
           font-size: 14px;
-          line-height: 1.5;
-          color: #C9A84C;
-          margin: 0;
+          line-height: 1.55;
+          color: rgba(201,168,76,0.85);
+          margin: 28px 0 0 0;
         }
 
         /* === 4. PROOF === */
