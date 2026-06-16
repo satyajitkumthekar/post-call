@@ -140,35 +140,18 @@ export default function Schedule() {
           )}
         </section>
 
-        {/* SECTION 2 — The Clarity Call */}
+        {/* SECTION 2 — Clarity Call (compact) */}
         <section className="schedule-clarity">
           <span className="schedule-eyebrow">THE CLARITY CALL</span>
-          <h2 className="schedule-clarity-heading">
-            A working session, not a sales pitch.
-          </h2>
           <p className="schedule-clarity-body">
-            We get to the bottom of why your body hasn't changed, map exactly what it'll take to crack it, and you leave with a clear next step — whether or not we work together.
+            A free call where we map exactly what it will take to crack your body. You leave with a clear next step, whether or not we end up working together.
           </p>
-
-          <div className="schedule-points">
-            <div className="schedule-point">
-              <span className="schedule-point-marker" />
-              <span>We diagnose what's actually been stopping you.</span>
-            </div>
-            <div className="schedule-point">
-              <span className="schedule-point-marker" />
-              <span>We map the exact path: stubborn fat off, real muscle on.</span>
-            </div>
-            <div className="schedule-point">
-              <span className="schedule-point-marker" />
-              <span>You leave with total clarity on your next move — with us or not.</span>
-            </div>
-          </div>
         </section>
 
         {/* SECTION 3 — Testimonials */}
         {testimonials.length > 0 && (
           <section className="schedule-testimonials">
+            <span className="schedule-eyebrow">THE PROOF</span>
             <h2 className="schedule-testimonials-heading">
               Building a new generation of Indians. Weapons of intellect and physicality.
             </h2>
@@ -178,77 +161,64 @@ export default function Schedule() {
 
       {/* Carousel breaks out of column for edge-to-edge scroll */}
       {testimonials.length > 0 && (
-        <div className="schedule-carousel-wrapper">
-          <div className="schedule-carousel">
-            {testimonials.map((t) => (
-              <div
-                key={t.id}
-                className="schedule-card"
-                onClick={() => playTestimonial(t.id)}
-              >
-                <video
-                  ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
-                  src={t.url}
-                  className="schedule-card-video"
-                  playsInline
-                  muted
-                  loop
-                  preload="metadata"
-                  onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
-                  onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
-                />
+        <div className="schedule-carousel">
+          {testimonials.map((t) => (
+            <div
+              key={t.id}
+              className="schedule-card"
+              onClick={() => playTestimonial(t.id)}
+            >
+              <video
+                ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
+                src={t.url}
+                className="schedule-card-video"
+                playsInline
+                muted
+                loop
+                preload="metadata"
+                onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
+                onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
+              />
 
-                {activeTestimonial !== t.id && (
-                  <div className="schedule-card-play-overlay">
-                    <div className="schedule-card-play-circle">
-                      <Play className="w-4 h-4 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                    </div>
+              {activeTestimonial !== t.id && (
+                <div className="schedule-card-play-overlay">
+                  <div className="schedule-card-play-circle">
+                    <Play className="w-4 h-4 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
                   </div>
-                )}
-
-                {videoLoading[t.id] && activeTestimonial === t.id && (
-                  <div className="schedule-card-loader">
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
-                  </div>
-                )}
-
-                {activeTestimonial === t.id && (
-                  <button
-                    onClick={(e) => toggleMute(t.id, e)}
-                    className="schedule-card-mute"
-                  >
-                    {mutedStates[t.id] === false ? (
-                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                    ) : (
-                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                    )}
-                  </button>
-                )}
-
-                <div className="schedule-card-caption">
-                  <p className="schedule-card-name">
-                    {t.testimonial_name || 'Client'}
-                  </p>
-                  {t.testimonial_designation && (
-                    <p className="schedule-card-designation">
-                      {t.testimonial_designation}
-                    </p>
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+              )}
 
-      {/* Static CTA below testimonials */}
-      {testimonials.length > 0 && (
-        <div className="schedule-column">
-          <div className="schedule-bottom-cta">
-            <button onClick={openBooking} className="schedule-cta-btn">
-              Book Your Free Clarity Call
-            </button>
-          </div>
+              {videoLoading[t.id] && activeTestimonial === t.id && (
+                <div className="schedule-card-loader">
+                  <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                </div>
+              )}
+
+              {activeTestimonial === t.id && (
+                <button
+                  onClick={(e) => toggleMute(t.id, e)}
+                  className="schedule-card-mute"
+                >
+                  {mutedStates[t.id] === false ? (
+                    <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                  ) : (
+                    <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                  )}
+                </button>
+              )}
+
+              <div className="schedule-card-caption">
+                <p className="schedule-card-name">
+                  {t.testimonial_name || 'Client'}
+                </p>
+                {t.testimonial_designation && (
+                  <p className="schedule-card-designation">
+                    {t.testimonial_designation}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -310,12 +280,12 @@ export default function Schedule() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
         }
         .schedule-vsl-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
-          font-size: 28px;
+          font-size: 27px;
           line-height: 1.1;
           color: #F0EDE8;
           margin: 0;
@@ -327,7 +297,7 @@ export default function Schedule() {
           line-height: 1.5;
           color: #8A8680;
           margin: 0;
-          max-width: 360px;
+          max-width: 340px;
         }
         .schedule-video-wrap {
           position: relative;
@@ -338,7 +308,7 @@ export default function Schedule() {
           background-color: #131316;
           border: 1px solid rgba(255,255,255,0.06);
           cursor: pointer;
-          margin-top: 8px;
+          margin-top: 6px;
         }
         .schedule-video {
           width: 100%;
@@ -371,14 +341,10 @@ export default function Schedule() {
           border-radius: 12px;
           background-color: #131316;
           animation: pulse 2s infinite;
-          margin-top: 8px;
+          margin-top: 6px;
         }
 
-        /* ========== SECTION 2 — CLARITY ========== */
-        .schedule-clarity {
-          padding-bottom: 48px;
-          text-align: left;
-        }
+        /* ========== SHARED EYEBROW ========== */
         .schedule-eyebrow {
           font-family: 'DM Sans', sans-serif;
           font-weight: 500;
@@ -387,51 +353,27 @@ export default function Schedule() {
           color: #C9A14A;
           text-transform: uppercase;
           display: block;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
         }
-        .schedule-clarity-heading {
-          font-family: 'Playfair Display', serif;
-          font-weight: 400;
-          font-size: 24px;
-          line-height: 1.15;
-          color: #F0EDE8;
-          margin: 0 0 14px 0;
+
+        /* ========== SECTION 2 — CLARITY (compact) ========== */
+        .schedule-clarity {
+          padding-bottom: 0;
+          text-align: left;
         }
         .schedule-clarity-body {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
           font-size: 15px;
-          line-height: 1.55;
-          color: #8A8680;
-          margin: 0 0 24px 0;
-        }
-        .schedule-points {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        .schedule-point {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 400;
-          font-size: 15px;
           line-height: 1.5;
-          color: #D4D0CC;
-        }
-        .schedule-point-marker {
-          flex-shrink: 0;
-          width: 6px;
-          height: 2px;
-          margin-top: 10px;
-          background-color: #C9A14A;
-          border-radius: 1px;
+          color: #8A8680;
+          margin: 0;
         }
 
         /* ========== SECTION 3 — TESTIMONIALS ========== */
         .schedule-testimonials {
-          padding-bottom: 20px;
+          padding-top: 40px;
+          padding-bottom: 16px;
           text-align: left;
         }
         .schedule-testimonials-heading {
@@ -443,17 +385,14 @@ export default function Schedule() {
           margin: 0;
         }
 
-        /* Carousel */
-        .schedule-carousel-wrapper {
-          padding-bottom: 48px;
-        }
+        /* ========== CAROUSEL ========== */
         .schedule-carousel {
           display: flex;
           gap: 12px;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
-          padding: 16px 20px 4px;
+          padding: 0 20px 16px;
           scrollbar-width: none;
         }
         .schedule-carousel::-webkit-scrollbar {
@@ -461,10 +400,10 @@ export default function Schedule() {
         }
         .schedule-card {
           flex-shrink: 0;
-          width: 78vw;
-          max-width: 320px;
-          aspect-ratio: 9/16;
-          border-radius: 14px;
+          width: 82vw;
+          max-width: 340px;
+          aspect-ratio: 4/5;
+          border-radius: 16px;
           overflow: hidden;
           position: relative;
           background-color: #131316;
@@ -485,7 +424,7 @@ export default function Schedule() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(0,0,0,0.3);
+          background: rgba(0,0,0,0.25);
         }
         .schedule-card-play-circle {
           width: 44px;
@@ -528,28 +467,23 @@ export default function Schedule() {
           bottom: 0;
           left: 0;
           right: 0;
-          padding: 32px 14px 14px;
+          padding: 36px 14px 14px;
           background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
           pointer-events: none;
         }
         .schedule-card-name {
           font-family: 'DM Sans', sans-serif;
-          font-weight: 500;
-          font-size: 14px;
-          color: #F0EDE8;
+          font-weight: 700;
+          font-size: 16px;
+          color: #FFFFFF;
           margin: 0;
         }
         .schedule-card-designation {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
-          font-size: 12px;
+          font-size: 13px;
           color: #8A8680;
-          margin: 2px 0 0 0;
-        }
-
-        /* Bottom static CTA */
-        .schedule-bottom-cta {
-          padding-bottom: 48px;
+          margin: 3px 0 0 0;
         }
 
         @keyframes pulse {
