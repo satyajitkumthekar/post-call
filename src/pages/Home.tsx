@@ -19,7 +19,6 @@ interface Testimonial {
 
 interface JourneyStep {
   label: string;
-  time: string;
   name: string;
   painQuote: string | null;
   paragraphs: string[];
@@ -29,7 +28,6 @@ interface JourneyStep {
 const journeySteps: JourneyStep[] = [
   {
     label: 'ASSESS',
-    time: 'before we begin',
     name: 'Assess',
     painQuote: null,
     paragraphs: [
@@ -40,7 +38,6 @@ const journeySteps: JourneyStep[] = [
   },
   {
     label: 'PHASE 01',
-    time: 'month 1',
     name: 'Simplify',
     painQuote:
       "There's too much noise. I'm never sure I'm on the right path, or which of the hundred things I could be doing is the right one. I can't hold myself accountable on my own, my training falls apart the second life gets in the way, and every plan I've tried felt like a restrictive diet I couldn't keep up.",
@@ -53,7 +50,6 @@ const journeySteps: JourneyStep[] = [
   },
   {
     label: 'PHASE 02',
-    time: 'months 2 to 4',
     name: 'Master',
     painQuote:
       "I know exactly what to do. I just don't do it on the hard days. It would be going well, then one bad day would turn into a bad week, and I couldn't even explain why. And every time I slipped, I'd feel guilty, and the guilt made the next day worse.",
@@ -66,7 +62,6 @@ const journeySteps: JourneyStep[] = [
   },
   {
     label: 'PHASE 03',
-    time: 'months 5 to 6',
     name: 'Own',
     painQuote:
       "I've been consistent before. I know I can do it. That's what's so frustrating about being here again. Every program worked right up until it stopped, and the second the support was gone, so was I. I don't want to need a coach for the rest of my life.",
@@ -369,9 +364,8 @@ export default function Home() {
         {/* === 3. THE JOURNEY === */}
         <section className="hp-journey">
           <span className="hp-eyebrow">THE PROGRAM</span>
-          <h2 className="hp-journey-heading">Six months. One clear path.</h2>
           <p className="hp-journey-hook">
-            It was never that you didn't care. You care a lot. That's almost the problem.
+            We take down every barrier between you and your body, in order. First we understand you, then we clear what's outside you, what's inside you, and finally your need for us at all.
           </p>
 
           <div className="hp-roadmap">
@@ -415,7 +409,7 @@ export default function Home() {
 
                   <div className="hp-step-content">
                     <span className="hp-step-label">
-                      {step.label} <span className="hp-step-time">&middot; {step.time}</span>
+                      {step.label}
                     </span>
                     <h3 className="hp-step-name">{step.name}</h3>
                     {step.painQuote && (
@@ -439,10 +433,10 @@ export default function Home() {
         {/* === 4. TESTIMONIALS INTRO === */}
         {testimonials.length > 0 && (
           <section className="hp-proof">
-            <span className="hp-eyebrow">THE PROOF</span>
-            <h2 className="hp-proof-heading">
-              Building a new generation of Indians. Weapons of intellect and physicality.
-            </h2>
+            <span className="hp-eyebrow">BUILDING A NEW GENERATION OF INDIANS</span>
+            <p className="hp-proof-sub">
+              Weapons of intellect and physicality.
+            </p>
           </section>
         )}
       </div>
@@ -733,22 +727,13 @@ export default function Home() {
 
         /* === 3. JOURNEY === */
         .hp-journey { padding-bottom: 72px; }
-        .hp-journey-heading {
-          font-family: 'Playfair Display', serif;
-          font-weight: 400;
-          font-size: 24px;
-          line-height: 1.2;
-          color: #F0EDE8;
-          margin: 0 0 20px 0;
-        }
         .hp-journey-hook {
-          font-family: 'Playfair Display', serif;
-          font-weight: 400;
-          font-style: italic;
-          font-size: 17px;
-          line-height: 1.5;
-          color: #B0ACA6;
-          margin: 0 0 56px 0;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 15px;
+          line-height: 1.6;
+          color: #8A8680;
+          margin: 0 0 48px 0;
         }
 
         /* Roadmap */
@@ -804,11 +789,6 @@ export default function Home() {
           display: block;
           margin-bottom: 6px;
         }
-        .hp-step-time {
-          font-weight: 300;
-          color: #5A5855;
-          letter-spacing: 0.06em;
-        }
         .hp-step-name {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
@@ -855,12 +835,13 @@ export default function Home() {
           padding-top: 16px;
           padding-bottom: 24px;
         }
-        .hp-proof-heading {
+        .hp-proof-sub {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
-          font-size: 22px;
-          line-height: 1.3;
-          color: #F0EDE8;
+          font-style: italic;
+          font-size: 16px;
+          line-height: 1.5;
+          color: #8A8680;
           margin: 0;
         }
 
