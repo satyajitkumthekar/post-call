@@ -259,10 +259,10 @@ export default function Home() {
         <section className="hp-header">
           <span className="hp-eyebrow">YOU'RE IN</span>
           <h1 className="hp-headline">
-            Your call is booked. Here's exactly what we do.
+            The call is booked. Now let's make it count.
           </h1>
           <p className="hp-sub">
-            Take five minutes with this before we talk. It will make our conversation far more valuable.
+            A confirmation email is on its way. Before we speak, spend ten minutes with this page. It will make our conversation far more valuable.
           </p>
         </section>
 
@@ -319,7 +319,6 @@ export default function Home() {
                     <div className="hp-video-play-circle">
                       <Play className="w-7 h-7 ml-0.5" style={{ color: '#C9A84C' }} fill="currentColor" />
                     </div>
-                    <span className="hp-tap-label">Tap to watch</span>
                   </button>
                 )}
 
@@ -550,13 +549,13 @@ export default function Home() {
         .hp-headline {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
-          font-size: 28px;
-          line-height: 1.15;
+          font-size: 26px;
+          line-height: 1.2;
           color: #F0EDE8;
           margin: 0 0 16px 0;
         }
         @media (min-width: 640px) {
-          .hp-headline { font-size: 34px; }
+          .hp-headline { font-size: 30px; }
         }
         .hp-sub {
           font-family: 'DM Sans', sans-serif;
