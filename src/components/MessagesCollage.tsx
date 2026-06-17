@@ -65,11 +65,8 @@ export default function MessagesCollage() {
   }
 
   return (
-    <section
-      className="relative overflow-hidden min-h-[700px]"
-      style={{ backgroundColor: '#000000' }}
-    >
-      <div className="relative z-20 pt-20 pb-8 text-center pointer-events-none">
+    <div style={{ backgroundColor: '#000000' }}>
+      <div style={{ paddingTop: '64px', paddingBottom: '24px', textAlign: 'center' }}>
         <h2
           style={{
             fontFamily: "'Cormorant Garamond', serif",
@@ -77,13 +74,16 @@ export default function MessagesCollage() {
             fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)',
             color: '#F0EDE8',
             lineHeight: 1.2,
-            textShadow: '0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)',
+            margin: 0,
           }}
         >
           Inside the program. Real messages, real clients.
         </h2>
       </div>
 
+      <section
+        className="relative overflow-hidden min-h-[700px]"
+      >
       {testimonialImages.map((image, index) => {
         const position = imagePositions[index];
         const cycleDuration = 12;
@@ -160,6 +160,7 @@ export default function MessagesCollage() {
           }
         }
       `}</style>
-    </section>
+      </section>
+    </div>
   );
 }
