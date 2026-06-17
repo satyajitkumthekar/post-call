@@ -543,19 +543,21 @@ export default function Home() {
         /* === 1. HEADER === */
         .hp-header {
           padding-top: 72px;
-          padding-bottom: 56px;
+          padding-bottom: 0;
           text-align: center;
         }
         .hp-headline {
           font-family: 'Playfair Display', serif;
           font-weight: 400;
-          font-size: 26px;
-          line-height: 1.2;
+          font-size: 24px;
+          line-height: 1.25;
           color: #F0EDE8;
-          margin: 0 0 16px 0;
+          margin: 0 auto 16px;
+          max-width: 520px;
+          text-wrap: balance;
         }
         @media (min-width: 640px) {
-          .hp-headline { font-size: 30px; }
+          .hp-headline { font-size: 28px; }
         }
         .hp-sub {
           font-family: 'DM Sans', sans-serif;
@@ -565,6 +567,7 @@ export default function Home() {
           color: #8A8680;
           margin: 0 auto;
           max-width: 360px;
+          padding-bottom: 48px;
         }
 
         /* === 2. VIDEO === */
