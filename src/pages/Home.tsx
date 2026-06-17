@@ -45,7 +45,7 @@ const journeySteps: JourneyStep[] = [
       "There's too much noise. I'm never sure I'm on the right path, or which of the hundred things I could be doing is the right one. I can't hold myself accountable on my own, my training falls apart the second life gets in the way, and every plan I've tried felt like a restrictive diet I couldn't keep up.",
     paragraphs: [
       "So the first thing we do is take all of it off your plate. You get one clear plan, so you stop wondering if you're on the right path, and we tell you what to do and when, so you stop weighing a hundred options. A team checks in and holds you to it, so it's not all on you anymore.",
-      "Your training bends around your week, so a work trip or a hard stretch can't break it. And you eat in a way built around your real life, not a strict diet you have to force.",
+      "Your training bends around your week, so a work trip or a hard stretch can't break it. And instead of a strict diet, you learn the Anchor Meal Method, a way of eating built around your life that lets you keep the foods you love and still get the body you want.",
     ],
     endState:
       "The noise goes quiet, and you start moving fast. The belly fat starts coming off, you get stronger, your energy comes back, and seeing it work is what makes you want to keep going.",
