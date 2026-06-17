@@ -502,17 +502,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* === 5. CLOSING === */}
-      <div className="hp-col">
-        <section className="hp-closing">
-          <h2 className="hp-closing-heading">See you on the call.</h2>
-          <p className="hp-closing-sub">
-            Check your email for the confirmation, and add it to your calendar.
-          </p>
-        </section>
-      </div>
-
-      {/* === 6. MESSAGES WALL === */}
+      {/* === 5. MESSAGES WALL === */}
       <MessagesCollage />
 
       <style>{`
@@ -942,30 +932,6 @@ export default function Home() {
           font-size: 13px;
           color: #8A8680;
           margin: 3px 0 0 0;
-        }
-
-        /* === 5. CLOSING === */
-        .hp-closing {
-          padding-top: 64px;
-          padding-bottom: 80px;
-          padding-bottom: calc(80px + env(safe-area-inset-bottom));
-          text-align: center;
-        }
-        .hp-closing-heading {
-          font-family: 'Playfair Display', serif;
-          font-weight: 400;
-          font-size: 22px;
-          line-height: 1.3;
-          color: #F0EDE8;
-          margin: 0 0 10px 0;
-        }
-        .hp-closing-sub {
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 300;
-          font-size: 14px;
-          line-height: 1.5;
-          color: #5A5855;
-          margin: 0;
         }
 
         /* Reduced motion */

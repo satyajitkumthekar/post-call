@@ -69,14 +69,15 @@ export default function MessagesCollage() {
       className="relative overflow-hidden min-h-[700px]"
       style={{ backgroundColor: '#000000' }}
     >
-      <div className="relative z-10 pt-20 pb-8 text-center pointer-events-none">
+      <div className="relative z-20 pt-20 pb-8 text-center pointer-events-none">
         <h2
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 300,
+            fontWeight: 400,
             fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)',
             color: '#F0EDE8',
             lineHeight: 1.2,
+            textShadow: '0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)',
           }}
         >
           Inside the program. Real messages, real clients.
