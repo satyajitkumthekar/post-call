@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import MessagesCollage from '../components/MessagesCollage';
 
 interface UploadedFile {
   id: string;
@@ -510,6 +511,9 @@ export default function Home() {
           </p>
         </section>
       </div>
+
+      {/* === 6. MESSAGES WALL === */}
+      <MessagesCollage />
 
       <style>{`
         .hp {
