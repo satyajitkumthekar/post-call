@@ -259,10 +259,10 @@ export default function Home() {
         <section className="hp-header">
           <span className="hp-eyebrow">YOU'RE IN</span>
           <h1 className="hp-headline">
-            The call is booked. Now let's make it count.
+            The call is booked.
           </h1>
           <p className="hp-sub">
-            A confirmation email is on its way. Before we speak, spend ten minutes with this page. It will make our conversation far more valuable.
+            Spend ten minutes here before we talk. It'll make the call count.
           </p>
         </section>
 
@@ -542,8 +542,8 @@ export default function Home() {
 
         /* === 1. HEADER === */
         .hp-header {
-          padding-top: 72px;
-          padding-bottom: 0;
+          padding-top: 56px;
+          padding-bottom: 28px;
           text-align: center;
         }
         .hp-headline {
@@ -552,9 +552,7 @@ export default function Home() {
           font-size: 24px;
           line-height: 1.25;
           color: #F0EDE8;
-          margin: 0 auto 16px;
-          max-width: 520px;
-          text-wrap: balance;
+          margin: 0 0 10px 0;
         }
         @media (min-width: 640px) {
           .hp-headline { font-size: 28px; }
@@ -562,12 +560,11 @@ export default function Home() {
         .hp-sub {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
-          font-size: 15px;
-          line-height: 1.6;
+          font-size: 14px;
+          line-height: 1.5;
           color: #8A8680;
           margin: 0 auto;
-          max-width: 360px;
-          padding-bottom: 48px;
+          max-width: 400px;
         }
 
         /* === 2. VIDEO === */
