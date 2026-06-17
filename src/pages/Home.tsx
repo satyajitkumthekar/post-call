@@ -365,7 +365,7 @@ export default function Home() {
         <section className="hp-journey">
           <span className="hp-eyebrow">THE PROGRAM</span>
           <p className="hp-journey-hook">
-            We take down every barrier between you and your body, in order. First we understand you, then we clear what's outside you, what's inside you, and finally your need for us at all.
+            We take down every barrier between you and your body, in order. The external ones, the internal ones, and finally your need for us at all.
           </p>
 
           <div className="hp-roadmap">
