@@ -14,6 +14,7 @@ interface Testimonial {
   id: string;
   testimonial_name: string | null;
   testimonial_designation: string | null;
+  thumbnail_url: string | null;
   url: string;
 }
 
@@ -114,7 +115,7 @@ export default function Home() {
     const fetchTestimonials = async () => {
       const { data } = await supabase
         .from('uploaded_files')
-        .select('id, testimonial_name, testimonial_designation, url')
+        .select('id, testimonial_name, testimonial_designation, thumbnail_url, url')
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false });
       if (data) setTestimonials(data);
@@ -459,6 +460,7 @@ export default function Home() {
                   muted
                   loop
                   preload="metadata"
+                  poster={t.thumbnail_url || undefined}
                   onWaiting={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
                   onPlaying={() => setTVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
                 />

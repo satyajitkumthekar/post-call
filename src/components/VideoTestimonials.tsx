@@ -6,6 +6,7 @@ interface Testimonial {
   id: string;
   testimonial_name: string | null;
   testimonial_designation: string | null;
+  thumbnail_url: string | null;
   url: string;
   file_name: string;
 }
@@ -51,7 +52,7 @@ interface VideoCardProps {
 function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnded }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<VideoError | null>(null);
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [thumbnail, setThumbnail] = useState<string | null>(testimonial.thumbnail_url);
 
   const captureThumbnail = () => {
     const video = videoRef.current;
@@ -70,7 +71,7 @@ function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnde
   };
 
   const handleSeeked = () => {
-    captureThumbnail();
+    if (!testimonial.thumbnail_url) captureThumbnail();
   };
 
   const handleLoadedMetadata = () => {
@@ -302,7 +303,7 @@ export default function VideoTestimonials() {
     try {
       const { data, error } = await supabase
         .from('uploaded_files')
-        .select('id, testimonial_name, testimonial_designation, url, file_name')
+        .select('id, testimonial_name, testimonial_designation, thumbnail_url, url, file_name')
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
