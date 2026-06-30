@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Volume2, VolumeX, Loader2, Play } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 import { trackPixel } from '../lib/pixel';
@@ -11,25 +11,12 @@ interface Testimonial {
   url: string;
 }
 
-function getYouTubeEmbedUrl(url: string): string | null {
-  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
-  const longMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
-  if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`;
-  const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-  if (embedMatch) return url;
-  return null;
-}
-
 export default function Schedule() {
-  const [vslUrl, setVslUrl] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [vslPlaying, setVslPlaying] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState<string | null>(null);
   const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
 
-  const vslVideoRef = useRef<HTMLVideoElement>(null);
   const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   const params = new URLSearchParams(window.location.search);
@@ -47,14 +34,6 @@ export default function Schedule() {
   }, []);
 
   useEffect(() => {
-    const fetchVsl = async () => {
-      const { data } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'vsl_video_url')
-        .maybeSingle();
-      if (data?.value) setVslUrl(data.value);
-    };
     const fetchTestimonials = async () => {
       const { data } = await supabase
         .from('uploaded_files')
@@ -64,25 +43,10 @@ export default function Schedule() {
         .limit(10);
       if (data) setTestimonials(data);
     };
-    fetchVsl();
     fetchTestimonials();
   }, []);
 
   const vslPlayTracked = useRef(false);
-
-  const handleVslPlay = async () => {
-    const video = vslVideoRef.current;
-    if (!video) return;
-    if (vslPlaying) {
-      video.pause();
-    } else {
-      if (!vslPlayTracked.current) {
-        vslPlayTracked.current = true;
-        trackPixel('ViewContent', { content_name: 'VSL Video' });
-      }
-      try { await video.play(); } catch {}
-    }
-  };
 
   const playTestimonial = (id: string) => {
     if (activeTestimonial && activeTestimonial !== id) {
@@ -132,46 +96,21 @@ export default function Schedule() {
             Before we talk, watch this.
           </p>
 
-          {vslUrl ? (
-            getYouTubeEmbedUrl(vslUrl) ? (
-              <div className="schedule-video-wrap" onClick={() => {
-                if (!vslPlayTracked.current) {
-                  vslPlayTracked.current = true;
-                  trackPixel('ViewContent', { content_name: 'VSL Video' });
-                }
-              }}>
-                <iframe
-                  src={getYouTubeEmbedUrl(vslUrl)!}
-                  className="schedule-video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{ border: 'none' }}
-                />
-              </div>
-            ) : (
-              <div className="schedule-video-wrap" onClick={handleVslPlay}>
-                <video
-                  ref={vslVideoRef}
-                  src={vslUrl}
-                  className="schedule-video"
-                  playsInline
-                  preload="metadata"
-                  onPlay={() => setVslPlaying(true)}
-                  onPause={() => setVslPlaying(false)}
-                  onEnded={() => setVslPlaying(false)}
-                />
-                {!vslPlaying && (
-                  <div className="schedule-video-overlay">
-                    <div className="schedule-play-btn">
-                      <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          ) : (
-            <div className="schedule-video-placeholder" />
-          )}
+          <div className="schedule-video-wrap" onClick={() => {
+            if (!vslPlayTracked.current) {
+              vslPlayTracked.current = true;
+              trackPixel('ViewContent', { content_name: 'VSL Video' });
+            }
+          }}>
+            <iframe
+              src="https://player.mediadelivery.net/embed/693813/15442e53-67bc-483c-bf3f-3a9abbb36038?autoplay=true&loop=false&muted=true&preload=true&responsive=true"
+              loading="lazy"
+              className="schedule-video"
+              allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
+              allowFullScreen
+              style={{ border: 'none' }}
+            />
+          </div>
         </section>
 
         {/* SECTION 2 — Clarity Call (compact) */}
