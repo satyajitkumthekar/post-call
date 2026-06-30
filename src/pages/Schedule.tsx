@@ -288,7 +288,7 @@ export default function Schedule() {
         .schedule-video {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
         }
         .schedule-video-overlay {
           position: absolute;
@@ -399,7 +399,7 @@ export default function Schedule() {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           background-color: #131316;
         }
         .schedule-card-play-overlay {

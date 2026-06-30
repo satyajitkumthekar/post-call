@@ -164,7 +164,7 @@ function VideoCard({ testimonial, shouldLoad, isPlaying, onPlay, onPause, onEnde
             <video
               ref={videoRef}
               src={testimonial.url}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               preload="metadata"
               playsInline
               poster={thumbnail ?? undefined}

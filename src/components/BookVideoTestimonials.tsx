@@ -57,7 +57,7 @@ function VideoCard({
           <video
             ref={(el) => { (videoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el; onVideoMount(el); }}
             src={testimonial.url}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             preload="metadata"
             playsInline
             poster={testimonial.thumbnail_url || undefined}
