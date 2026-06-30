@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 import { trackPixel } from '../lib/pixel';
@@ -16,6 +16,8 @@ export default function Schedule() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
+  const [playingStates, setPlayingStates] = useState<Record<string, boolean>>({});
+  const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
 
   const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -57,10 +59,6 @@ export default function Schedule() {
           const video = testimonialVideoRefs.current[id];
           if (entry.isIntersecting) {
             setVisibleCards((prev) => new Set(prev).add(id));
-            if (video) {
-              video.muted = true;
-              video.play().catch(() => {});
-            }
           } else {
             setVisibleCards((prev) => {
               const next = new Set(prev);
@@ -70,6 +68,7 @@ export default function Schedule() {
             if (video) {
               video.pause();
               video.currentTime = 0;
+              setPlayingStates((prev) => ({ ...prev, [id]: false }));
             }
           }
         });
@@ -95,6 +94,29 @@ export default function Schedule() {
   }, [testimonials]);
 
   const vslPlayTracked = useRef(false);
+
+  const togglePlay = async (id: string) => {
+    const video = testimonialVideoRefs.current[id];
+    if (!video) return;
+    if (video.paused) {
+      video.muted = false;
+      setMutedStates((prev) => ({ ...prev, [id]: false }));
+      await video.play().catch(() => {});
+      setPlayingStates((prev) => ({ ...prev, [id]: true }));
+    } else {
+      video.pause();
+      setPlayingStates((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const toggleMute = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = testimonialVideoRefs.current[id];
+    if (!video) return;
+    const newMuted = !video.muted;
+    video.muted = newMuted;
+    setMutedStates((prev) => ({ ...prev, [id]: newMuted }));
+  };
 
   return (
     <div className="schedule-page">
@@ -163,7 +185,7 @@ export default function Schedule() {
               data-id={t.id}
               ref={(el) => { cardRefs.current[t.id] = el; }}
             >
-              <div className="schedule-card-video-area">
+              <div className="schedule-card-video-area" onClick={() => togglePlay(t.id)}>
                 <video
                   ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
                   src={t.url}
@@ -175,15 +197,36 @@ export default function Schedule() {
                   preload="metadata"
                   onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
                   onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
+                  onEnded={() => setPlayingStates((prev) => ({ ...prev, [t.id]: false }))}
                 />
 
-                {videoLoading[t.id] && visibleCards.has(t.id) && (
+                {videoLoading[t.id] && playingStates[t.id] && (
                   <div className="schedule-card-loader">
                     <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
                   </div>
                 )}
 
-                </div>
+                {!playingStates[t.id] && (
+                  <div className="schedule-card-play-overlay">
+                    <div className="schedule-card-play-btn">
+                      <Play className="w-6 h-6 ml-0.5" style={{ color: '#C9A14A', fill: '#C9A14A' }} />
+                    </div>
+                  </div>
+                )}
+
+                {playingStates[t.id] && (
+                  <button
+                    onClick={(e) => toggleMute(t.id, e)}
+                    className="schedule-card-mute"
+                  >
+                    {mutedStates[t.id] === false ? (
+                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    ) : (
+                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    )}
+                  </button>
+                )}
+              </div>
 
               <div className="schedule-card-info">
                 <p className="schedule-card-name">
@@ -414,6 +457,47 @@ export default function Schedule() {
           justify-content: center;
           z-index: 10;
           pointer-events: none;
+        }
+        .schedule-card-video-area {
+          cursor: pointer;
+        }
+        .schedule-card-play-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);
+          z-index: 5;
+        }
+        .schedule-card-play-btn {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1.5px solid rgba(201,161,74,0.5);
+          background-color: rgba(201,161,74,0.07);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+        }
+        .schedule-card-mute {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          z-index: 20;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(0,0,0,0.5);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: none;
+          cursor: pointer;
         }
         .schedule-card-info {
           padding: 14px 16px;
