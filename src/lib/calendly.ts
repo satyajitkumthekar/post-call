@@ -1,4 +1,17 @@
 let calendlyScriptLoaded = false;
+let calendlyPixelListenerAttached = false;
+
+function attachCalendlyPixelListener() {
+  if (calendlyPixelListenerAttached) return;
+  calendlyPixelListenerAttached = true;
+  window.addEventListener('message', (e) => {
+    if (e.data?.event === 'calendly.event_scheduled') {
+      if (typeof (window as any).fbq === 'function') {
+        (window as any).fbq('track', 'Schedule');
+      }
+    }
+  });
+}
 
 export function ensureCalendlyScript(): Promise<void> {
   if ((window as any).Calendly) {
@@ -23,6 +36,7 @@ export function ensureCalendlyScript(): Promise<void> {
 }
 
 export function openCalendlyPopup(url: string) {
+  attachCalendlyPixelListener();
   ensureCalendlyScript().then(() => {
     (window as any).Calendly.initPopupWidget({ url });
   });
