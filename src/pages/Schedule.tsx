@@ -162,6 +162,9 @@ export default function Schedule() {
           <p className="schedule-clarity-body">
             A free call where we map exactly what it will take to crack your body. You leave with a clear next step, whether or not we end up working together.
           </p>
+          <button onClick={openBooking} className="schedule-inline-cta">
+            Book Your Free Clarity Call
+          </button>
         </section>
 
         {/* SECTION 3 — Testimonials */}
@@ -389,6 +392,26 @@ export default function Schedule() {
           line-height: 1.5;
           color: #8A8680;
           margin: 0;
+        }
+
+        .schedule-inline-cta {
+          display: block;
+          width: 100%;
+          margin-top: 20px;
+          padding: 15px 24px;
+          border-radius: 12px;
+          border: none;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 500;
+          font-size: 15px;
+          letter-spacing: 0.02em;
+          color: #0A0A0B;
+          background-color: #C9A14A;
+          transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .schedule-inline-cta:active {
+          transform: scale(0.98);
         }
 
         /* ========== SECTION 3 — TESTIMONIALS ========== */
