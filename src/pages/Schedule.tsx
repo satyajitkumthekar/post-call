@@ -120,13 +120,6 @@ export default function Schedule() {
 
   return (
     <div className="schedule-page">
-      {/* Sticky bottom CTA */}
-      <div className="schedule-sticky-cta">
-        <button onClick={openBooking} className="schedule-cta-btn">
-          Book Your Free Clarity Call
-        </button>
-      </div>
-
       {/* Centered column */}
       <div className="schedule-column">
 
@@ -246,12 +239,19 @@ export default function Schedule() {
         </div>
       )}
 
+      {/* Bottom CTA */}
+      <div className="schedule-bottom-cta">
+        <button onClick={openBooking} className="schedule-inline-cta">
+          Book Your Free Clarity Call
+        </button>
+      </div>
+
       <style>{`
         .schedule-page {
           min-height: 100vh;
           min-height: 100svh;
           background-color: #070707;
-          padding-bottom: 80px;
+          padding-bottom: 40px;
         }
 
         .schedule-column {
@@ -261,39 +261,11 @@ export default function Schedule() {
           padding-right: 20px;
         }
 
-        /* ========== STICKY CTA ========== */
-        .schedule-sticky-cta {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          z-index: 50;
-          background-color: rgba(10,10,10,0.95);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-top: 1px solid rgba(201,161,74,0.25);
-          padding: 10px 16px;
-          padding-bottom: calc(10px + env(safe-area-inset-bottom));
-        }
-        .schedule-cta-btn {
-          display: block;
-          width: 100%;
+        /* ========== BOTTOM CTA ========== */
+        .schedule-bottom-cta {
           max-width: 480px;
-          margin: 0 auto;
-          background-color: #C9A14A;
-          color: #0A0A0A;
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 600;
-          font-size: 15px;
-          letter-spacing: 0.02em;
-          padding: 14px 20px;
-          border-radius: 10px;
-          border: none;
-          cursor: pointer;
-          transition: transform 0.1s;
-        }
-        .schedule-cta-btn:active {
-          transform: scale(0.97);
+          margin: 32px auto 0;
+          padding: 0 20px;
         }
 
         /* ========== SECTION 1 — VSL ========== */
