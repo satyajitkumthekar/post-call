@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, Loader2, Play } from 'lucide-react';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 import { trackPixel } from '../lib/pixel';
@@ -14,11 +14,13 @@ interface Testimonial {
 
 export default function Schedule() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [activeTestimonial, setActiveTestimonial] = useState<string | null>(null);
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
 
   const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const params = new URLSearchParams(window.location.search);
   const urlName = params.get('name');
@@ -47,25 +49,54 @@ export default function Schedule() {
     fetchTestimonials();
   }, []);
 
-  const vslPlayTracked = useRef(false);
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute('data-id');
+          if (!id) return;
+          const video = testimonialVideoRefs.current[id];
+          if (entry.isIntersecting) {
+            setVisibleCards((prev) => new Set(prev).add(id));
+            if (video) {
+              video.muted = true;
+              setMutedStates((prev) => ({ ...prev, [id]: true }));
+              video.play().catch(() => {});
+            }
+          } else {
+            setVisibleCards((prev) => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+            });
+            if (video) {
+              video.pause();
+              video.currentTime = 0;
+            }
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+    return () => observerRef.current?.disconnect();
+  }, []);
 
-  const playTestimonial = (id: string) => {
-    if (activeTestimonial && activeTestimonial !== id) {
-      const prev = testimonialVideoRefs.current[activeTestimonial];
-      if (prev) { prev.pause(); prev.currentTime = 0; }
-    }
-    const video = testimonialVideoRefs.current[id];
-    if (!video) return;
-    if (activeTestimonial === id) {
-      video.pause();
-      setActiveTestimonial(null);
-    } else {
-      video.muted = true;
-      setMutedStates((prev) => ({ ...prev, [id]: true }));
-      video.play().catch(() => {});
-      setActiveTestimonial(id);
-    }
-  };
+  useEffect(() => {
+    const observer = observerRef.current;
+    if (!observer) return;
+    testimonials.forEach((t) => {
+      const el = cardRefs.current[t.id];
+      if (el) observer.observe(el);
+    });
+    return () => {
+      testimonials.forEach((t) => {
+        const el = cardRefs.current[t.id];
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, [testimonials]);
+
+  const vslPlayTracked = useRef(false);
 
   const toggleMute = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -140,7 +171,8 @@ export default function Schedule() {
             <div
               key={t.id}
               className="schedule-card"
-              onClick={() => playTestimonial(t.id)}
+              data-id={t.id}
+              ref={(el) => { cardRefs.current[t.id] = el; }}
             >
               <video
                 ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
@@ -155,21 +187,13 @@ export default function Schedule() {
                 onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
               />
 
-              {activeTestimonial !== t.id && (
-                <div className="schedule-card-play-overlay">
-                  <div className="schedule-card-play-circle">
-                    <Play className="w-4 h-4 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
-                  </div>
-                </div>
-              )}
-
-              {videoLoading[t.id] && activeTestimonial === t.id && (
+              {videoLoading[t.id] && visibleCards.has(t.id) && (
                 <div className="schedule-card-loader">
                   <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
                 </div>
               )}
 
-              {activeTestimonial === t.id && (
+              {visibleCards.has(t.id) && (
                 <button
                   onClick={(e) => toggleMute(t.id, e)}
                   className="schedule-card-mute"
@@ -401,24 +425,6 @@ export default function Schedule() {
           height: 100%;
           object-fit: cover;
           background-color: #131316;
-        }
-        .schedule-card-play-overlay {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(0,0,0,0.25);
-        }
-        .schedule-card-play-circle {
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: rgba(201,161,74,0.12);
-          border: 1px solid rgba(201,161,74,0.4);
         }
         .schedule-card-loader {
           position: absolute;
