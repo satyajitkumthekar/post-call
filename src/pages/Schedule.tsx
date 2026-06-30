@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
 import { trackPixel } from '../lib/pixel';
@@ -15,7 +15,6 @@ interface Testimonial {
 export default function Schedule() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
-  const [mutedStates, setMutedStates] = useState<Record<string, boolean>>({});
   const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
 
   const testimonialVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
@@ -60,7 +59,6 @@ export default function Schedule() {
             setVisibleCards((prev) => new Set(prev).add(id));
             if (video) {
               video.muted = true;
-              setMutedStates((prev) => ({ ...prev, [id]: true }));
               video.play().catch(() => {});
             }
           } else {
@@ -98,15 +96,6 @@ export default function Schedule() {
 
   const vslPlayTracked = useRef(false);
 
-  const toggleMute = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = testimonialVideoRefs.current[id];
-    if (!video) return;
-    const newMuted = !video.muted;
-    video.muted = newMuted;
-    setMutedStates((prev) => ({ ...prev, [id]: newMuted }));
-  };
-
   return (
     <div className="schedule-page">
       {/* Sticky bottom CTA */}
@@ -135,12 +124,12 @@ export default function Schedule() {
             }
           }}>
             <iframe
-              src="https://player.mediadelivery.net/embed/693813/15442e53-67bc-483c-bf3f-3a9abbb36038?autoplay=true&loop=false&muted=true&preload=true&responsive=true"
+              src="https://player.mediadelivery.net/embed/693813/15442e53-67bc-483c-bf3f-3a9abbb36038?autoplay=false&loop=true&muted=false&preload=true&responsive=true"
               loading="lazy"
               className="schedule-video"
               allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
               allowFullScreen
-              style={{ border: 'none' }}
+              style={{ border: 'none', position: 'absolute', top: 0, height: '100%', width: '100%' }}
             />
           </div>
         </section>
@@ -194,19 +183,7 @@ export default function Schedule() {
                   </div>
                 )}
 
-                {visibleCards.has(t.id) && (
-                  <button
-                    onClick={(e) => toggleMute(t.id, e)}
-                    className="schedule-card-mute"
-                  >
-                    {mutedStates[t.id] === false ? (
-                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                    ) : (
-                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                    )}
-                  </button>
-                )}
-              </div>
+                </div>
 
               <div className="schedule-card-info">
                 <p className="schedule-card-name">
@@ -437,23 +414,6 @@ export default function Schedule() {
           justify-content: center;
           z-index: 10;
           pointer-events: none;
-        }
-        .schedule-card-mute {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          z-index: 20;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: rgba(0,0,0,0.5);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          border: none;
-          cursor: pointer;
         }
         .schedule-card-info {
           padding: 14px 16px;
