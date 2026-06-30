@@ -48,7 +48,7 @@ export function openCalendlyPopup(url: string) {
 }
 
 export function buildCalendlyUrl(leadData?: { firstName: string; whatsappNumber: string } | null): string {
-  const base = 'https://calendly.com/satyajit-kumthekar/diagnostic-call';
+  const base = 'https://calendly.com/satyajit-kumthekar/discovery-call-clone';
   const params = new URLSearchParams({
     hide_gdpr_banner: '1',
     background_color: '0a0a0a',
