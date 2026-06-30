@@ -51,8 +51,6 @@ export function buildCalendlyUrl(leadData?: { firstName: string; whatsappNumber:
   const base = 'https://calendly.com/satyajit-kumthekar/discovery-call-clone';
   const params = new URLSearchParams({
     hide_gdpr_banner: '1',
-    background_color: '0a0a0a',
-    text_color: 'f5f5f5',
     primary_color: 'c9a14a',
   });
   if (leadData) {
