@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
+import { trackPixel } from '../lib/pixel';
 
 interface Testimonial {
   id: string;
@@ -67,12 +68,18 @@ export default function Schedule() {
     fetchTestimonials();
   }, []);
 
+  const vslPlayTracked = useRef(false);
+
   const handleVslPlay = async () => {
     const video = vslVideoRef.current;
     if (!video) return;
     if (vslPlaying) {
       video.pause();
     } else {
+      if (!vslPlayTracked.current) {
+        vslPlayTracked.current = true;
+        trackPixel('ViewContent', { content_name: 'VSL Video' });
+      }
       try { await video.play(); } catch {}
     }
   };
@@ -127,7 +134,12 @@ export default function Schedule() {
 
           {vslUrl ? (
             getYouTubeEmbedUrl(vslUrl) ? (
-              <div className="schedule-video-wrap">
+              <div className="schedule-video-wrap" onClick={() => {
+                if (!vslPlayTracked.current) {
+                  vslPlayTracked.current = true;
+                  trackPixel('ViewContent', { content_name: 'VSL Video' });
+                }
+              }}>
                 <iframe
                   src={getYouTubeEmbedUrl(vslUrl)!}
                   className="schedule-video"

@@ -1,3 +1,5 @@
+import { trackPixel, trackPixelCustom } from './pixel';
+
 let calendlyScriptLoaded = false;
 let calendlyPixelListenerAttached = false;
 
@@ -5,10 +7,12 @@ function attachCalendlyPixelListener() {
   if (calendlyPixelListenerAttached) return;
   calendlyPixelListenerAttached = true;
   window.addEventListener('message', (e) => {
-    if (e.data?.event === 'calendly.event_scheduled') {
-      if (typeof (window as any).fbq === 'function') {
-        (window as any).fbq('track', 'Schedule');
-      }
+    if (!e.data?.event) return;
+    if (e.data.event === 'calendly.date_and_time_selected') {
+      trackPixelCustom('CalendlyDateSelected');
+    }
+    if (e.data.event === 'calendly.event_scheduled') {
+      trackPixel('Schedule');
     }
   });
 }
@@ -37,6 +41,7 @@ export function ensureCalendlyScript(): Promise<void> {
 
 export function openCalendlyPopup(url: string) {
   attachCalendlyPixelListener();
+  trackPixelCustom('CalendlyOpened');
   ensureCalendlyScript().then(() => {
     (window as any).Calendly.initPopupWidget({ url });
   });
