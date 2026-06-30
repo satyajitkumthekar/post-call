@@ -174,39 +174,41 @@ export default function Schedule() {
               data-id={t.id}
               ref={(el) => { cardRefs.current[t.id] = el; }}
             >
-              <video
-                ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
-                src={t.url}
-                poster={t.thumbnail_url || undefined}
-                className="schedule-card-video"
-                playsInline
-                muted
-                loop
-                preload="metadata"
-                onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
-                onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
-              />
+              <div className="schedule-card-video-area">
+                <video
+                  ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
+                  src={t.url}
+                  poster={t.thumbnail_url || undefined}
+                  className="schedule-card-video"
+                  playsInline
+                  muted
+                  loop
+                  preload="metadata"
+                  onWaiting={() => setVideoLoading((prev) => ({ ...prev, [t.id]: true }))}
+                  onPlaying={() => setVideoLoading((prev) => ({ ...prev, [t.id]: false }))}
+                />
 
-              {videoLoading[t.id] && visibleCards.has(t.id) && (
-                <div className="schedule-card-loader">
-                  <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
-                </div>
-              )}
+                {videoLoading[t.id] && visibleCards.has(t.id) && (
+                  <div className="schedule-card-loader">
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'rgba(201,161,74,0.7)' }} />
+                  </div>
+                )}
 
-              {visibleCards.has(t.id) && (
-                <button
-                  onClick={(e) => toggleMute(t.id, e)}
-                  className="schedule-card-mute"
-                >
-                  {mutedStates[t.id] === false ? (
-                    <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                  ) : (
-                    <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
-                  )}
-                </button>
-              )}
+                {visibleCards.has(t.id) && (
+                  <button
+                    onClick={(e) => toggleMute(t.id, e)}
+                    className="schedule-card-mute"
+                  >
+                    {mutedStates[t.id] === false ? (
+                      <Volume2 className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    ) : (
+                      <VolumeX className="w-3.5 h-3.5" style={{ color: '#F0EDE8' }} />
+                    )}
+                  </button>
+                )}
+              </div>
 
-              <div className="schedule-card-caption">
+              <div className="schedule-card-info">
                 <p className="schedule-card-name">
                   {t.testimonial_name || 'Client'}
                 </p>
@@ -407,20 +409,21 @@ export default function Schedule() {
         }
         .schedule-card {
           flex-shrink: 0;
-          width: 82vw;
-          max-width: 340px;
-          aspect-ratio: 4/5;
-          border-radius: 16px;
+          width: 72vw;
+          max-width: 300px;
+          border-radius: 20px;
           overflow: hidden;
-          position: relative;
           background-color: #131316;
           border: 1px solid rgba(255,255,255,0.06);
           scroll-snap-align: start;
-          cursor: pointer;
+        }
+        .schedule-card-video-area {
+          position: relative;
+          aspect-ratio: 9/16;
+          overflow: hidden;
+          background-color: #0A0A0B;
         }
         .schedule-card-video {
-          position: absolute;
-          inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -452,28 +455,22 @@ export default function Schedule() {
           border: none;
           cursor: pointer;
         }
-        .schedule-card-caption {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 36px 14px 14px;
-          background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-          pointer-events: none;
+        .schedule-card-info {
+          padding: 14px 16px;
         }
         .schedule-card-name {
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 700;
-          font-size: 16px;
-          color: #FFFFFF;
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 400;
+          font-size: 1.1rem;
+          color: #F0EDE8;
           margin: 0;
         }
         .schedule-card-designation {
           font-family: 'DM Sans', sans-serif;
           font-weight: 300;
-          font-size: 13px;
+          font-size: 0.78rem;
           color: #8A8680;
-          margin: 3px 0 0 0;
+          margin: 2px 0 0 0;
         }
 
         @keyframes pulse {
