@@ -10,6 +10,16 @@ interface Testimonial {
   url: string;
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  const longMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+  if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`;
+  const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+  if (embedMatch) return url;
+  return null;
+}
+
 export default function Schedule() {
   const [vslUrl, setVslUrl] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -116,25 +126,37 @@ export default function Schedule() {
           </p>
 
           {vslUrl ? (
-            <div className="schedule-video-wrap" onClick={handleVslPlay}>
-              <video
-                ref={vslVideoRef}
-                src={vslUrl}
-                className="schedule-video"
-                playsInline
-                preload="metadata"
-                onPlay={() => setVslPlaying(true)}
-                onPause={() => setVslPlaying(false)}
-                onEnded={() => setVslPlaying(false)}
-              />
-              {!vslPlaying && (
-                <div className="schedule-video-overlay">
-                  <div className="schedule-play-btn">
-                    <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+            getYouTubeEmbedUrl(vslUrl) ? (
+              <div className="schedule-video-wrap">
+                <iframe
+                  src={getYouTubeEmbedUrl(vslUrl)!}
+                  className="schedule-video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 'none' }}
+                />
+              </div>
+            ) : (
+              <div className="schedule-video-wrap" onClick={handleVslPlay}>
+                <video
+                  ref={vslVideoRef}
+                  src={vslUrl}
+                  className="schedule-video"
+                  playsInline
+                  preload="metadata"
+                  onPlay={() => setVslPlaying(true)}
+                  onPause={() => setVslPlaying(false)}
+                  onEnded={() => setVslPlaying(false)}
+                />
+                {!vslPlaying && (
+                  <div className="schedule-video-overlay">
+                    <div className="schedule-play-btn">
+                      <Play className="w-5 h-5 ml-0.5" style={{ color: '#C9A84C', fill: '#C9A84C' }} />
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )
           ) : (
             <div className="schedule-video-placeholder" />
           )}
