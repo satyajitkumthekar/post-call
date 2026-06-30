@@ -8,6 +8,7 @@ interface Testimonial {
   id: string;
   testimonial_name: string | null;
   testimonial_designation: string | null;
+  thumbnail_url: string | null;
   url: string;
 }
 
@@ -37,7 +38,7 @@ export default function Schedule() {
     const fetchTestimonials = async () => {
       const { data } = await supabase
         .from('uploaded_files')
-        .select('id, testimonial_name, testimonial_designation, url')
+        .select('id, testimonial_name, testimonial_designation, thumbnail_url, url')
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false })
         .limit(10);
@@ -144,6 +145,7 @@ export default function Schedule() {
               <video
                 ref={(el) => { testimonialVideoRefs.current[t.id] = el; }}
                 src={t.url}
+                poster={t.thumbnail_url || undefined}
                 className="schedule-card-video"
                 playsInline
                 muted

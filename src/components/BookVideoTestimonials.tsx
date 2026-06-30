@@ -6,6 +6,7 @@ interface Testimonial {
   id: string;
   testimonial_name: string | null;
   testimonial_designation: string | null;
+  thumbnail_url: string | null;
   url: string;
 }
 
@@ -25,28 +26,6 @@ function VideoCard({
   onVideoMount: (el: HTMLVideoElement | null) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
-
-  const handleLoadedMetadata = () => {
-    const video = videoRef.current;
-    if (!video || thumbnail) return;
-    video.currentTime = 0.1;
-  };
-
-  const handleSeeked = () => {
-    const video = videoRef.current;
-    if (!video || thumbnail) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 360;
-    canvas.height = video.videoHeight || 640;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    try {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      if (dataUrl && dataUrl !== 'data:,') setThumbnail(dataUrl);
-    } catch { /* cross-origin */ }
-  };
 
   const handleClick = async () => {
     const video = videoRef.current;
@@ -81,9 +60,7 @@ function VideoCard({
             className="w-full h-full object-contain"
             preload="metadata"
             playsInline
-            poster={thumbnail ?? undefined}
-            onLoadedMetadata={handleLoadedMetadata}
-            onSeeked={handleSeeked}
+            poster={testimonial.thumbnail_url || undefined}
             onEnded={() => onEnded(testimonial.id)}
             onPause={() => onPause(testimonial.id)}
           />
@@ -159,7 +136,7 @@ export default function BookVideoTestimonials() {
     const fetchTestimonials = async () => {
       const { data } = await supabase
         .from('uploaded_files')
-        .select('id, testimonial_name, testimonial_designation, url')
+        .select('id, testimonial_name, testimonial_designation, thumbnail_url, url')
         .eq('bucket_id', 'video-testimonials')
         .order('created_at', { ascending: false })
         .limit(20);
