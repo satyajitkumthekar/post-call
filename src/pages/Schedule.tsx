@@ -140,7 +140,7 @@ export default function Schedule() {
             }
           }}>
             <iframe
-              src="https://player.mediadelivery.net/embed/693813/15442e53-67bc-483c-bf3f-3a9abbb36038?autoplay=false&loop=true&muted=false&preload=true&responsive=true"
+              src="https://player.mediadelivery.net/embed/693813/15442e53-67bc-483c-bf3f-3a9abbb36038?autoplay=true&loop=true&muted=true&preload=true&responsive=true"
               loading="lazy"
               className="schedule-video"
               allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
