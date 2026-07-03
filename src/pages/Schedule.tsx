@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
+import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl, getUtmFromUrl } from '../lib/calendly';
 import { trackPixel } from '../lib/pixel';
 
 interface Testimonial {
@@ -28,10 +28,11 @@ export default function Schedule() {
   const urlWhatsapp = params.get('whatsapp');
   const leadData = urlName && urlWhatsapp ? { firstName: urlName, whatsappNumber: urlWhatsapp } : null;
   const calendlyUrl = buildCalendlyUrl(leadData);
+  const utm = getUtmFromUrl();
 
   const openBooking = useCallback(() => {
-    openCalendlyPopup(calendlyUrl);
-  }, [calendlyUrl]);
+    openCalendlyPopup(calendlyUrl, utm);
+  }, [calendlyUrl, utm]);
 
   useEffect(() => {
     ensureCalendlyScript();

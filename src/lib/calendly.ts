@@ -39,11 +39,39 @@ export function ensureCalendlyScript(): Promise<void> {
   });
 }
 
-export function openCalendlyPopup(url: string) {
+export interface CalendlyUtm {
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
+}
+
+export function getUtmFromUrl(): CalendlyUtm {
+  const params = new URLSearchParams(window.location.search);
+  const utm: CalendlyUtm = {};
+  const source = params.get('utm_source');
+  const medium = params.get('utm_medium');
+  const campaign = params.get('utm_campaign');
+  const content = params.get('utm_content');
+  const term = params.get('utm_term');
+  if (source) utm.utmSource = source;
+  if (medium) utm.utmMedium = medium;
+  if (campaign) utm.utmCampaign = campaign;
+  if (content) utm.utmContent = content;
+  if (term) utm.utmTerm = term;
+  return utm;
+}
+
+export function openCalendlyPopup(url: string, utm?: CalendlyUtm) {
   attachCalendlyPixelListener();
   trackPixelCustom('CalendlyOpened');
   ensureCalendlyScript().then(() => {
-    (window as any).Calendly.initPopupWidget({ url });
+    const opts: Record<string, unknown> = { url };
+    if (utm && Object.keys(utm).length > 0) {
+      opts.utm = utm;
+    }
+    (window as any).Calendly.initPopupWidget(opts);
   });
 }
 

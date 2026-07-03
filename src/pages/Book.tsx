@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl } from '../lib/calendly';
+import { ensureCalendlyScript, openCalendlyPopup, buildCalendlyUrl, getUtmFromUrl } from '../lib/calendly';
 import BookVideoTestimonials from '../components/BookVideoTestimonials';
 import BookMessagesCarousel from '../components/BookMessagesCarousel';
 import LeadGateModal from '../components/LeadGateModal';
@@ -100,10 +100,11 @@ export default function Book() {
   }, []);
 
   const calendlyUrl = buildCalendlyUrl(leadData);
+  const utm = getUtmFromUrl();
 
   const openBookingModal = useCallback(() => {
-    openCalendlyPopup(calendlyUrl);
-  }, [calendlyUrl]);
+    openCalendlyPopup(calendlyUrl, utm);
+  }, [calendlyUrl, utm]);
 
   const handlePlay = async () => {
     if (!videoRef.current) return;
