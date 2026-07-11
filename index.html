@@ -40,7 +40,11 @@
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '3217090605164893');
-        fbq('track', 'PageView');
+        if(window.location.pathname==='/schedule1'){
+          fbq('trackCustom', 'organic_PageView');
+        }else{
+          fbq('track', 'PageView');
+        }
       })();
     </script>
     <!-- End Meta Pixel Code -->
