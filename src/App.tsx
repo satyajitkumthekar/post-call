@@ -4,6 +4,7 @@ import Book from './pages/Book';
 import Home from './pages/Home';
 import Leads from './pages/Leads';
 import Schedule from './pages/Schedule';
+import Schedule1 from './pages/Schedule1';
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -32,6 +33,10 @@ function App() {
 
   if (currentPath === '/schedule') {
     return <Schedule />;
+  }
+
+  if (currentPath === '/schedule1') {
+    return <Schedule1 />;
   }
 
   if (currentPath === '/book') {
