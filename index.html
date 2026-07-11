@@ -40,9 +40,10 @@
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '3217090605164893');
-        if(window.location.pathname==='/schedule1'){
+        var path=window.location.pathname;
+        if(path==='/schedule1'){
           fbq('trackCustom', 'organic_PageView');
-        }else{
+        }else if(path==='/schedule'){
           fbq('track', 'PageView');
         }
       })();
