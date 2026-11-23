@@ -3,6 +3,7 @@ import Admin from './pages/Admin';
 import Book from './pages/Book';
 import Home from './pages/Home';
 import Leads from './pages/Leads';
+import MediaLibrary from './pages/MediaLibrary';
 import Schedule from './pages/Schedule';
 import Schedule1 from './pages/Schedule1';
 
@@ -29,6 +30,10 @@ function App() {
 
   if (currentPath === '/leads') {
     return <Leads />;
+  }
+
+  if (currentPath === '/media') {
+    return <MediaLibrary />;
   }
 
   if (currentPath === '/schedule') {
