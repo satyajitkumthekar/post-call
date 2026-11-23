@@ -8,6 +8,7 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
+  Download,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -410,6 +411,27 @@ export default function MediaLibrary() {
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: '#8A8680', lineHeight: 1.7, maxWidth: '560px' }}>
           All videos and images used across the site — the homepage video, client video testimonials, the message wall, and story panels. Click any video to play it, or any image to view it full size.
         </p>
+
+        <button
+          onClick={() => {
+            window.history.pushState({}, '', '/media/videos');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
+          className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-200 hover:-translate-y-0.5"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 400,
+            fontSize: '0.8rem',
+            letterSpacing: '0.05em',
+            cursor: 'pointer',
+            color: '#C9A84C',
+            backgroundColor: 'rgba(201,168,76,0.05)',
+            border: '1px solid rgba(201,168,76,0.3)',
+          }}
+        >
+          <Download className="w-4 h-4" />
+          Download video assets
+        </button>
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2" style={{ margin: '32px 0 40px' }}>

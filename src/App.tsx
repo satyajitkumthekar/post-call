@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Leads from './pages/Leads';
 import MediaLibrary from './pages/MediaLibrary';
 import Schedule from './pages/Schedule';
+import VideoDownloads from './pages/VideoDownloads';
 import Schedule1 from './pages/Schedule1';
 
 function App() {
@@ -34,6 +35,10 @@ function App() {
 
   if (currentPath === '/media') {
     return <MediaLibrary />;
+  }
+
+  if (currentPath === '/media/videos') {
+    return <VideoDownloads />;
   }
 
   if (currentPath === '/schedule') {
