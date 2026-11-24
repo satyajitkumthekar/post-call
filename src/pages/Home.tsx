@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Play, RotateCcw, Volume2, VolumeX, Loader2, Download, Images } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import MessagesCollage from '../components/MessagesCollage';
 
@@ -504,6 +504,52 @@ export default function Home() {
 
       {/* === 5. MESSAGES WALL === */}
       <MessagesCollage />
+
+      {/* === 6. MEDIA LIBRARY LINK === */}
+      <section style={{ padding: '48px 20px 64px', textAlign: 'center', backgroundColor: '#0A0A0A' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            onClick={() => {
+              window.history.pushState({}, '', '/media');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-200 hover:-translate-y-0.5"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 400,
+              fontSize: '0.82rem',
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+              color: '#C9A84C',
+              backgroundColor: 'rgba(201,168,76,0.05)',
+              border: '1px solid rgba(201,168,76,0.3)',
+            }}
+          >
+            <Images className="w-4 h-4" />
+            View media library
+          </button>
+          <button
+            onClick={() => {
+              window.history.pushState({}, '', '/media/videos');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-200 hover:-translate-y-0.5"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 400,
+              fontSize: '0.82rem',
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+              color: '#C9A84C',
+              backgroundColor: 'rgba(201,168,76,0.05)',
+              border: '1px solid rgba(201,168,76,0.3)',
+            }}
+          >
+            <Download className="w-4 h-4" />
+            Download videos
+          </button>
+        </div>
+      </section>
 
       <style>{`
         .hp {
