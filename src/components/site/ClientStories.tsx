@@ -331,7 +331,7 @@ export default function ClientStories() {
             ref={rowRef}
             role="tablist"
             aria-label="Client stories"
-            className="no-scrollbar -mx-4 flex scroll-mt-24 gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-4 sm:overflow-visible sm:px-0"
+            className="no-scrollbar -mx-4 flex scroll-mt-24 gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-x-4 sm:gap-y-3 sm:overflow-visible lg:grid-cols-6 sm:px-0"
           >
             {stories.map((story, i) => {
               const selected = i === active;
@@ -349,14 +349,14 @@ export default function ClientStories() {
                   tabIndex={selected ? 0 : -1}
                   onClick={() => select(i)}
                   onKeyDown={(e) => onTabKeyDown(e, i)}
-                  className={`min-w-[42%] flex-none border-t-2 pb-2 pr-3 pt-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-w-0 ${
+                  className={`flex min-w-[42%] flex-none flex-col justify-start border-t-2 pb-2 pr-3 pt-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-w-0 ${
                     selected ? 'border-ink' : 'border-line hover:border-muted'
                   }`}
                 >
                   <span className={`block font-display text-lg font-semibold ${selected ? 'text-ink' : 'text-muted'}`}>
                     {story.name}
                   </span>
-                  <span className="block truncate font-label text-[11px] uppercase tracking-[0.06em] text-muted">
+                  <span className="line-clamp-2 font-label text-[11px] uppercase leading-[1.5] tracking-[0.06em] text-muted">
                     {story.role ?? ' '}
                   </span>
                 </button>
