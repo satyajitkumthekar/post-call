@@ -81,3 +81,33 @@ body::before {
 .pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
 }
+
+/* ── Light homepage (2026 redesign) ─────────────────────────────
+   Home adds the class "site-light" to <body> while it is open.
+   The older pages (book, schedule, admin) keep the dark styles above. */
+body.site-light {
+  background-color: #FAFAF7;
+  color: #12291E;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 400;
+}
+body.site-light::before {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .site-light *,
+  .site-light *::before,
+  .site-light *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
