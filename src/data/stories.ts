@@ -2,9 +2,14 @@
 // with their testimonial reel, and links to their case study on Instagram.
 //
 // To add a client: put their files in public/stories/<slug>/ (01.webp, 02.webp ..., reel-poster.webp)
-// and add an entry below. To turn on a client's video, add reel.mp4 to their folder and add
-// src: media('<slug>', 'reel.mp4') to their reel. Without a src the card shows a still and "Video coming soon". To link a client's Instagram post, paste the post's
+// and add an entry below.
+//
+// Videos live on Bunny Stream, in the same library as the main video. To turn on a client's video,
+// upload it to that library and paste its video ID into bunnyId. Until then the card shows a still
+// from the video with "Video coming soon". To link a client's Instagram post, paste the post's
 // address into instagramUrl. Until then the card links to the results account instead.
+
+export const BUNNY_LIBRARY_ID = '693813';
 
 export const RESULTS_INSTAGRAM_URL = 'https://www.instagram.com/superhumanlab.fit/';
 
@@ -21,7 +26,14 @@ export interface ClientStory {
   stats: { value: string; label: string }[];
   summary: string[];
   slides: StorySlide[];
-  reel: { poster: string; src?: string; length?: string };
+  reel: {
+    poster: string;
+    /** Bunny Stream video ID, from the video's page in Bunny. */
+    bunnyId?: string;
+    /** A video file in public/stories instead of Bunny. */
+    src?: string;
+    length?: string;
+  };
   instagramUrl?: string;
 }
 

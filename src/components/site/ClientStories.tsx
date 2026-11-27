@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import { RESULTS_INSTAGRAM_URL, stories } from '../../data/stories';
+import { BUNNY_LIBRARY_ID, RESULTS_INSTAGRAM_URL, stories } from '../../data/stories';
 import type { ClientStory } from '../../data/stories';
 import { pauseOtherVideos, prefersReducedMotion } from '../../lib/media';
 import { ArrowIcon, Container, Eyebrow, PlayIcon, TextLink } from './ui';
@@ -104,73 +104,106 @@ function StoryCarousel({ story, active }: { story: ClientStory; active: boolean 
   );
 }
 
+function PlayPill({ story, onPlay }: { story: ClientStory; onPlay: () => void }) {
+  // The whole frame starts the video. The visible button sits in the empty strip under the captions,
+  // left of the coach's window, so it never covers words or faces in the reel's layout.
+  return (
+    <button
+      type="button"
+      onClick={onPlay}
+      aria-label={`Play ${story.name}'s testimonial${story.reel.length ? `, ${story.reel.length} long` : ''}`}
+      className="group absolute inset-0 focus-visible:outline-none"
+    >
+      <span className="absolute left-[57%] top-[81%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-volt py-1.5 pl-1.5 pr-3.5 font-display text-sm font-semibold text-ink shadow-[0_8px_24px_rgba(18,41,30,.22)] transition-transform duration-200 group-hover:scale-[1.04] group-focus-visible:outline group-focus-visible:outline-[3px] group-focus-visible:outline-offset-4 group-focus-visible:outline-ink sm:py-2 sm:pl-2 sm:pr-4">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-ink text-volt sm:h-8 sm:w-8">
+          <PlayIcon className="ml-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+        </span>
+        <span className="hidden sm:inline">Watch {story.name}</span>
+        {story.reel.length && <span className="font-label text-xs font-normal tabular-nums">{story.reel.length}</span>}
+      </span>
+    </button>
+  );
+}
+
 function StoryReel({ story, active }: { story: ClientStory; active: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
+  const { bunnyId, src, poster } = story.reel;
 
+  // Leaving a story stops its video. A Bunny player is removed, which stops it; a file is paused.
   useEffect(() => {
-    if (!active) videoRef.current?.pause();
-  }, [active]);
+    if (active) return;
+    videoRef.current?.pause();
+    if (bunnyId) setStarted(false);
+  }, [active, bunnyId]);
 
-  const play = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    setStarted(true);
-    video.play().catch(() => setStarted(false));
-  };
+  const frame = 'relative aspect-video w-full overflow-hidden rounded-panel border border-line bg-surface shadow-card';
+  const still = (
+    <img
+      src={poster}
+      alt={`A still from ${story.name}'s testimonial video`}
+      width={1280}
+      height={720}
+      loading="lazy"
+      decoding="async"
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+  );
 
-  // No video file yet: show a still from the reel instead.
-  if (!story.reel.src) {
+  if (bunnyId) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-panel border border-line bg-surface shadow-card">
-        <img
-          src={story.reel.poster}
-          alt={`A still from ${story.name}'s testimonial video`}
-          width={1280}
-          height={720}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <span className="absolute left-[57%] top-[81%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-line bg-surface/95 px-3.5 py-1.5 font-label text-xs text-muted shadow-card">
-          Video coming soon
-        </span>
+      <div className={frame}>
+        {started ? (
+          <iframe
+            src={`https://player.mediadelivery.net/embed/${BUNNY_LIBRARY_ID}/${bunnyId}?autoplay=true&preload=true&responsive=true`}
+            title={`${story.name}'s testimonial`}
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full border-0"
+          />
+        ) : (
+          <>
+            {still}
+            <PlayPill story={story} onPlay={() => setStarted(true)} />
+          </>
+        )}
       </div>
     );
   }
 
+  if (src) {
+    const play = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      setStarted(true);
+      video.play().catch(() => setStarted(false));
+    };
+    return (
+      <div className={frame}>
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          preload="none"
+          playsInline
+          controls={started}
+          controlsList="nodownload"
+          onPlay={(e) => pauseOtherVideos(e.currentTarget)}
+          onEnded={() => setStarted(false)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {!started && <PlayPill story={story} onPlay={play} />}
+      </div>
+    );
+  }
+
+  // No video yet: a still from the reel.
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-panel border border-line bg-surface shadow-card">
-      <video
-        ref={videoRef}
-        src={story.reel.src}
-        poster={story.reel.poster}
-        preload="none"
-        playsInline
-        controls={started}
-        controlsList="nodownload"
-        onPlay={(e) => pauseOtherVideos(e.currentTarget)}
-        onEnded={() => setStarted(false)}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      {!started && (
-        // The whole frame starts the video. The visible button sits in the empty strip under the captions,
-        // left of the coach's window, so it never covers words or faces in the reel's layout.
-        <button
-          type="button"
-          onClick={play}
-          aria-label={`Play ${story.name}'s testimonial${story.reel.length ? `, ${story.reel.length} long` : ''}`}
-          className="group absolute inset-0 focus-visible:outline-none"
-        >
-          <span className="absolute left-[57%] top-[81%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-volt py-1.5 pl-1.5 pr-3.5 font-display text-sm font-semibold text-ink shadow-[0_8px_24px_rgba(18,41,30,.22)] transition-transform duration-200 group-hover:scale-[1.04] group-focus-visible:outline group-focus-visible:outline-[3px] group-focus-visible:outline-offset-4 group-focus-visible:outline-ink sm:py-2 sm:pl-2 sm:pr-4">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-ink text-volt sm:h-8 sm:w-8">
-              <PlayIcon className="ml-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            </span>
-            <span className="hidden sm:inline">Watch {story.name}</span>
-            {story.reel.length && <span className="font-label text-xs font-normal tabular-nums">{story.reel.length}</span>}
-          </span>
-        </button>
-      )}
+    <div className={frame}>
+      {still}
+      <span className="absolute left-[57%] top-[81%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-line bg-surface/95 px-3.5 py-1.5 font-label text-xs text-muted shadow-card">
+        Video coming soon
+      </span>
     </div>
   );
 }
