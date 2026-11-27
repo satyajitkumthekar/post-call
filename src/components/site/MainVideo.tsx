@@ -101,7 +101,6 @@ export default function MainVideo() {
         ) : (
           <>
             <b className="whitespace-nowrap font-display font-semibold">Watch this first.</b>
-            <span className="text-sm text-muted">It covers what we do, how it works, and who it isn&rsquo;t for.</span>
           </>
         )}
       </div>
