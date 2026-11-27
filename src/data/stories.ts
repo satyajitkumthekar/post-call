@@ -62,7 +62,7 @@ export const stories: ClientStory[] = [
       { src: media("dev", '06.webp'), alt: "“After three months with my first trainer I looked phenomenal. The minute the sessions stopped, I knew nothing.”" },
       { src: media("dev", '07.webp'), alt: "“I would say: I didn’t go to the gym, let’s move on. You were not satisfied with that answer.”" },
     ],
-    reel: { poster: media("dev", 'reel-poster.webp'), length: "2:58" },
+    reel: { poster: media("dev", 'reel-poster.webp'), bunnyId: 'e0b06045-bf44-47ff-a62f-ba5bf1efa09b', length: "2:58" },
     instagramUrl: '',
   },
   {
@@ -88,7 +88,7 @@ export const stories: ClientStory[] = [
       { src: media("dinesh", '07.webp'), alt: "“My whole mental bandwidth is free now. For my workouts, my work, my personal life, everything.”" },
       { src: media("dinesh", '08.webp'), alt: "“This is not a cookie cutter solution. It is very specific to me and my life.”" },
     ],
-    reel: { poster: media("dinesh", 'reel-poster.webp'), length: "2:49" },
+    reel: { poster: media("dinesh", 'reel-poster.webp'), bunnyId: 'df7e9f44-1004-45db-8a1e-c4c3f3aa8d4a', length: "2:49" },
     instagramUrl: '',
   },
   {
@@ -113,7 +113,7 @@ export const stories: ClientStory[] = [
       { src: media("ashutosh", '06.webp'), alt: "“I have also handled marketing for coaches, so I know a sales pitch when I see one. His reels were someone genuinely sharing what he had learned.”" },
       { src: media("ashutosh", '07.webp'), alt: "“A coach is not someone who holds your hand. You walk the journey yourself. He shows you which direction to walk in.”" },
     ],
-    reel: { poster: media("ashutosh", 'reel-poster.webp'), length: "2:49" },
+    reel: { poster: media("ashutosh", 'reel-poster.webp'), bunnyId: '798e4410-2a19-4703-90d1-1ddb020887b7', length: "2:49" },
     instagramUrl: '',
   },
   {
@@ -134,7 +134,7 @@ export const stories: ClientStory[] = [
       { src: media("aditi", '03.webp'), alt: "“I know where to spend my calories and how much to save. I have become very smart with it. I play with it.”" },
       { src: media("aditi", '04.webp'), alt: "“I used to wear XL or double XL. Now I fit into my sister’s clothes, two sizes down.”" },
     ],
-    reel: { poster: media("aditi", 'reel-poster.webp'), length: "2:19" },
+    reel: { poster: media("aditi", 'reel-poster.webp'), bunnyId: '97f07c6a-ff51-4592-9df6-df35be4a57d6', length: "2:19" },
     instagramUrl: '',
   },
   {
@@ -155,7 +155,7 @@ export const stories: ClientStory[] = [
       { src: media("vishwa", '03.webp'), alt: "“People push me to drink. I tell them: I was where you are, and now I am here. Can you do that?”" },
       { src: media("vishwa", '04.webp'), alt: "“I only knew you from Instagram, and you were in another country. I doubted an online coach could help me.”" },
     ],
-    reel: { poster: media("vishwa", 'reel-poster.webp'), length: "2:31" },
+    reel: { poster: media("vishwa", 'reel-poster.webp'), bunnyId: 'a64d7944-4b33-49a5-a5c4-7a1f91a40d77', length: "2:31" },
     instagramUrl: '',
   },
 ];
