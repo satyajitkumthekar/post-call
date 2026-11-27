@@ -42,16 +42,6 @@ export function PlayIcon({ className = 'h-6 w-6' }: { className?: string }) {
   );
 }
 
-export function CheckBadge() {
-  return (
-    <span className="grid h-7 w-7 flex-none place-items-center rounded-[9px] bg-accent/10 text-accent" aria-hidden="true">
-      <svg viewBox="0 0 14 11" className="h-[11px] w-[14px]">
-        <path d="M1 5.2 4.9 9 13 1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
-  );
-}
-
 export function TextLink({ href, children, dark = false }: { href: string; children: ReactNode; dark?: boolean }) {
   const external = href.startsWith('http');
   return (

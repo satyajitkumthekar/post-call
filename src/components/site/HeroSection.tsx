@@ -16,8 +16,8 @@ export default function HeroSection() {
             </h1>
           </div>
           <p className="max-w-[38ch] text-lg text-muted xl:pb-1">
-            Spend ten minutes here before we talk. It covers what The Last Piece is, how it works and what you get, so the
-            call can be about you.
+            Spend ten minutes here before we talk. It covers what The Last Piece is and how it works, so the call can be
+            about you.
           </p>
         </div>
         <MainVideo />
