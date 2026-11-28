@@ -16,8 +16,19 @@ export function Eyebrow({ children, dark = false }: { children: ReactNode; dark?
   );
 }
 
-type Direction = 'right' | 'left' | 'up' | 'out';
-const turn: Record<Direction, string> = { right: '', left: 'rotate-180', up: '-rotate-90', out: '-rotate-45' };
+type Direction = 'right' | 'left' | 'up' | 'down' | 'out';
+const turn: Record<Direction, string> = { right: '', left: 'rotate-180', up: '-rotate-90', down: 'rotate-90', out: '-rotate-45' };
+
+export function ListIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className={`${className} flex-none`}>
+      <path d="M6 4h8M6 8h8M6 12h8" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="2.5" cy="4" r="1.1" fill="currentColor" />
+      <circle cx="2.5" cy="8" r="1.1" fill="currentColor" />
+      <circle cx="2.5" cy="12" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
 
 export function ArrowIcon({ direction = 'right', className = 'h-4 w-4' }: { direction?: Direction; className?: string }) {
   return (

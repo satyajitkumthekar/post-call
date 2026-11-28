@@ -3,7 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { BUNNY_LIBRARY_ID, RESULTS_INSTAGRAM_URL, stories } from '../../data/stories';
 import type { ClientStory } from '../../data/stories';
 import { pauseOtherVideos, prefersReducedMotion } from '../../lib/media';
-import { ArrowIcon, Container, PlayIcon, TextLink } from './ui';
+import { ArrowIcon, Container, ListIcon, PlayIcon, TextLink } from './ui';
 
 // Each client gets one panel: their testimonial video first, then their best result in their own words,
 // the objection they had before starting, and their Instagram carousel (their story, slide by slide).
@@ -262,8 +262,103 @@ function StoryPanel({
   );
 }
 
+// Phones show only two or three names at a time, so a button opens the full list of stories to choose from.
+function StoryPicker({
+  open,
+  active,
+  onClose,
+  onPick,
+}: {
+  open: boolean;
+  active: number;
+  onClose: () => void;
+  onPick: (i: number) => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  // The page behind the list stays still while it is open.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const overflow = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = overflow;
+    };
+  }, [open]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="story-picker-title"
+      onClose={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="sheet-up inset-x-0 bottom-0 top-auto m-0 max-h-[85dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-panel border-0 bg-canvas p-0 text-ink shadow-lift backdrop:bg-ink/50"
+    >
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-canvas/95 px-4 py-3 backdrop-blur">
+        <h3 id="story-picker-title" className="font-display text-lg font-semibold tracking-[-0.01em]">
+          All {stories.length} client stories
+        </h3>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-full border border-line bg-surface px-3.5 py-1.5 font-display text-sm font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Close
+        </button>
+      </div>
+      <ul className="grid gap-1 p-2 pb-6">
+        {stories.map((story, i) => (
+          <li key={story.slug}>
+            <button
+              type="button"
+              onClick={() => onPick(i)}
+              aria-current={i === active ? 'true' : undefined}
+              className={`flex w-full items-center gap-3 rounded-card p-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent ${
+                i === active ? 'bg-surface shadow-card' : 'hover:bg-surface'
+              }`}
+            >
+              <img
+                src={story.reel.poster}
+                alt=""
+                width={64}
+                height={64}
+                loading="lazy"
+                decoding="async"
+                className="h-16 w-16 flex-none rounded-[10px] border border-line object-cover object-left"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="font-display text-base font-semibold text-ink">{story.name}</span>
+                  {i === active && (
+                    <span className="font-label text-[10px] uppercase tracking-[0.08em] text-accent">Showing</span>
+                  )}
+                </span>
+                {story.role && (
+                  <span className="block truncate font-label text-[11px] uppercase tracking-[0.06em] text-muted">{story.role}</span>
+                )}
+                <span className="mt-1 line-clamp-2 text-sm leading-snug text-muted">&ldquo;{story.headline}&rdquo;</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </dialog>
+  );
+}
+
 export default function ClientStories() {
   const [active, setActive] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const activeRef = useRef(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -410,16 +505,36 @@ export default function ClientStories() {
     rowRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
+  // Choosing a story from the full list closes it and brings that story into view.
+  const pick = (i: number) => {
+    setPickerOpen(false);
+    select(i);
+    window.requestAnimationFrame(() => {
+      rowRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      tabRefs.current[i]?.focus({ preventScroll: true });
+    });
+  };
+
   return (
     <section id="stories" aria-labelledby="stories-title">
       <Container>
         <div className="pb-10 pt-6 sm:pb-16 sm:pt-10">
           <h2
             id="stories-title"
-            className="mb-8 max-w-[22ch] text-balance font-display text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-[1.08] tracking-[-0.022em] sm:mb-10"
+            className="mb-5 max-w-[22ch] text-balance font-display text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-[1.08] tracking-[-0.022em] sm:mb-10"
           >
             Weapons of intellect and physicality.
           </h2>
+
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            aria-haspopup="dialog"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 font-display text-sm font-semibold text-ink shadow-card transition-colors hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:hidden"
+          >
+            <ListIcon />
+            See all {count} stories
+          </button>
 
           <div
             ref={rowRef}
@@ -480,6 +595,7 @@ export default function ClientStories() {
           </div>
         </div>
       </Container>
+      <StoryPicker open={pickerOpen} active={active} onClose={() => setPickerOpen(false)} onPick={pick} />
     </section>
   );
 }

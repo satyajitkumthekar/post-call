@@ -1,5 +1,5 @@
 import { LINKS } from './links';
-import { Container, Eyebrow, TextLink } from './ui';
+import { Container, Eyebrow } from './ui';
 
 // The Last Piece, in the words of the offer doc. Each part is one heading and one block of text:
 // the client's voice, what changes, and where it lands.
@@ -102,16 +102,6 @@ export default function ProgramSection() {
               </div>
             </article>
           ))}
-        </div>
-
-        <div className="mt-14 flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-paper/15 pt-8 sm:mt-20">
-          <p className="max-w-[54ch] leading-relaxed text-paper-soft">
-            The whole system is free to read in the Superhuman KIT. That is the do it yourself version. The Last Piece is us
-            running it with you.
-          </p>
-          <TextLink href={LINKS.kit} dark>
-            Read the Superhuman KIT
-          </TextLink>
         </div>
       </Container>
     </section>
