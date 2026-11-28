@@ -1,0 +1,3 @@
+# The site is one app: every address (/, /schedule, /book, /admin, ...) loads index.html,
+# and the app shows the right page. Real files (images, scripts) are still served as they are.
+/*  /index.html  200
