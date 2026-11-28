@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { MESSAGES_SHOWN_FIRST, messages as pinned } from '../../data/messages';
-import { supabase } from '../../lib/supabase';
+import { MESSAGES_SHOWN_FIRST, messages } from '../../data/messages';
 import { ArrowIcon, Container, Eyebrow } from './ui';
 
 // Screenshots of client messages, best first (the list and its order live in src/data/messages.ts).
-// Screenshots uploaded on the admin page that are not in that list follow, newest first.
 // The wall places each one in the shortest column, in order, so the best ones sit at the top.
 
 interface WallItem {
@@ -17,13 +15,12 @@ interface WallItem {
 
 const GAP = 16;
 const base = import.meta.env.BASE_URL;
-const pinnedItems: WallItem[] = pinned.map((m) => ({
+const items: WallItem[] = messages.map((m) => ({
   key: m.file,
   src: `${base}messages/${m.file}`,
   ratio: m.height / m.width,
   alt: m.alt,
 }));
-const pinnedUploads = new Set(pinned.map((m) => m.supabaseUrl).filter(Boolean));
 
 function columnCount(width: number) {
   if (width >= 880) return 4;
@@ -32,7 +29,6 @@ function columnCount(width: number) {
 }
 
 export default function MessageWall() {
-  const [uploads, setUploads] = useState<WallItem[]>([]);
   const [showAll, setShowAll] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const [width, setWidth] = useState(0);
@@ -40,32 +36,7 @@ export default function MessageWall() {
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastTrigger = useRef<HTMLElement | null>(null);
 
-  const items = [...pinnedItems, ...uploads];
   const shown = showAll ? items : items.slice(0, MESSAGES_SHOWN_FIRST);
-
-  // New screenshots from the admin page, if any.
-  useEffect(() => {
-    let alive = true;
-    supabase
-      .from('uploaded_files')
-      .select('id, url')
-      .eq('bucket_id', 'text-testimonial-images')
-      .order('created_at', { ascending: false })
-      .then(
-        ({ data }) => {
-          if (!alive || !data) return;
-          setUploads(
-            data
-              .filter((m) => m.url && !pinnedUploads.has(m.url))
-              .map((m) => ({ key: String(m.id), src: m.url, ratio: 1.3, alt: 'A message from a client' })),
-          );
-        },
-        () => undefined,
-      );
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   // The wall's width decides the number of columns.
   useLayoutEffect(() => {
@@ -77,13 +48,6 @@ export default function MessageWall() {
     observer.observe(wall);
     return () => observer.disconnect();
   }, []);
-
-  // An uploaded screenshot's real shape is known once it loads.
-  const measure = (key: string, img: HTMLImageElement) => {
-    if (!img.naturalWidth) return;
-    const ratio = img.naturalHeight / img.naturalWidth;
-    setUploads((list) => list.map((m) => (m.key === key && Math.abs(m.ratio - ratio) > 0.01 ? { ...m, ratio } : m)));
-  };
 
   const cols = columnCount(width);
   const colWidth = width ? (width - GAP * (cols - 1)) / cols : 0;
@@ -117,7 +81,7 @@ export default function MessageWall() {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = overflow;
     };
-  }, [open, items.length, close]);
+  }, [open, close]);
 
   if (!items.length) return null;
 
@@ -151,7 +115,6 @@ export default function MessageWall() {
                     alt={item.alt}
                     loading={i < MESSAGES_SHOWN_FIRST ? 'eager' : 'lazy'}
                     decoding="async"
-                    onLoad={(e) => measure(item.key, e.currentTarget)}
                     className="block h-full w-full object-cover object-top"
                   />
                 </button>

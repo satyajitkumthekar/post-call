@@ -3,9 +3,6 @@
 // To add one: put the image in public/messages/, then add an entry below at the spot where it should
 // appear. Width and height are the image's size in pixels, so the wall can lay it out before it loads.
 // The first eight show straight away; the rest appear when the visitor taps "Show all".
-//
-// Screenshots uploaded on the admin page (to "text testimonial images") still appear too, after these.
-// supabaseUrl marks the ones that also live there, so they are not shown twice.
 
 export interface ClientMessage {
   /** The image's file name in public/messages/. */
@@ -14,8 +11,6 @@ export interface ClientMessage {
   height: number;
   /** What the message says, for people using screen readers. */
   alt: string;
-  /** The same screenshot's address on the admin page, if it was uploaded there. */
-  supabaseUrl?: string;
 }
 
 /** How many messages show before "Show all". */
@@ -51,7 +46,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 935,
     alt: "A client: from 93.5 kg to 88.8 kg in three weeks, seen on a morning of being harsh on themselves.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827886473-t97aav.jpg",
   },
   {
     file: "calmer-under-triggers.webp",
@@ -82,7 +76,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 1036,
     alt: "A client: sleeping 7 hours, not rushing mornings, and sitting with uncomfortable feelings instead of escaping into food or the phone.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677432446-70ib3e.jpg",
   },
   {
     file: "avocado-toast.webp",
@@ -95,7 +88,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 676,
     alt: "A client quit smoking cold turkey: almost two weeks without a cigarette.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677424860-94uixp.jpg",
   },
   {
     file: "manish-in-control.webp",
@@ -108,14 +100,12 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 914,
     alt: "A client hit a new lowest weight through two travel weddings, eating consciously without logging.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827904567-fvip0m.jpg",
   },
   {
     file: "fundraise-party-gym.webp",
     width: 900,
     height: 632,
     alt: "A client at the gym during an office party: “never been happier to not be drinking under pressure.”",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677412436-on1dx9.jpg",
   },
   {
     file: "outlet-for-chaos.webp",
@@ -128,7 +118,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 577,
     alt: "A client: “It’s like I’ve dropped 4.5 kgs. There’s actual progress!!!”",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827929189-j2j4v8.jpg",
   },
   {
     file: "aashay-vertical-jump.webp",
@@ -141,14 +130,12 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 1108,
     alt: "A client sees 111.8 on the scale: “These wins push you to stick to the plan more.”",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677457239-bb4o8.jpg",
   },
   {
     file: "broke-75kg.webp",
     width: 900,
     height: 404,
     alt: "A client broke a long 75 kg plateau for the first time: 74.9 kg.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677441738-u930j.jpg",
   },
   {
     file: "sudden-calm.webp",
@@ -161,7 +148,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 350,
     alt: "A client: no smoking or alcohol since starting, focused and motivated.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677416580-r7st8i.jpg",
   },
   {
     file: "practice-before-tasks.webp",
@@ -174,7 +160,6 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 603,
     alt: "A client felt clean inside and proud after saying no to a cigarette with ease.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677420760-bo437.jpg",
   },
   {
     file: "aashay-addicted-to-gym.webp",
@@ -193,14 +178,12 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 677,
     alt: "A client did dumbbell bench press with 22 kg dumbbells for 10 reps, a first.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827921625-tjzopr9.jpg",
   },
   {
     file: "down-2kg-2-weeks.webp",
     width: 900,
     height: 715,
     alt: "A client: down 2 kilos in 2 weeks.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827918537-92qbjm.jpg",
   },
   {
     file: "happier-these-days.webp",
@@ -225,62 +208,53 @@ export const messages: ClientMessage[] = [
     width: 900,
     height: 1169,
     alt: "A client has lost the taste for junk food and for skipping breakfast.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677451384-muu0j.PNG",
   },
   {
     file: "thanks-new-year.webp",
     width: 900,
     height: 617,
     alt: "A client: “I feel amazing having someone like you by my side.”",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827902859-wiswgi.jpg",
   },
   {
     file: "strong-week.webp",
     width: 900,
     height: 710,
     alt: "A client missed two workouts in a busy week but kept up food and steps.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827916515-6rz9n.jpg",
   },
   {
     file: "the-canvas.webp",
     width: 900,
     height: 845,
     alt: "A client feels a bit different, and it’s the progress.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827917531-aqzji.jpg",
   },
   {
     file: "down-1-5kg.webp",
     width: 900,
     height: 353,
     alt: "A client: 99.5 kg, 1.5 kg down in a week.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827914025-vbuqxk.jpg",
   },
   {
     file: "food-log.webp",
     width: 900,
     height: 1143,
     alt: "A client’s food for the day, planned and logged ahead of time.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677397754-3ghinm.jpg",
   },
   {
     file: "more-weight-or-reps.webp",
     width: 900,
     height: 695,
     alt: "A client feels better in the gym, always going for more weight or more reps.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827932333-dbhpd.jpg",
   },
   {
     file: "steps-non-negotiable.webp",
     width: 900,
     height: 1442,
     alt: "A client averaged 10,011 steps a day for a week.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1781677428337-gy1akf.jpg",
   },
   {
     file: "no-overcompensating.webp",
     width: 900,
     height: 442,
     alt: "A client planned to go extra hard on the diet to make up for the day before, just as the coach predicted.",
-    supabaseUrl: "https://sruasbbxnnslydvnoyhc.supabase.co/storage/v1/object/public/text-testimonial-images/1768827896362-lq03t.jpg",
   },
 ];
