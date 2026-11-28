@@ -15,10 +15,7 @@ export default function HeroSection() {
               The call is booked. <span className="block font-medium text-muted">Now let&rsquo;s make it count.</span>
             </h1>
           </div>
-          <p className="max-w-[38ch] text-lg text-muted xl:pb-1">
-            Spend ten minutes here before we talk. It covers what The Last Piece is and how it works, so the call can be
-            about you.
-          </p>
+          <p className="max-w-[38ch] text-lg text-muted xl:pb-1">Spend ten minutes here before we talk.</p>
         </div>
         <MainVideo />
       </Container>
