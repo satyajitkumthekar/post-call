@@ -60,7 +60,7 @@ export default function MessageWall() {
   return (
     <section aria-labelledby="messages-title">
       <Container>
-        <div className="border-t border-line pb-16 pt-16 sm:pb-24 sm:pt-24">
+        <div className="pb-16 pt-16 sm:pb-24 sm:pt-24">
           <Eyebrow>In their own words</Eyebrow>
           <h2
             id="messages-title"

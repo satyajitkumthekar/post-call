@@ -7,7 +7,7 @@ import SiteFooter from '../components/site/SiteFooter';
 import SiteHeader from '../components/site/SiteHeader';
 
 // The homepage people land on after booking a call.
-// Order: the video first, then client stories, then the program. It ends there on purpose.
+// Order: the video first, then client stories, then the program, and the client messages at the end.
 export default function Home() {
   useEffect(() => {
     document.body.classList.add('site-light');
@@ -20,8 +20,8 @@ export default function Home() {
       <main>
         <HeroSection />
         <ClientStories />
-        <MessageWall />
         <ProgramSection />
+        <MessageWall />
       </main>
       <SiteFooter />
     </div>

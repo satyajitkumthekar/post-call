@@ -4,7 +4,7 @@ import { Container, Eyebrow } from './ui';
 export default function HeroSection() {
   return (
     <section aria-labelledby="hero-title">
-      <Container className="pb-16 pt-8 sm:pb-24 sm:pt-12">
+      <Container className="pb-8 pt-8 sm:pb-12 sm:pt-12">
         <div className="mb-6 grid items-end gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] xl:gap-12">
           <div>
             <Eyebrow>You&rsquo;re in</Eyebrow>

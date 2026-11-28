@@ -3,10 +3,11 @@ import type { KeyboardEvent } from 'react';
 import { BUNNY_LIBRARY_ID, RESULTS_INSTAGRAM_URL, stories } from '../../data/stories';
 import type { ClientStory } from '../../data/stories';
 import { pauseOtherVideos, prefersReducedMotion } from '../../lib/media';
-import { ArrowIcon, Container, Eyebrow, PlayIcon, TextLink } from './ui';
+import { ArrowIcon, Container, PlayIcon, TextLink } from './ui';
 
-// Each client gets one panel: their Instagram carousel on the left (their story, slide by slide),
-// and on the right their words, their testimonial reel, their numbers, and a link to the case study.
+// Each client gets one panel: their testimonial video first, then their best result in their own words,
+// what worried them most before starting, and their Instagram carousel (their story, slide by slide).
+// The panels sit side by side: swiping moves the whole story, and the names row follows along.
 
 function StoryCarousel({ story, active }: { story: ClientStory; active: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -36,8 +37,10 @@ function StoryCarousel({ story, active }: { story: ClientStory; active: boolean 
     }
   };
 
+  // Arrows are for mouse users. On touch screens a swipe that starts on an arrow would move the whole
+  // story instead of the slide, so phones get swipe, dots and the counter only.
   const arrow =
-    'absolute top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-card backdrop-blur transition hover:bg-surface disabled:pointer-events-none disabled:opacity-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+    'absolute top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-card backdrop-blur transition hover:bg-surface disabled:pointer-events-none disabled:opacity-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [@media(pointer:coarse)]:hidden';
 
   return (
     <figure className="m-0">
@@ -219,53 +222,41 @@ function StoryPanel({
   next: ClientStory;
   onNext: () => void;
 }) {
+  // Phones: one column (video, result, worry, carousel, links). Desktop: the carousel moves to a right column.
   return (
-    <article className="grid gap-8 pt-8 sm:pt-10 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-14">
-      <div className="mx-auto w-full max-w-[420px] lg:sticky lg:top-24 lg:mx-0 lg:max-w-none lg:self-start">
+    <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)] lg:grid-rows-[auto_auto_1fr] lg:gap-x-12">
+      <StoryReel story={story} active={active} />
+
+      <div className="flex flex-col gap-5">
+        <h3 className="m-0 text-balance font-display text-[clamp(1.5rem,5vw,2rem)] font-semibold leading-[1.15] tracking-[-0.02em]">
+          &ldquo;{story.headline}&rdquo;
+        </h3>
+        <div className="border-l-2 border-accent pl-4">
+          <p className="font-label text-[11px] uppercase tracking-[0.08em] text-muted">
+            {story.worryLabel ?? 'Biggest worry before starting'}
+          </p>
+          <p className="mt-1.5 max-w-[56ch] text-[15px] leading-[1.6] text-muted sm:text-base">{story.worry}</p>
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-[420px] lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:mx-0 lg:max-w-none">
         <StoryCarousel story={story} active={active} />
       </div>
 
-      <div className="flex min-w-0 flex-col gap-6">
-        <p className="font-label text-xs uppercase tracking-[0.09em] text-muted">
-          <span className="font-medium text-ink">{story.name}</span>
-          {story.role && <span> · {story.role}</span>}
-        </p>
-        <blockquote className="m-0 text-balance font-display text-[clamp(1.375rem,3.4vw,1.75rem)] font-medium leading-[1.3] tracking-[-0.02em]">
-          &ldquo;{story.quote}&rdquo;
-        </blockquote>
-
-        <StoryReel story={story} active={active} />
-
-        <dl className="grid grid-cols-2 gap-4">
-          {story.stats.map((stat) => (
-            <div key={stat.value} className="flex min-w-0 flex-col-reverse border-t-[1.5px] border-ink pt-3">
-              <dt className="text-sm leading-snug text-muted">{stat.label}</dt>
-              <dd className="m-0 font-display text-2xl font-semibold tabular-nums tracking-[-0.02em]">{stat.value}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <div className="flex max-w-[62ch] flex-col gap-3 leading-[1.7] text-muted">
-          {story.summary.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-line pt-5">
-          {story.instagramUrl ? (
-            <TextLink href={story.instagramUrl}>See {story.name}&rsquo;s case study on Instagram</TextLink>
-          ) : (
-            <TextLink href={RESULTS_INSTAGRAM_URL}>More client results on Instagram</TextLink>
-          )}
-          <button
-            type="button"
-            onClick={onNext}
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 font-display text-sm font-semibold text-ink transition-colors hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            Next story: {next.name}
-            <ArrowIcon />
-          </button>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-line pt-5 lg:self-start">
+        {story.instagramUrl ? (
+          <TextLink href={story.instagramUrl}>See {story.name}&rsquo;s case study on Instagram</TextLink>
+        ) : (
+          <TextLink href={RESULTS_INSTAGRAM_URL}>More client results on Instagram</TextLink>
+        )}
+        <button
+          type="button"
+          onClick={onNext}
+          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 font-display text-sm font-semibold text-ink transition-colors hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Next story: {next.name}
+          <ArrowIcon />
+        </button>
       </div>
     </article>
   );
@@ -273,13 +264,21 @@ function StoryPanel({
 
 export default function ClientStories() {
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const rowRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  // While a tap on a name scrolls the stories, the stories it passes on the way are not selected.
+  const scrollingTo = useRef<number | null>(null);
   const firstRender = useRef(true);
   const count = stories.length;
 
-  // Keep the active tab in view inside the tab row on phones, without moving the page.
   useEffect(() => {
+    activeRef.current = active;
+    // Only the story on screen can be reached with the keyboard or a screen reader.
+    panelRefs.current.forEach((panel, i) => panel?.toggleAttribute('inert', i !== active));
+    // Keep the active name in view inside the names row on phones, without moving the page.
     if (firstRender.current) {
       firstRender.current = false;
       return;
@@ -289,9 +288,40 @@ export default function ClientStories() {
     if (row && tab) row.scrollTo({ left: tab.offsetLeft - 16, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   }, [active]);
 
+  // Stay on the same story when the width changes, for example when a phone is turned.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      track.scrollLeft = activeRef.current * track.clientWidth;
+    });
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, []);
+
+  // A swipe moves the whole story; the names row follows.
+  const onTrackScroll = () => {
+    const track = trackRef.current;
+    if (!track || !track.clientWidth) return;
+    const i = Math.min(count - 1, Math.max(0, Math.round(track.scrollLeft / track.clientWidth)));
+    if (scrollingTo.current !== null) {
+      if (i !== scrollingTo.current) return;
+      scrollingTo.current = null;
+    }
+    if (i !== activeRef.current) setActive(i);
+  };
+
   const select = (i: number, focus = false) => {
     const target = (i + count) % count;
     setActive(target);
+    const track = trackRef.current;
+    if (track) {
+      scrollingTo.current = target;
+      track.scrollTo({ left: target * track.clientWidth, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+      window.setTimeout(() => {
+        if (scrollingTo.current === target) scrollingTo.current = null;
+      }, 1000);
+    }
     if (focus) tabRefs.current[target]?.focus();
   };
 
@@ -311,27 +341,19 @@ export default function ClientStories() {
   return (
     <section id="stories" aria-labelledby="stories-title">
       <Container>
-        <div className="border-t border-line pb-16 pt-16 sm:pb-24 sm:pt-24">
-          <div className="mb-10 grid items-end gap-5 lg:grid-cols-2 lg:gap-12">
-            <div>
-              <Eyebrow>Building a new generation of Indians</Eyebrow>
-              <h2
-                id="stories-title"
-                className="max-w-[22ch] text-balance font-display text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-[1.08] tracking-[-0.022em]"
-              >
-                Weapons of intellect and physicality.
-              </h2>
-            </div>
-            <p className="max-w-[44ch] text-lg text-muted">
-              Real clients, in their own words. Swipe through each story, then watch them tell it.
-            </p>
-          </div>
+        <div className="pb-10 pt-6 sm:pb-16 sm:pt-10">
+          <h2
+            id="stories-title"
+            className="mb-8 max-w-[22ch] text-balance font-display text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-[1.08] tracking-[-0.022em] sm:mb-10"
+          >
+            Weapons of intellect and physicality.
+          </h2>
 
           <div
             ref={rowRef}
             role="tablist"
             aria-label="Client stories"
-            className="no-scrollbar -mx-4 flex scroll-mt-24 gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-x-4 sm:gap-y-3 sm:overflow-visible lg:grid-cols-6 sm:px-0"
+            className="no-scrollbar -mx-4 flex scroll-mt-24 gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-x-4 sm:gap-y-3 sm:overflow-visible sm:px-0 lg:grid-cols-6"
           >
             {stories.map((story, i) => {
               const selected = i === active;
@@ -357,24 +379,33 @@ export default function ClientStories() {
                     {story.name}
                   </span>
                   <span className="line-clamp-2 font-label text-[11px] uppercase leading-[1.5] tracking-[0.06em] text-muted">
-                    {story.role ?? ' '}
+                    {story.role ?? ' '}
                   </span>
                 </button>
               );
             })}
           </div>
 
-          {stories.map((story, i) => (
-            <div
-              key={story.slug}
-              role="tabpanel"
-              id={`story-panel-${story.slug}`}
-              aria-labelledby={`story-tab-${story.slug}`}
-              hidden={i !== active}
-            >
-              <StoryPanel story={story} active={i === active} next={stories[(i + 1) % count]} onNext={() => showNext(i)} />
-            </div>
-          ))}
+          <div
+            ref={trackRef}
+            onScroll={onTrackScroll}
+            className="no-scrollbar relative -mx-4 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain sm:-mx-6"
+          >
+            {stories.map((story, i) => (
+              <div
+                key={story.slug}
+                ref={(el) => {
+                  panelRefs.current[i] = el;
+                }}
+                role="tabpanel"
+                id={`story-panel-${story.slug}`}
+                aria-labelledby={`story-tab-${story.slug}`}
+                className="w-full flex-none snap-start snap-always px-4 pb-6 pt-6 sm:px-6 sm:pt-8"
+              >
+                <StoryPanel story={story} active={i === active} next={stories[(i + 1) % count]} onNext={() => showNext(i)} />
+              </div>
+            ))}
+          </div>
         </div>
       </Container>
     </section>
