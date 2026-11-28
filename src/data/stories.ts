@@ -1,5 +1,5 @@
 // Client stories on the homepage. Each one shows the client's testimonial video, their best result in
-// their own words, the objection they had before starting, and their Instagram carousel (their story).
+// their own words, their biggest worry before starting, and their Instagram carousel (their story).
 //
 // To add a client: put their files in public/stories/<slug>/ (01.webp, 02.webp ..., reel-poster.webp)
 // and add an entry below.
@@ -24,10 +24,9 @@ export interface ClientStory {
   role?: string;
   /** Their best result, in their own words. Shown big, right under the video. */
   headline: string;
-  /** The objection they had before starting, in their own voice, the way a prospect would say it.
-   *  Keep it to about two short lines. */
+  /** Their biggest worry before starting, in their own voice: the objection a prospect would raise on a call. */
   objection: string;
-  /** The small label above the objection. Leave it out for "Before starting". */
+  /** The small label above it. Leave it out for "<Name>’s biggest worry before starting". */
   objectionLabel?: string;
   slides: StorySlide[];
   reel: {
@@ -49,7 +48,7 @@ export const stories: ClientStory[] = [
     name: "Dev",
     role: "Software sales, Sydney",
     headline: "Food is no longer an escape. It’s liberating.",
-    objection: "“I’ve tried online coaching. I was just one more name on a list.”",
+    objection: "“I’d tried online coaches before. You get a plan, fifteen minutes a week to talk, and ‘why aren’t you following it?’ I was just one more name on a list.”",
     slides: [
       { src: media("dev", '01.webp'), alt: "“For years I gave in to every ‘eat, eat, have more’. It was so loud, I didn’t know I had a voice.”" },
       { src: media("dev", '02.webp'), alt: "“I was an athlete until I was 19. Nationals, the whole thing. Then for seven or eight years I forgot who that was.”" },
@@ -67,7 +66,7 @@ export const stories: ClientStory[] = [
     name: "Dinesh",
     role: "Consultant, Mumbai",
     headline: "My whole mental bandwidth is free now.",
-    objection: "“My schedule is too busy to stick to a strict plan.”",
+    objection: "“New job, new city, a new home to set up. Will I be able to sustain a strict plan with a schedule this busy?”",
     slides: [
       { src: media("dinesh", '01.webp'), alt: "“Fighting with myself over food, losing the battle, then feeling guilty after eating. This whole chain simply vanished.”" },
       { src: media("dinesh", '02.webp'), alt: "“The gym was the one thing I was doing half right. Once my new job started, even that became almost impossible.”" },
@@ -86,7 +85,7 @@ export const stories: ClientStory[] = [
     name: "Ashutosh",
     role: "AI engineer, Hamburg",
     headline: "I told my coach I hate pain. Three months later I was asking him for more.",
-    objection: "“I hate pain. And coaching is just a sales pitch.”",
+    objection: "“I hate pain. At work I go for the difficult things, but in fitness I could never push myself.”",
     slides: [
       { src: media("ashutosh", '01.webp'), alt: "“I was the smartest in the room, but never the fittest. That gap was bothering me a lot.”" },
       { src: media("ashutosh", '02.webp'), alt: "“I went for the difficult things at work. In fitness I could never challenge myself.”" },
@@ -104,7 +103,7 @@ export const stories: ClientStory[] = [
     name: "Aditi",
     role: "Marketing manager, Mumbai",
     headline: "I spend my calories on drinks and pizza, and I’m two sizes down.",
-    objection: "“I’ll have to give up the food I love, and I’ll quit after a few days anyway.”",
+    objection: "“Will I be deprived of my favourite food? And what if I lose control after a few days and quit, like I have before?”",
     slides: [
       { src: media("aditi", '01.webp'), alt: "“Calories are pocket money now. I spend them on drinks and pizza, and I’m two sizes down.”" },
       { src: media("aditi", '02.webp'), alt: "“Will I be deprived of my favourite food? And what if I lose control after a few days and quit, like I have before?”" },
@@ -119,7 +118,7 @@ export const stories: ClientStory[] = [
     name: "Vishwa",
     role: "Hospitality, the Maldives",
     headline: "30 days without a drink or a smoke. I still go to the same parties.",
-    objection: "“An online coach in another country can’t really help me.”",
+    objection: "“I only knew you from Instagram, and you were in another country. I doubted an online coach could really help me.”",
     slides: [
       { src: media("vishwa", '01.webp'), alt: "“30 days without a drink or a smoke. I’m leaner, stronger. I still go to the same parties. I stand there with a juice and feel like the hero of the scene.”" },
       { src: media("vishwa", '02.webp'), alt: "“Drink tonight, gym tomorrow, regret, repeat. I was stuck in that loop for years.”" },
@@ -134,7 +133,7 @@ export const stories: ClientStory[] = [
     name: "Soham",
     role: "Chief of staff, YC startup",
     headline: "I used to be 95 kgs. Now I am 76 kgs.",
-    objection: "“I travel and work 14-hour days. No routine survives that.”",
+    objection: "“Some days I travel, some days I work 14 or 15 hours straight, some days it’s back-to-back meetings. How do you build a routine around that?”",
     slides: [
       { src: media("soham", '01.webp'), alt: "“Being in the fittest form of my life has helped me showcase confidence I didn’t have before.”" },
       { src: media("soham", '02.webp'), alt: "“At the end of every day, my brain used to be absolutely fried.”" },
@@ -149,7 +148,7 @@ export const stories: ClientStory[] = [
     name: "Prabhat",
     role: "Product manager, Revolut",
     headline: "Everything that took mental bandwidth every day is now on autopilot.",
-    objection: "“It’s all a scam. This just can’t be done.”",
+    objection: "“I thought this was all a scam and just couldn’t be done. I’d tried before, and every time I gave up within a few weeks.”",
     slides: [
       { src: media("prabhat", '01.webp'), alt: "“In the last month and a half, I’ve literally been on autopilot mode.”" },
       { src: media("prabhat", '02.webp'), alt: "“After a few weeks, I used to just deviate from the streak and give it all up.”" },
@@ -164,7 +163,7 @@ export const stories: ClientStory[] = [
     name: "Ria",
     role: "Psychologist, Melbourne",
     headline: "I can enjoy all types of food and still feel alright.",
-    objection: "“I’d have to eat clean all the time to see any progress.”",
+    objection: "“Eat clean, binge, feel horrible, repeat. I felt stuck in that loop, and I thought I’d have to be a very good, clean-eating girl to see any progress.”",
     slides: [
       { src: media("ria", '01.webp'), alt: "“I can enjoy all types of food to an extent and still feel alright.”" },
       { src: media("ria", '02.webp'), alt: "“It was a very toxic relationship. I couldn’t eat a piece of cake and still feel good about myself.”" },
@@ -179,7 +178,7 @@ export const stories: ClientStory[] = [
     name: "Ojas",
     role: "Consultant, BCG, Mumbai",
     headline: "I added fitness to my life without having to subtract anything.",
-    objection: "“Getting fit means giving something up, and my career comes first.”",
+    objection: "“I always thought getting fit meant giving something else up. My career came first, so I expected I’d need something extremely radical.”",
     slides: [
       { src: media("ojas", '01.webp'), alt: "“I’ve been able to add fitness to my life without having to subtract anything.”" },
       { src: media("ojas", '02.webp'), alt: "“I expected I would have to do something extremely radical to see some progress.”" },
@@ -194,7 +193,7 @@ export const stories: ClientStory[] = [
     name: "Dhruv",
     role: "AI startup, San Francisco",
     headline: "From skinny fat to that 70, 72 kilo mark. Now I’ve started cutting again.",
-    objection: "“I’ve always been the skinny kid. It’s just my genes.”",
+    objection: "“I’d been trying to gain weight my whole life. I was the skinny kid, then skinny-fat, and nothing I tried ever stuck.”",
     slides: [
       { src: media("dhruv", '01.webp'), alt: "“The best piece of advice I recently got: you can just do things.”" },
       { src: media("dhruv", '02.webp'), alt: "“I was a super skinny kid for the longest time.”" },
@@ -209,7 +208,7 @@ export const stories: ClientStory[] = [
     name: "Sid",
     role: "Product manager, Mumbai",
     headline: "One month in, I’ve moved weights maybe 2x more than what I was doing.",
-    objection: "“I’ve tried before. I just can’t stick to anything.”",
+    objection: "“I’d started before, last year and the year before. My doubt was never whether the plan works. It was: will I be able to follow it?”",
     slides: [
       { src: media("sid", '01.webp'), alt: "“Honestly, we can still see a difference, which I’m also shocked at.”" },
       { src: media("sid", '02.webp'), alt: "“The food habit was like, whatever I’m getting, I’m eating that.”" },

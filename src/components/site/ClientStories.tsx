@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { BUNNY_LIBRARY_ID, RESULTS_INSTAGRAM_URL, stories } from '../../data/stories';
 import type { ClientStory } from '../../data/stories';
@@ -7,7 +7,7 @@ import { ArrowIcon, Container, PlayIcon, TextLink } from './ui';
 
 // Each client gets one panel: their testimonial video first, then their best result in their own words,
 // the objection they had before starting, and their Instagram carousel (their story, slide by slide).
-// The panels sit side by side: swiping moves the whole story, and the names row follows along.
+// The panels sit side by side: swiping moves the whole story, and the names row moves with it.
 
 function StoryCarousel({ story, active }: { story: ClientStory; active: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -232,7 +232,9 @@ function StoryPanel({
           &ldquo;{story.headline}&rdquo;
         </h3>
         <div className="border-l-2 border-accent pl-4">
-          <p className="font-label text-[11px] uppercase tracking-[0.08em] text-muted">{story.objectionLabel ?? 'Before starting'}</p>
+          <p className="font-label text-[11px] uppercase tracking-[0.08em] text-muted">
+            {story.objectionLabel ?? `${story.name}’s biggest worry before starting`}
+          </p>
           <p className="mt-1.5 max-w-[56ch] text-[15px] leading-[1.6] text-muted sm:text-base">{story.objection}</p>
         </div>
       </div>
@@ -269,22 +271,43 @@ export default function ClientStories() {
   const trackRef = useRef<HTMLDivElement>(null);
   // While a tap on a name scrolls the stories, the stories it passes on the way are not selected.
   const scrollingTo = useRef<number | null>(null);
-  const firstRender = useRef(true);
   const count = stories.length;
 
   useEffect(() => {
     activeRef.current = active;
     // Only the story on screen can be reached with the keyboard or a screen reader.
     panelRefs.current.forEach((panel, i) => panel?.toggleAttribute('inert', i !== active));
-    // Keep the active name in view inside the names row on phones, without moving the page.
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    const row = rowRef.current;
-    const tab = tabRefs.current[active];
-    if (row && tab) row.scrollTo({ left: tab.offsetLeft - 16, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   }, [active]);
+
+  // On phones the names row cannot be moved on its own: it slides together with the stories.
+  // As the stories move, the row moves with them, keeping the current name at the left edge.
+  const syncRow = useCallback(() => {
+    const track = trackRef.current;
+    const row = rowRef.current;
+    if (!track || !row || !track.clientWidth || row.scrollWidth <= row.clientWidth) return;
+    const position = Math.min(count - 1, Math.max(0, track.scrollLeft / track.clientWidth));
+    const i = Math.floor(position);
+    const from = tabRefs.current[i]?.offsetLeft ?? 0;
+    const to = tabRefs.current[Math.min(count - 1, i + 1)]?.offsetLeft ?? from;
+    row.scrollLeft = from + (to - from) * (position - i) - 16;
+  }, [count]);
+
+  const select = useCallback(
+    (i: number, focus = false) => {
+      const target = Math.min(count - 1, Math.max(0, i));
+      setActive(target);
+      const track = trackRef.current;
+      if (track) {
+        scrollingTo.current = target;
+        track.scrollTo({ left: target * track.clientWidth, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+        window.setTimeout(() => {
+          if (scrollingTo.current === target) scrollingTo.current = null;
+        }, 1000);
+      }
+      if (focus) tabRefs.current[target]?.focus();
+    },
+    [count],
+  );
 
   // Stay on the same story when the width changes, for example when a phone is turned.
   useEffect(() => {
@@ -292,35 +315,86 @@ export default function ClientStories() {
     if (!track || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(() => {
       track.scrollLeft = activeRef.current * track.clientWidth;
+      syncRow();
     });
     observer.observe(track);
     return () => observer.disconnect();
-  }, []);
+  }, [syncRow]);
 
-  // A swipe moves the whole story; the names row follows.
+  // A sideways swipe on the names row moves the stories (and so the names) under the finger.
+  // When the finger lifts, it settles on the next or previous story.
+  useEffect(() => {
+    const row = rowRef.current;
+    const track = trackRef.current;
+    if (!row || !track) return;
+    let drag: { x: number; y: number; left: number; step: number; axis: 'x' | 'y' | null } | null = null;
+    let swallowClick = false;
+    const onStart = (e: TouchEvent) => {
+      if (row.scrollWidth <= row.clientWidth || e.touches.length !== 1) return;
+      const i = activeRef.current;
+      const here = tabRefs.current[i]?.offsetLeft ?? 0;
+      const next = tabRefs.current[i < count - 1 ? i + 1 : i - 1]?.offsetLeft ?? here + 1;
+      drag = { x: e.touches[0].clientX, y: e.touches[0].clientY, left: track.scrollLeft, step: Math.max(1, Math.abs(next - here)), axis: null };
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!drag) return;
+      const dx = e.touches[0].clientX - drag.x;
+      const dy = e.touches[0].clientY - drag.y;
+      if (!drag.axis) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        drag.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        if (drag.axis === 'x') {
+          scrollingTo.current = null;
+          track.style.scrollSnapType = 'none';
+        }
+      }
+      if (drag.axis === 'x') track.scrollLeft = drag.left - (dx * track.clientWidth) / drag.step;
+    };
+    const onEnd = () => {
+      const done = drag;
+      drag = null;
+      if (!done || done.axis !== 'x') return;
+      track.style.scrollSnapType = '';
+      swallowClick = true;
+      window.setTimeout(() => {
+        swallowClick = false;
+      }, 400);
+      const from = Math.round(done.left / track.clientWidth);
+      const moved = (track.scrollLeft - done.left) / track.clientWidth;
+      select(Math.abs(moved) < 0.15 ? from : from + Math.sign(moved) * Math.max(1, Math.round(Math.abs(moved))));
+    };
+    // A swipe that ends on a name is not a tap on that name.
+    const onClick = (e: MouseEvent) => {
+      if (!swallowClick) return;
+      swallowClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    row.addEventListener('touchstart', onStart, { passive: true });
+    row.addEventListener('touchmove', onMove, { passive: true });
+    row.addEventListener('touchend', onEnd);
+    row.addEventListener('touchcancel', onEnd);
+    row.addEventListener('click', onClick, true);
+    return () => {
+      row.removeEventListener('touchstart', onStart);
+      row.removeEventListener('touchmove', onMove);
+      row.removeEventListener('touchend', onEnd);
+      row.removeEventListener('touchcancel', onEnd);
+      row.removeEventListener('click', onClick, true);
+    };
+  }, [count, select]);
+
+  // A swipe on the stories moves the whole story; the names row follows.
   const onTrackScroll = () => {
     const track = trackRef.current;
     if (!track || !track.clientWidth) return;
+    syncRow();
     const i = Math.min(count - 1, Math.max(0, Math.round(track.scrollLeft / track.clientWidth)));
     if (scrollingTo.current !== null) {
       if (i !== scrollingTo.current) return;
       scrollingTo.current = null;
     }
     if (i !== activeRef.current) setActive(i);
-  };
-
-  const select = (i: number, focus = false) => {
-    const target = (i + count) % count;
-    setActive(target);
-    const track = trackRef.current;
-    if (track) {
-      scrollingTo.current = target;
-      track.scrollTo({ left: target * track.clientWidth, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
-      window.setTimeout(() => {
-        if (scrollingTo.current === target) scrollingTo.current = null;
-      }, 1000);
-    }
-    if (focus) tabRefs.current[target]?.focus();
   };
 
   const onTabKeyDown = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
@@ -332,7 +406,7 @@ export default function ClientStories() {
   };
 
   const showNext = (i: number) => {
-    select(i + 1);
+    select((i + 1) % count);
     rowRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
   };
 
@@ -351,7 +425,7 @@ export default function ClientStories() {
             ref={rowRef}
             role="tablist"
             aria-label="Client stories"
-            className="no-scrollbar -mx-4 flex scroll-mt-24 gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-x-4 sm:gap-y-3 sm:overflow-visible sm:px-0 lg:grid-cols-6"
+            className="no-scrollbar relative -mx-4 flex touch-pan-y touch-pinch-zoom scroll-mt-24 gap-3 overflow-x-hidden px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-x-4 sm:gap-y-3 sm:overflow-visible sm:px-0 lg:grid-cols-6"
           >
             {stories.map((story, i) => {
               const selected = i === active;
