@@ -6,7 +6,7 @@ import { pauseOtherVideos, prefersReducedMotion } from '../../lib/media';
 import { ArrowIcon, Container, PlayIcon, TextLink } from './ui';
 
 // Each client gets one panel: their testimonial video first, then their best result in their own words,
-// what worried them most before starting, and their Instagram carousel (their story, slide by slide).
+// the objection they had before starting, and their Instagram carousel (their story, slide by slide).
 // The panels sit side by side: swiping moves the whole story, and the names row follows along.
 
 function StoryCarousel({ story, active }: { story: ClientStory; active: boolean }) {
@@ -222,7 +222,7 @@ function StoryPanel({
   next: ClientStory;
   onNext: () => void;
 }) {
-  // Phones: one column (video, result, worry, carousel, links). Desktop: the carousel moves to a right column.
+  // Phones: one column (video, result, objection, carousel, links). Desktop: the carousel moves to a right column.
   return (
     <article className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)] lg:grid-rows-[auto_auto_1fr] lg:gap-x-12">
       <StoryReel story={story} active={active} />
@@ -232,10 +232,8 @@ function StoryPanel({
           &ldquo;{story.headline}&rdquo;
         </h3>
         <div className="border-l-2 border-accent pl-4">
-          <p className="font-label text-[11px] uppercase tracking-[0.08em] text-muted">
-            {story.worryLabel ?? 'Biggest worry before starting'}
-          </p>
-          <p className="mt-1.5 max-w-[56ch] text-[15px] leading-[1.6] text-muted sm:text-base">{story.worry}</p>
+          <p className="font-label text-[11px] uppercase tracking-[0.08em] text-muted">{story.objectionLabel ?? 'Before starting'}</p>
+          <p className="mt-1.5 max-w-[56ch] text-[15px] leading-[1.6] text-muted sm:text-base">{story.objection}</p>
         </div>
       </div>
 
